@@ -72,13 +72,13 @@ button:active{transform:scale(.98)}
 .ex{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
 .ex:last-child{border-bottom:none}
 .ex input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent);margin-top:2px;flex:none}
-.ex .grow{flex:1}
+.ex .grow{flex:1;min-width:0}
 .ex .name{font-weight:600}
 .ex.done .name{color:var(--muted);text-decoration:line-through}
 .ex .target{color:var(--muted);font-size:13px;margin-bottom:6px}
 .ex input[type=text]{padding:8px 10px;font-size:14px}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.week div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 2px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer}
+.week div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 2px;text-align:center;font-size:11px;color:var(--muted);cursor:pointer;overflow:hidden}
 .week div b{display:block;color:var(--text);font-size:12px}
 .week div.today{border-color:var(--accent)}
 .week div.sel{background:rgba(34,197,94,.15)}
@@ -95,6 +95,26 @@ nav.tabs button.active{color:var(--accent)}
 details summary{cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0}
 .presetedit{display:grid;grid-template-columns:1fr 70px 60px 34px;gap:6px;margin-bottom:6px;align-items:center}
 .presetedit input{padding:8px;font-size:13px}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.toolbar button{flex:1 1 auto}
+.ex .topline{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.ex .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ex .cue{color:var(--muted);font-size:12.5px;margin:2px 0 6px}
+a.howto{color:var(--accent2);font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;flex:none}
+a.howto:active{opacity:.75}
+.chip.sel{background:rgba(34,197,94,.15);border-color:var(--accent);color:var(--text)}
+.week div.hascustom{box-shadow:inset 0 3px 0 var(--accent2)}
+.libgroup h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 0;font-weight:600}
+.libitem{display:flex;gap:8px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.libitem:last-child{border-bottom:none}
+.libitem .grow{flex:1;min-width:0}
+.libitem .name{font-weight:600}
+.badge{display:inline-block;margin-left:6px;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent2);vertical-align:middle}
+.modalback{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.55);display:none;align-items:flex-end;justify-content:center}
+.modalbox{background:var(--card);border:1px solid var(--line);border-radius:18px 18px 0 0;width:100%;max-width:560px;max-height:min(86vh,720px);overflow:auto;padding:14px 14px calc(16px + var(--safe-b))}
+.modalbox h2{font-size:16px;margin:0;text-transform:none;letter-spacing:0;color:var(--text);font-weight:700}
+.pickhit{display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:10px 2px}
+.pickhit .meta{color:var(--muted);font-size:12.5px;font-weight:500;white-space:normal}
 </style>
 </head>
 <body>
@@ -178,21 +198,81 @@ details summary{cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0}
 
 <!-- ============ WORKOUT ============ -->
 <section class="page" id="page-workout">
-  <div class="card">
-    <h2>This week</h2>
-    <div class="week" id="weekStrip"></div>
-  </div>
-  <div class="card">
-    <div class="row" style="justify-content:space-between;margin-bottom:4px">
-      <div>
-        <div style="font-size:18px;font-weight:700" id="woTitle"></div>
-        <div class="note" id="woDate"></div>
-      </div>
-      <span class="pill" id="woStatus"></span>
+  <div id="woHome">
+    <div class="toolbar">
+      <button class="sm" id="btnLibrary">Exercise library</button>
+      <button class="sm" id="btnNewWo">+ Custom workout</button>
     </div>
-    <div id="woList"></div>
-    <div class="field" style="margin-top:10px"><label class="f">Notes</label><input id="woNotes" placeholder="How did it feel? Anything to change next time?"></div>
-    <button class="primary full" id="woDoneBtn"></button>
+    <div class="card">
+      <h2>This week</h2>
+      <div class="week" id="weekStrip"></div>
+    </div>
+    <div class="card" id="planCard">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px">
+        <div style="min-width:0">
+          <div style="font-size:18px;font-weight:700" id="woTitle"></div>
+          <div class="note" id="woDate"></div>
+        </div>
+        <span class="pill" id="woStatus"></span>
+      </div>
+      <div id="planEditFields" style="display:none">
+        <div class="row">
+          <div class="field"><label class="f">Day name</label><input id="planTitle" maxlength="40"></div>
+          <div class="field" style="max-width:110px"><label class="f">Short</label><input id="planShort" maxlength="8"></div>
+        </div>
+        <div class="note" style="margin-bottom:6px">Add or remove exercises for this weekday. Short is the label on the week strip.</div>
+      </div>
+      <div id="woList"></div>
+      <div class="toolbar" style="margin-top:10px;margin-bottom:0">
+        <button class="sm" id="planEditBtn">Edit exercises</button>
+        <button class="sm" id="planAddBtn" style="display:none">+ Add exercise</button>
+      </div>
+      <div class="field" style="margin-top:10px" id="woNotesWrap"><label class="f">Notes</label><input id="woNotes" placeholder="How did it feel? Anything to change next time?"></div>
+      <button class="primary full" id="woDoneBtn"></button>
+    </div>
+    <div id="customScheduled"></div>
+    <div id="customUnscheduled"></div>
+    <button class="full" id="btnResetPlan">Reset to default plan</button>
+  </div>
+
+  <div id="woLibrary" style="display:none">
+    <div class="toolbar">
+      <button class="sm" id="libBack">‹ Back</button>
+    </div>
+    <div class="card">
+      <h2>Add your own</h2>
+      <div class="field"><label class="f">Name</label><input id="libName" placeholder="e.g. Zercher squat" maxlength="80"></div>
+      <div class="field"><label class="f">Muscle group</label><select id="libGroup"></select></div>
+      <div class="field"><label class="f">How-to cue (optional)</label><input id="libCue" placeholder="Short form reminder" maxlength="180"></div>
+      <div class="field"><label class="f">Video URL (optional)</label><input id="libVideo" placeholder="https://…  — blank uses a YouTube search" inputmode="url"></div>
+      <button class="primary full" id="libAdd">Add to library</button>
+    </div>
+    <div class="card">
+      <h2>Exercises</h2>
+      <div class="field"><input id="libSearch" placeholder="Search by name, cue, or muscle group" autocomplete="off"></div>
+      <div class="chips" id="libGroups" style="margin-bottom:4px"></div>
+      <div id="libList"></div>
+    </div>
+  </div>
+
+  <div id="woEditor" style="display:none">
+    <div class="toolbar">
+      <button class="sm" id="edCancel">Cancel</button>
+      <button class="sm primary" id="edSave">Save workout</button>
+    </div>
+    <div class="card">
+      <h2 id="edHeading">New workout</h2>
+      <div class="field"><label class="f">Name</label><input id="edName" placeholder="e.g. Arm day" maxlength="60"></div>
+      <div class="field">
+        <label class="f">Weekdays</label>
+        <div class="chips" id="edDays"></div>
+        <div class="note" id="edDaysNote" style="margin-top:6px"></div>
+      </div>
+      <h2 style="margin-top:4px">Exercises</h2>
+      <div id="edList"></div>
+      <button class="sm" id="edAdd" style="margin-top:8px">+ Add exercise</button>
+    </div>
+    <button class="danger full" id="edDelete" style="display:none">Delete workout</button>
   </div>
 </section>
 
@@ -260,6 +340,41 @@ details summary{cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0}
   <button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
 </nav>
 <div class="toast" id="toast"></div>
+<div class="modalback" id="picker" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+  <div class="modalbox">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px">
+      <h2 id="pickerTitle">Add exercise</h2>
+      <button class="sm ghost" id="pickerClose">Close</button>
+    </div>
+    <div id="pickerBrowse">
+      <div class="field"><input id="pickerSearch" placeholder="Search the library" autocomplete="off"></div>
+      <div class="chips" id="pickerGroups" style="margin-bottom:6px"></div>
+      <div id="pickerResults"></div>
+      <button class="full" id="pickerToLib" style="margin-top:10px">Add a new exercise to the library</button>
+    </div>
+    <div id="pickerTarget" style="display:none">
+      <div style="font-weight:700;margin-bottom:4px" id="pickerExName"></div>
+      <div class="note" id="pickerExCue" style="margin-bottom:8px"></div>
+      <div class="chips" id="pickerKind" style="margin-bottom:10px">
+        <button type="button" class="chip sel" data-kind="reps">Sets &amp; reps</button>
+        <button type="button" class="chip" data-kind="time">Time</button>
+      </div>
+      <div id="pickerReps">
+        <div class="row">
+          <div class="field"><label class="f">Sets</label><input id="pkSets" inputmode="numeric" value="3"></div>
+          <div class="field"><label class="f">Reps</label><input id="pkReps" value="10" placeholder="10 or 10 per leg"></div>
+        </div>
+      </div>
+      <div id="pickerTime" style="display:none">
+        <div class="field"><label class="f">Time</label><input id="pkTime" placeholder="e.g. 30 min or 3 × 30 s"></div>
+      </div>
+      <div class="row">
+        <button type="button" class="sm" id="pickerBack">Back</button>
+        <button type="button" class="primary" id="pickerAdd" style="flex:1">Add to workout</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 (function(){
@@ -301,12 +416,190 @@ const PLAN = {
   0:{title:"Long Walk", short:"Walk", exercises:[{name:"Long walk", target:"Go long & easy"}]}
 };
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const DAY_ORDER = [1,2,3,4,5,6,0]; // Monday-first, matches the week strip
 const MEAL_TYPES = ["breakfast","lunch","snack","dinner"];
+const GROUPS = [
+  ["chest","Chest"],["back","Back"],["shoulders","Shoulders"],["arms","Arms"],
+  ["legs","Legs"],["glutes","Glutes"],["core","Core"],["cardio","Cardio"],["full","Full body"]
+];
+const GROUP_IDS = GROUPS.map(g=>g[0]);
+function groupLabel(id){ const g=GROUPS.find(x=>x[0]===id); return g?g[1]:""; }
+
+/* Built-in how-tos. Every name used by PLAN is included. */
+const LIBRARY = [
+  {name:"Bench press / Push-ups", group:"chest", cue:"Brace your core and keep shoulders down. Lower until elbows are near 90°, then press back up."},
+  {name:"Bench press", group:"chest", cue:"Feet planted, slight arch, bar to mid-chest, press up over the shoulders."},
+  {name:"Push-ups", group:"chest", cue:"Hands under shoulders, body in a straight line, chest toward the floor, then press up."},
+  {name:"Incline dumbbell press", group:"chest", cue:"Bench at a shallow incline, dumbbells from chest height to arms extended over shoulders."},
+  {name:"Chest fly", group:"chest", cue:"Soft elbows, open wide until a chest stretch, then squeeze back together."},
+  {name:"Cable crossover", group:"chest", cue:"Slight forward lean, sweep hands together in an arc and squeeze the chest."},
+  {name:"Dips", group:"chest", cue:"Lean slightly forward, lower until shoulders are below elbows, then press up."},
+  {name:"Rows", group:"back", cue:"Flat back, pull elbows toward your hips, squeeze shoulder blades, lower with control."},
+  {name:"Dumbbell rows", group:"back", cue:"Support yourself, pull the dumbbell to your hip, keep your torso still."},
+  {name:"Lat pulldown", group:"back", cue:"Lean back slightly, pull the bar to your upper chest, elbows down and in."},
+  {name:"Pull-ups", group:"back", cue:"Dead hang, pull chest toward the bar, lower until arms are straight."},
+  {name:"Seated cable row", group:"back", cue:"Sit tall, pull the handle to your ribs, pause, then reach back under control."},
+  {name:"Face pulls", group:"back", cue:"Pull the rope toward your face, hands apart, squeeze the rear shoulders."},
+  {name:"Bent-over barbell row", group:"back", cue:"Hinge to a flat back, pull the bar to your lower ribs, don't yank with the lower back."},
+  {name:"Deadlift", group:"back", cue:"Bar over mid-foot, brace, push the floor away, and stand tall with the bar close."},
+  {name:"Shoulder press", group:"shoulders", cue:"Brace your core, press the weight overhead without shrugging, lower to chin level."},
+  {name:"Overhead press", group:"shoulders", cue:"Squeeze glutes, bar from shoulders to lockout over mid-foot, head through at the top."},
+  {name:"Lateral raise", group:"shoulders", cue:"Soft elbows, raise dumbbells out to shoulder height, lower slowly."},
+  {name:"Front raise", group:"shoulders", cue:"Lift the weight in front to shoulder height with a slight bend in the elbows."},
+  {name:"Rear delt fly", group:"shoulders", cue:"Hinge forward, raise arms out to the side, squeeze between the shoulder blades."},
+  {name:"Arnold press", group:"shoulders", cue:"Start palms facing you, rotate as you press overhead, reverse on the way down."},
+  {name:"Bicep curls", group:"arms", cue:"Elbows pinned to your sides, curl up without swinging, lower fully."},
+  {name:"Hammer curls", group:"arms", cue:"Palms face each other, curl without letting elbows drift forward."},
+  {name:"Tricep pushdown", group:"arms", cue:"Elbows at your sides, straighten the arms, squeeze, then return under control."},
+  {name:"Overhead tricep extension", group:"arms", cue:"Keep upper arms by your ears, bend only the elbows, then extend."},
+  {name:"Skull crushers", group:"arms", cue:"Lower the weight toward your forehead with elbows still, then extend."},
+  {name:"Chin-ups", group:"arms", cue:"Palms toward you, pull until your chin clears the bar, lower under control."},
+  {name:"Squats", group:"legs", cue:"Feet about shoulder width, sit hips back and down, knees track over toes, stand tall."},
+  {name:"Goblet squats", group:"legs", cue:"Hold the weight at your chest, elbows inside knees at the bottom, stand up tall."},
+  {name:"Romanian deadlifts", group:"legs", cue:"Soft knees, hinge at the hips with a flat back, feel the hamstrings, then stand."},
+  {name:"Lunges", group:"legs", cue:"Step out, drop the back knee toward the floor, front knee stays over the ankle."},
+  {name:"Leg press", group:"legs", cue:"Feet mid-plate, lower until hips and knees are comfortable, press without locking hard."},
+  {name:"Leg curl", group:"legs", cue:"Curl heels toward your glutes, pause, and lower without letting the stack slam."},
+  {name:"Calf raises", group:"legs", cue:"Rise onto the balls of your feet, pause at the top, lower heels slowly."},
+  {name:"Bulgarian split squat", group:"legs", cue:"Rear foot elevated, drop straight down, keep your front heel planted."},
+  {name:"Step-ups", group:"legs", cue:"Whole foot on the step, drive through the heel, don't push off the back leg."},
+  {name:"Glute bridges", group:"glutes", cue:"Ribs down, drive through heels, squeeze glutes at the top, don't overarch."},
+  {name:"Hip thrust", group:"glutes", cue:"Shoulders on a bench, chin tucked, thrust until hips are level, squeeze."},
+  {name:"Cable glute kickback", group:"glutes", cue:"Slight lean, kick the heel back, squeeze, and don't swing the leg."},
+  {name:"Donkey kicks", group:"glutes", cue:"On all fours, lift one heel toward the ceiling with the knee bent, hips square."},
+  {name:"Plank", group:"core", cue:"Forearms down, squeeze glutes, keep a straight line from head to heels, don't sag."},
+  {name:"Crunches", group:"core", cue:"Lift shoulder blades off the floor, ribs toward hips, don't yank the neck."},
+  {name:"Dead bug", group:"core", cue:"Low back pressed down, opposite arm and leg reach, move slowly."},
+  {name:"Russian twists", group:"core", cue:"Lean back slightly, rotate the ribcage side to side, hips stay quiet."},
+  {name:"Hanging leg raise", group:"core", cue:"Hang tall, tilt the pelvis, lift knees or legs without swinging."},
+  {name:"Bird dog", group:"core", cue:"Reach opposite arm and leg, hips stay level, pause, then switch."},
+  {name:"Bicycle crunches", group:"core", cue:"Rotate elbow toward opposite knee, extend the other leg, slow and controlled."},
+  {name:"Incline walk", group:"cardio", cue:"Light grip on the rails if you need them, short steps, steady breathing, easy pace."},
+  {name:"Long walk", group:"cardio", cue:"Relaxed posture, comfortable pace you could keep up for a long time."},
+  {name:"Running", group:"cardio", cue:"Upright posture, quick light steps, land under your hips, breathe steadily."},
+  {name:"Cycling", group:"cardio", cue:"Seat about hip height, smooth circles, easy resistance you can hold with good form."},
+  {name:"Jump rope", group:"cardio", cue:"Small jumps, elbows close, wrists turn the rope, stay on the balls of your feet."},
+  {name:"Rowing machine", group:"cardio", cue:"Legs, then hips, then arms on the pull. Arms, hips, then legs on the way back."},
+  {name:"Kettlebell swings", group:"full", cue:"Hinge and snap the hips, arms stay relaxed, bell floats to chest or eye height."},
+  {name:"Thrusters", group:"full", cue:"Squat with weights at your shoulders, then drive straight into an overhead press."},
+  {name:"Burpees", group:"full", cue:"Chest to the floor, hop or step in, stand, and add a small jump if you want."},
+  {name:"Mountain climbers", group:"full", cue:"Plank position, drive knees in one at a time, hips stay as level as you can."},
+  {name:"Clean and press", group:"full", cue:"Pull the weight in close, catch at the shoulders, then press overhead."}
+];
 
 /* ---------- State ---------- */
+function nid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function dowFromYmd(s){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(s||"")) return null;
+  const [y,m,d]=s.split("-").map(Number);
+  return new Date(y,m-1,d).getDay();
+}
+function inferKind(e){
+  const t=((e&&e.target)||"")+" "+((e&&e.name)||"");
+  return /min|sec|\d+\s*s\b|\bwalk\b|\bhold\b|plank/i.test(t) ? "time" : "reps";
+}
+function cleanExEntry(val){
+  if(!val || typeof val!=="object") return {checked:false, log:""};
+  return {checked:!!val.checked, log:val.log?String(val.log):""};
+}
+function migrateWorkoutLogs(workouts){
+  const out={};
+  if(!workouts || typeof workouts!=="object") return out;
+  for(const date of Object.keys(workouts)){
+    const w=workouts[date];
+    if(!w || typeof w!=="object") continue;
+    const src=(w.exercises && typeof w.exercises==="object" && !Array.isArray(w.exercises))?w.exercises:{};
+    const exercises={};
+    const dow=dowFromYmd(date);
+    for(const k of Object.keys(src)){
+      if(/^\d+$/.test(k)) continue;
+      exercises[k]=cleanExEntry(src[k]);
+    }
+    if(dow!=null){
+      for(const k of Object.keys(src)){
+        if(!/^\d+$/.test(k)) continue;
+        const id="def-"+dow+"-"+k;
+        if(!exercises[id]) exercises[id]=cleanExEntry(src[k]);
+      }
+    }
+    out[date]={done:!!w.done, exercises, notes:w.notes?String(w.notes):""};
+  }
+  return out;
+}
+function normalizePlan(plan){
+  if(!plan || typeof plan!=="object" || Array.isArray(plan)) return null;
+  const out={};
+  let any=false;
+  for(let i=0;i<7;i++){
+    const src=plan[i]!=null?plan[i]:plan[String(i)];
+    const base=PLAN[i];
+    if(!src || typeof src!=="object"){
+      out[i]={title:base.title, short:base.short, rest:!!base.rest, note:base.note||"", exercises:base.exercises.map((e,idx)=>({id:"def-"+i+"-"+idx, name:e.name, target:e.target, kind:inferKind(e)}))};
+      continue;
+    }
+    any=true;
+    const exercises=Array.isArray(src.exercises)?src.exercises.map((e,idx)=>{
+      if(!e || typeof e!=="object" || !String(e.name||"").trim()) return null;
+      return {id:String(e.id||("def-"+i+"-"+idx)), name:String(e.name).trim(), target:String(e.target||""), kind:e.kind==="time"?"time":"reps"};
+    }).filter(Boolean):[];
+    out[i]={
+      title:String(src.title||base.title).trim()||base.title,
+      short:String(src.short||base.short).trim().slice(0,8)||base.short,
+      rest:!!src.rest && exercises.length===0,
+      note:src.note?String(src.note):"",
+      exercises
+    };
+  }
+  return any?out:null;
+}
+function normalizeCustomWorkouts(list){
+  if(!Array.isArray(list)) return [];
+  return list.map(w=>{
+    if(!w || typeof w!=="object") return null;
+    const name=String(w.name||"").trim();
+    if(!name) return null;
+    const days=Array.isArray(w.days)?[...new Set(w.days.map(Number).filter(n=>n>=0&&n<=6))]:[];
+    const exercises=Array.isArray(w.exercises)?w.exercises.map(e=>{
+      if(!e || typeof e!=="object" || !String(e.name||"").trim()) return null;
+      return {id:String(e.id||nid()), name:String(e.name).trim(), target:String(e.target||""), kind:e.kind==="time"?"time":"reps"};
+    }).filter(Boolean):[];
+    return {id:String(w.id||nid()), name, days, exercises};
+  }).filter(Boolean);
+}
+function normalizeCustomExercises(list){
+  if(!Array.isArray(list)) return [];
+  return list.map(e=>{
+    if(!e || typeof e!=="object") return null;
+    const name=String(e.name||"").trim();
+    if(!name) return null;
+    const group=GROUP_IDS.includes(e.group)?e.group:"full";
+    const video=e.video?String(e.video):"";
+    return {id:String(e.id||nid()), name, group, cue:e.cue?String(e.cue):"", video};
+  }).filter(Boolean);
+}
+function normalizeCustomLogs(logs){
+  const out={};
+  if(!logs || typeof logs!=="object") return out;
+  for(const date of Object.keys(logs)){
+    const day=logs[date];
+    if(!day || typeof day!=="object") continue;
+    const bucket={};
+    for(const id of Object.keys(day)){
+      const w=day[id];
+      if(!w || typeof w!=="object") continue;
+      const exercises={};
+      const src=(w.exercises && typeof w.exercises==="object")?w.exercises:{};
+      for(const k of Object.keys(src)) exercises[k]=cleanExEntry(src[k]);
+      bucket[id]={done:!!w.done, exercises, notes:w.notes?String(w.notes):""};
+    }
+    out[date]=bucket;
+  }
+  return out;
+}
 function blankState(){
-  return {version:1, settings:{calTarget:null, proteinTarget:null, goalWeight:null},
-    presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], weights:[], steps:{}, workouts:{}};
+  return {version:2, settings:{calTarget:null, proteinTarget:null, goalWeight:null},
+    presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], weights:[], steps:{}, workouts:{},
+    plan:null, customWorkouts:[], customExercises:[], customLogs:{}};
 }
 function load(){
   try{
@@ -319,13 +612,17 @@ function normalize(d){
   const b = blankState();
   if(!d || typeof d!=="object") return b;
   return {
-    version:1,
+    version:2,
     settings:Object.assign(b.settings, d.settings||{}),
     presets:Array.isArray(d.presets)&&d.presets.length ? d.presets : b.presets,
     meals:Array.isArray(d.meals)?d.meals:[],
     weights:Array.isArray(d.weights)?d.weights:[],
     steps:(d.steps&&typeof d.steps==="object")?d.steps:{},
-    workouts:(d.workouts&&typeof d.workouts==="object")?d.workouts:{}
+    workouts:migrateWorkoutLogs(d.workouts),
+    plan:normalizePlan(d.plan),
+    customWorkouts:normalizeCustomWorkouts(d.customWorkouts),
+    customExercises:normalizeCustomExercises(d.customExercises),
+    customLogs:normalizeCustomLogs(d.customLogs)
   };
 }
 let S = load();
@@ -349,13 +646,51 @@ function mealsOn(date){ return S.meals.filter(m=>m.date===date); }
 function totals(date){ return mealsOn(date).reduce((a,m)=>({cal:a.cal+(+m.cal||0), protein:a.protein+(+m.protein||0)}),{cal:0,protein:0}); }
 function sortedWeights(){ return [...S.weights].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0); }
 function woEntry(date){ return S.workouts[date] || {done:false, exercises:{}, notes:""}; }
-function planFor(date){ return PLAN[parseYmd(date).getDay()]; }
+function planDay(dow){
+  const src=(S.plan && (S.plan[dow]||S.plan[String(dow)])) || PLAN[dow];
+  const exercises=(src.exercises||[]).map((e,i)=>({
+    id:e.id||("def-"+dow+"-"+i),
+    name:e.name,
+    target:e.target||"",
+    kind:e.kind||inferKind(e)
+  }));
+  return {dow, title:src.title, short:src.short, rest:!!src.rest && exercises.length===0, note:src.note||"", exercises};
+}
+function planFor(date){ return planDay(parseYmd(date).getDay()); }
+function exState(w, id){ return (w && w.exercises && w.exercises[id]) || {}; }
 function isWoDone(date){
   const p=planFor(date), w=S.workouts[date];
   if(p.rest) return true;
   if(!w) return false;
   if(w.done) return true;
-  return p.exercises.length>0 && p.exercises.every((_,i)=>w.exercises[i]&&w.exercises[i].checked);
+  return p.exercises.length>0 && p.exercises.every(ex=>exState(w, ex.id).checked);
+}
+function scheduledCustoms(date){
+  const dow=parseYmd(date).getDay();
+  return (S.customWorkouts||[]).filter(w=>(w.days||[]).indexOf(dow)>=0);
+}
+function unscheduledCustoms(){ return (S.customWorkouts||[]).filter(w=>!w.days||!w.days.length); }
+function customEntry(date, id){
+  const day=S.customLogs && S.customLogs[date];
+  return (day && day[id]) || {done:false, exercises:{}, notes:""};
+}
+function isCustomDone(date, wo){
+  const w=S.customLogs && S.customLogs[date] && S.customLogs[date][wo.id];
+  if(!w) return false;
+  if(w.done) return true;
+  return wo.exercises.length>0 && wo.exercises.every(ex=>w.exercises[ex.id]&&w.exercises[ex.id].checked);
+}
+function dayLogged(date){
+  const p=planFor(date), customs=scheduledCustoms(date);
+  if(p.rest && !customs.length) return false;
+  const planOk=p.rest || isWoDone(date);
+  return planOk && customs.every(c=>isCustomDone(date, c));
+}
+function customProgress(date, c){
+  const w=customEntry(date, c.id);
+  const n=c.exercises.length;
+  const k=c.exercises.filter(ex=>w.exercises[ex.id]&&w.exercises[ex.id].checked).length;
+  return c.name+" "+k+"/"+n;
 }
 
 /* ---------- Navigation ---------- */
@@ -387,10 +722,21 @@ function renderToday(){
   $("dPro").textContent = r1(tot.protein)+"g";
   setBar("dProBar","dProSub", tot.protein, st.proteinTarget, "g", false);
 
-  const p = planFor(t), done = isWoDone(t);
-  $("dWo").innerHTML = p.rest ? "Rest day" : (done ? '<span class="hl">Done ✓</span>' : "Not yet");
-  const w = S.workouts[t]; const checked = w? Object.values(w.exercises).filter(e=>e.checked).length : 0;
-  $("dWoSub").textContent = p.rest ? "Recover & stretch" : `${p.title} · ${checked}/${p.exercises.length}`;
+  const p = planFor(t), done = isWoDone(t), customs = scheduledCustoms(t);
+  const w = S.workouts[t];
+  const checked = w ? p.exercises.filter(ex=>exState(w, ex.id).checked).length : 0;
+  if(p.rest && !customs.length){
+    $("dWo").textContent = "Rest day";
+    $("dWoSub").textContent = "Recover & stretch";
+  } else if(p.rest){
+    const all = customs.every(c=>isCustomDone(t,c));
+    $("dWo").innerHTML = all ? '<span class="hl">Done ✓</span>' : "Not yet";
+    $("dWoSub").textContent = customs.map(c=>customProgress(t,c)).join(" · ");
+  } else {
+    $("dWo").innerHTML = done ? '<span class="hl">Done ✓</span>' : "Not yet";
+    const extra = customs.length ? " · "+customs.map(c=>customProgress(t,c)).join(", ") : "";
+    $("dWoSub").textContent = `${p.title} · ${checked}/${p.exercises.length}${extra}`;
+  }
 
   const ws = sortedWeights();
   if(ws.length){
@@ -463,17 +809,92 @@ $("fAdd").onclick = () => {
 
 /* ---------- Workout ---------- */
 let woDate = todayStr();
+let woView = "home"; // home | library | editor
+let returnView = "home";
+let planEditing = false;
+let editorDraft = null;
+let libGroup = "all";
+let pickGroup = "all";
+let pickMode = null; // "plan" | "editor"
+let pickedItem = null;
+
 function weekDates(){
   const t=parseYmd(todayStr()); const dow=(t.getDay()+6)%7; // Monday-start
   const mon=new Date(t); mon.setDate(t.getDate()-dow);
   return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return ymd(d); });
 }
+function allExercises(){
+  return LIBRARY.map(e=>({name:e.name, group:e.group, cue:e.cue||"", video:"", custom:false}))
+    .concat((S.customExercises||[]).map(e=>({name:e.name, group:e.group, cue:e.cue||"", video:e.video||"", custom:true, id:e.id})));
+}
+function findExercise(name){
+  const n=String(name||"").trim().toLowerCase();
+  if(!n) return null;
+  const all=allExercises();
+  return all.find(e=>e.custom && e.name.toLowerCase()===n) || all.find(e=>e.name.toLowerCase()===n) || null;
+}
+function safeUrl(u){
+  try{
+    const url=new URL(String(u||"").trim());
+    if(url.protocol==="http:"||url.protocol==="https:") return url.href;
+  }catch(e){}
+  return "";
+}
+function watchUrl(name){
+  const hit=findExercise(name);
+  if(hit && hit.video){ const u=safeUrl(hit.video); if(u) return u; }
+  const q="how to do "+String(name||"").trim().toLowerCase()+" proper form";
+  return "https://www.youtube.com/results?search_query="+encodeURIComponent(q).replace(/%20/g,"+");
+}
+function howtoLink(name){
+  return `<a class="howto" href="${esc(watchUrl(name))}" target="_blank" rel="noopener noreferrer">▶ Watch how</a>`;
+}
+function logPlaceholder(n){
+  return /walk/i.test(n) ? "Time / distance / incline (e.g. 35 min, 12% @ 3.0)" : /plank/i.test(n) ? "Hold times (e.g. 30, 30, 25 s)" : "Weight × reps (e.g. 135 lb × 10,10,8)";
+}
+function exerciseLogHtml(ex, state, token){
+  return `<div class="ex ${state.checked?"done":""}"><input type="checkbox" data-chk="${esc(token)}" ${state.checked?"checked":""} aria-label="Done: ${esc(ex.name)}"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div>${howtoLink(ex.name)}</div><div class="target">${esc(ex.target||"")}</div><input type="text" data-log="${esc(token)}" value="${esc(state.log||"")}" placeholder="${esc(logPlaceholder(ex.name))}"></div></div>`;
+}
+function ensurePlan(){
+  if(S.plan) return S.plan;
+  const plan={};
+  for(let i=0;i<7;i++){
+    const base=PLAN[i];
+    plan[i]={
+      title:base.title, short:base.short, rest:!!base.rest, note:base.note||"",
+      exercises:base.exercises.map((e,idx)=>({id:"def-"+i+"-"+idx, name:e.name, target:e.target, kind:inferKind(e)}))
+    };
+  }
+  S.plan=plan;
+  return plan;
+}
+function ensureWo(date){ if(!S.workouts[date]) S.workouts[date]={done:false, exercises:{}, notes:""}; return S.workouts[date]; }
+function ensureCustom(date, id){
+  if(!S.customLogs[date]) S.customLogs[date]={};
+  if(!S.customLogs[date][id]) S.customLogs[date][id]={done:false, exercises:{}, notes:""};
+  return S.customLogs[date][id];
+}
+function patchEx(bucket, id, patch){
+  bucket.exercises[id]=Object.assign(bucket.exercises[id]||{checked:false, log:""}, patch);
+}
+function showWoViews(){
+  $("woHome").style.display = woView==="home"?"":"none";
+  $("woLibrary").style.display = woView==="library"?"":"none";
+  $("woEditor").style.display = woView==="editor"?"":"none";
+}
 function renderWorkout(){
+  showWoViews();
+  if(woView==="library") renderLibrary();
+  else if(woView==="editor") renderEditor();
+  else renderWorkoutHome();
+}
+function renderWorkoutHome(){
   const t=todayStr();
+  $("hdrTitle").textContent = "Workout";
   $("hdrSub").textContent = "Your weekly plan";
   $("weekStrip").innerHTML = weekDates().map(d=>{
-    const p=planFor(d), logged = !p.rest && isWoDone(d);
-    return `<div class="${d===t?"today ":""}${d===woDate?"sel ":""}${logged?"logged":""}" data-wodate="${d}">${DAYS[parseYmd(d).getDay()]}<b>${p.short}</b></div>`;
+    const p=planFor(d), logged=dayLogged(d), hasC=scheduledCustoms(d).length>0;
+    return `<div class="${d===t?"today ":""}${d===woDate?"sel ":""}${logged?"logged ":""}${hasC?"hascustom":""}" data-wodate="${d}">${DAYS[parseYmd(d).getDay()]}<b>${esc(p.short)}</b></div>`;
   }).join("");
   document.querySelectorAll("[data-wodate]").forEach(el=>el.onclick=()=>{ woDate=el.dataset.wodate; render(); });
 
@@ -483,32 +904,383 @@ function renderWorkout(){
   const done=isWoDone(woDate);
   $("woStatus").className = "pill "+(p.rest?"":done?"ok":"no");
   $("woStatus").textContent = p.rest ? "Rest" : done ? "Done" : "Not done";
-  if(p.rest){
+  $("planEditBtn").textContent = planEditing ? "Done editing" : "Edit exercises";
+  $("planAddBtn").style.display = planEditing ? "" : "none";
+  $("planEditFields").style.display = planEditing ? "" : "none";
+  if(planEditing){
+    if(document.activeElement!==$("planTitle")) $("planTitle").value = p.title;
+    if(document.activeElement!==$("planShort")) $("planShort").value = p.short;
+  }
+  if(p.rest && !planEditing){
     $("woList").innerHTML = '<div class="empty">Rest day — recover, stretch, maybe an easy walk. You earned it.</div>';
     $("woDoneBtn").style.display="none";
+    $("woNotesWrap").style.display="";
+  } else if(planEditing){
+    $("woDoneBtn").style.display="none";
+    $("woNotesWrap").style.display="none";
+    $("woList").innerHTML = p.exercises.length ? p.exercises.map(ex=>`<div class="ex"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-planrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-plantarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">No exercises on this day yet.</div>';
+  } else if(!p.exercises.length){
+    $("woList").innerHTML = '<div class="empty">No exercises on this day. Edit exercises to add some.</div>';
+    $("woDoneBtn").style.display="none";
+    $("woNotesWrap").style.display="";
   } else {
     $("woDoneBtn").style.display="";
-    const ph = n => /walk/i.test(n) ? "Time / distance / incline (e.g. 35 min, 12% @ 3.0)" : /plank/i.test(n) ? "Hold times (e.g. 30, 30, 25 s)" : "Weight × reps (e.g. 135 lb × 10,10,8)";
-    $("woList").innerHTML = p.exercises.map((ex,i)=>{
-      const e=w.exercises[i]||{};
-      return `<div class="ex ${e.checked?"done":""}"><input type="checkbox" data-exchk="${i}" ${e.checked?"checked":""} aria-label="Done"><div class="grow"><div class="name">${esc(ex.name)}</div><div class="target">${esc(ex.target)}</div><input type="text" data-exlog="${i}" value="${esc(e.log||"")}" placeholder="${ph(ex.name)}"></div></div>`;
-    }).join("");
-    document.querySelectorAll("[data-exchk]").forEach(c=>c.onchange=()=>{ updEx(+c.dataset.exchk,{checked:c.checked}); render(); });
-    document.querySelectorAll("[data-exlog]").forEach(inp=>inp.onchange=()=>updEx(+inp.dataset.exlog,{log:inp.value.trim()}));
+    $("woNotesWrap").style.display="";
+    $("woList").innerHTML = p.exercises.map(ex=>exerciseLogHtml(ex, exState(w, ex.id), "plan:"+ex.id)).join("");
     $("woDoneBtn").textContent = done ? "Mark as not done" : "Mark workout complete";
     $("woDoneBtn").className = done ? "full" : "primary full";
   }
   if(document.activeElement!==$("woNotes")) $("woNotes").value = w.notes||"";
+  renderCustomCards();
 }
-function ensureWo(date){ if(!S.workouts[date]) S.workouts[date]={done:false, exercises:{}, notes:""}; return S.workouts[date]; }
-function updEx(i, patch){ const w=ensureWo(woDate); w.exercises[i]=Object.assign(w.exercises[i]||{}, patch); save(); }
+function customCard(wo, date){
+  const w=customEntry(date, wo.id);
+  const done=isCustomDone(date, wo);
+  const days=wo.days&&wo.days.length ? wo.days.slice().sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b)).map(d=>DAYS[d]).join(", ") : "Unscheduled";
+  const body=wo.exercises.length ? wo.exercises.map(ex=>exerciseLogHtml(ex, exState(w, ex.id), "cw:"+wo.id+":"+ex.id)).join("") : '<div class="empty">No exercises in this workout.</div>';
+  const notes=document.activeElement && document.activeElement.dataset && document.activeElement.dataset.cnote===wo.id ? document.activeElement.value : (w.notes||"");
+  return `<div class="card" data-cwcard="${esc(wo.id)}"><div class="row" style="justify-content:space-between;margin-bottom:4px"><div style="min-width:0"><div style="font-size:18px;font-weight:700">${esc(wo.name)}</div><div class="note">Custom · ${esc(days)}</div></div><span class="pill ${done?"ok":"no"}">${done?"Done":"Not done"}</span></div>${body}<div class="field" style="margin-top:10px"><label class="f">Notes</label><input data-cnote="${esc(wo.id)}" value="${esc(notes)}" placeholder="How did it feel?"></div><div class="toolbar" style="margin-top:8px;margin-bottom:8px"><button class="sm" data-editwo="${esc(wo.id)}">Edit</button><button class="sm danger" data-delwo="${esc(wo.id)}">Delete</button></div><button class="${done?"":"primary "}full" data-cwdone="${esc(wo.id)}">${done?"Mark as not done":"Mark workout complete"}</button></div>`;
+}
+function renderCustomCards(){
+  const scheduled=scheduledCustoms(woDate);
+  const loose=unscheduledCustoms();
+  $("customScheduled").innerHTML = scheduled.map(wo=>customCard(wo, woDate)).join("");
+  $("customUnscheduled").innerHTML = loose.length ? `<div class="note" style="margin:2px 2px 8px">Unscheduled — log these on the day selected above.</div>`+loose.map(wo=>customCard(wo, woDate)).join("") : "";
+}
+function matchesQuery(e, q){
+  if(!q) return true;
+  return e.name.toLowerCase().includes(q) || (e.cue||"").toLowerCase().includes(q) || groupLabel(e.group).toLowerCase().includes(q);
+}
+function filteredExercises(group, q){
+  const query=String(q||"").trim().toLowerCase();
+  return allExercises().filter(e=>(group==="all"||e.group===group) && matchesQuery(e, query));
+}
+function renderLibrary(){
+  $("hdrTitle").textContent = "Exercise library";
+  $("hdrSub").textContent = LIBRARY.length+" built-in · searchable how-tos";
+  if(!$("libGroup").options.length){
+    $("libGroup").innerHTML = GROUPS.map(g=>`<option value="${g[0]}">${g[1]}</option>`).join("");
+  }
+  const chips=[["all","All"]].concat(GROUPS);
+  $("libGroups").innerHTML = chips.map(([id,label])=>`<button type="button" class="chip ${libGroup===id?"sel":""}" data-libgroup="${id}">${label}</button>`).join("");
+  $("libGroups").querySelectorAll("[data-libgroup]").forEach(b=>b.onclick=()=>{ libGroup=b.dataset.libgroup; renderLibrary(); });
+  const list=filteredExercises(libGroup, $("libSearch").value);
+  if(!list.length){ $("libList").innerHTML='<div class="empty">No exercises match.</div>'; return; }
+  const parts=[];
+  const groups=libGroup==="all"?GROUPS.filter(g=>list.some(e=>e.group===g[0])):GROUPS.filter(g=>g[0]===libGroup);
+  groups.forEach(([id,label])=>{
+    const items=list.filter(e=>e.group===id);
+    if(!items.length) return;
+    parts.push(`<div class="libgroup"><h3>${label}</h3>`+items.map(e=>{
+      const del=e.custom?`<button class="x" data-dellib="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">×</button>`:"";
+      const badge=e.custom?'<span class="badge">Custom</span>':"";
+      const cue=e.cue?`<div class="cue">${esc(e.cue)}</div>`:"";
+      return `<div class="libitem" data-libitem="${esc(e.name)}"><div class="grow"><div class="name">${esc(e.name)}${badge}</div>${cue}<div>${howtoLink(e.name)}</div></div>${del}</div>`;
+    }).join("")+`</div>`);
+  });
+  $("libList").innerHTML = parts.join("");
+}
+function syncEditorFromDom(){
+  if(!editorDraft || woView!=="editor") return;
+  editorDraft.name=$("edName").value;
+  document.querySelectorAll("[data-edtarget]").forEach(inp=>{
+    const ex=editorDraft.exercises.find(e=>e.id===inp.dataset.edtarget);
+    if(ex) ex.target=inp.value.trim();
+  });
+}
+function renderEditor(){
+  if(!editorDraft) return;
+  $("hdrTitle").textContent = editorDraft.isNew ? "New workout" : "Edit workout";
+  $("hdrSub").textContent = "Name, days, and exercises";
+  $("edHeading").textContent = editorDraft.isNew ? "New workout" : "Edit workout";
+  if(document.activeElement!==$("edName")) $("edName").value = editorDraft.name||"";
+  $("edDays").innerHTML = DAY_ORDER.map(d=>`<button type="button" class="chip ${editorDraft.days.indexOf(d)>=0?"sel":""}" data-edday="${d}">${DAYS[d]}</button>`).join("");
+  $("edDays").querySelectorAll("[data-edday]").forEach(b=>b.onclick=()=>{
+    syncEditorFromDom();
+    const d=+b.dataset.edday;
+    const i=editorDraft.days.indexOf(d);
+    if(i>=0) editorDraft.days.splice(i,1); else editorDraft.days.push(d);
+    renderEditor();
+  });
+  $("edDaysNote").textContent = editorDraft.days.length ? "Shows on "+editorDraft.days.slice().sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b)).map(d=>DAYS[d]).join(", ")+"." : "No day selected — this workout stays unscheduled and can be logged any day.";
+  $("edList").innerHTML = editorDraft.exercises.length ? editorDraft.exercises.map(ex=>`<div class="ex"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-edrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-edtarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">Pick exercises from the library.</div>';
+  $("edDelete").style.display = editorDraft.isNew ? "none" : "";
+}
+function openEditor(existing){
+  if(existing){
+    editorDraft=JSON.parse(JSON.stringify(existing));
+    editorDraft.isNew=false;
+    editorDraft.days=editorDraft.days||[];
+  } else {
+    editorDraft={id:uid(), name:"", days:[], exercises:[], isNew:true};
+  }
+  woView="editor";
+  render();
+  window.scrollTo(0,0);
+}
+function saveEditor(){
+  syncEditorFromDom();
+  const name=editorDraft.name.trim();
+  if(!name){ toast("Name your workout"); $("edName").focus(); return; }
+  if(!editorDraft.exercises.length){ toast("Add at least one exercise"); return; }
+  const wo={
+    id:editorDraft.id,
+    name,
+    days:editorDraft.days.slice(),
+    exercises:editorDraft.exercises.map(e=>({id:e.id, name:e.name, target:e.target||"", kind:e.kind==="time"?"time":"reps"}))
+  };
+  const i=S.customWorkouts.findIndex(w=>w.id===wo.id);
+  if(i>=0) S.customWorkouts[i]=wo; else S.customWorkouts.push(wo);
+  save();
+  editorDraft=null;
+  woView="home";
+  toast("Workout saved");
+  render();
+}
+function deleteCustom(id){
+  const wo=S.customWorkouts.find(w=>w.id===id);
+  if(!wo) return;
+  if(!confirm('Delete "'+wo.name+'"?')) return;
+  S.customWorkouts=S.customWorkouts.filter(w=>w.id!==id);
+  Object.keys(S.customLogs||{}).forEach(date=>{ if(S.customLogs[date]) delete S.customLogs[date][id]; });
+  save();
+  if(editorDraft && editorDraft.id===id){ editorDraft=null; woView="home"; }
+  toast("Workout deleted");
+  render();
+}
+function toggleCustomDone(id){
+  const wo=S.customWorkouts.find(w=>w.id===id);
+  if(!wo) return;
+  const w=ensureCustom(woDate, id);
+  if(isCustomDone(woDate, wo)){
+    w.done=false;
+    wo.exercises.forEach(ex=>{ if(w.exercises[ex.id]) w.exercises[ex.id].checked=false; });
+    toast("Marked not done");
+  } else {
+    w.done=true;
+    wo.exercises.forEach(ex=>{ w.exercises[ex.id]=Object.assign(w.exercises[ex.id]||{log:""},{checked:true}); });
+    toast("Workout complete 💪");
+  }
+  save(); render();
+}
+function openPicker(mode){
+  pickMode=mode;
+  pickedItem=null;
+  pickGroup="all";
+  $("picker").style.display="flex";
+  $("pickerBrowse").style.display="";
+  $("pickerTarget").style.display="none";
+  $("pickerSearch").value="";
+  $("pkSets").value="3"; $("pkReps").value="10"; $("pkTime").value="";
+  setPickKind("reps");
+  renderPicker();
+  setTimeout(()=>$("pickerSearch").focus(), 30);
+}
+function closePicker(){ $("picker").style.display="none"; pickedItem=null; pickMode=null; }
+function setPickKind(kind){
+  $("pickerKind").querySelectorAll("[data-kind]").forEach(b=>b.classList.toggle("sel", b.dataset.kind===kind));
+  $("pickerReps").style.display = kind==="reps"?"":"none";
+  $("pickerTime").style.display = kind==="time"?"":"none";
+}
+function renderPicker(){
+  const chips=[["all","All"]].concat(GROUPS);
+  $("pickerGroups").innerHTML = chips.map(([id,label])=>`<button type="button" class="chip ${pickGroup===id?"sel":""}" data-pickgroup="${id}">${label}</button>`).join("");
+  $("pickerGroups").querySelectorAll("[data-pickgroup]").forEach(b=>b.onclick=()=>{ pickGroup=b.dataset.pickgroup; renderPicker(); });
+  const list=filteredExercises(pickGroup, $("pickerSearch").value);
+  $("pickerResults").innerHTML = list.length ? list.map(e=>`<button type="button" class="pickhit" data-pick="${esc(e.name)}"><div class="name">${esc(e.name)}${e.custom?'<span class="badge">Custom</span>':""}</div><div class="meta">${esc(groupLabel(e.group))}${e.cue?" · "+esc(e.cue):""}</div></button>`).join("") : '<div class="empty">No exercises match.</div>';
+  $("pickerResults").querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{
+    pickedItem=allExercises().find(e=>e.name===b.dataset.pick)||null;
+    if(!pickedItem) return;
+    $("pickerBrowse").style.display="none";
+    $("pickerTarget").style.display="";
+    $("pickerExName").textContent=pickedItem.name;
+    $("pickerExCue").textContent=pickedItem.cue||"";
+    $("pickerTitle").textContent="Sets, reps, or time";
+  });
+}
+function readPickerTarget(){
+  const kind=$("pickerKind").querySelector(".sel").dataset.kind;
+  if(kind==="time"){
+    const time=$("pkTime").value.trim();
+    if(!time) return null;
+    return {kind:"time", target:time};
+  }
+  const sets=$("pkSets").value.trim(), reps=$("pkReps").value.trim();
+  if(!sets && !reps) return null;
+  const target=sets&&reps ? sets+" × "+reps : (sets||reps);
+  return {kind:"reps", target};
+}
+function commitPicked(){
+  if(!pickedItem) return;
+  const spec=readPickerTarget();
+  if(!spec){ toast( ($("pickerKind").querySelector(".sel").dataset.kind==="time") ? "Enter a time" : "Enter sets, reps, or both"); return; }
+  const ex={id:uid(), name:pickedItem.name, target:spec.target, kind:spec.kind};
+  if(pickMode==="plan"){
+    const dow=parseYmd(woDate).getDay();
+    const plan=ensurePlan();
+    plan[dow].rest=false;
+    plan[dow].exercises.push(ex);
+    planEditing=true;
+    save();
+    closePicker();
+    render();
+    toast("Added "+ex.name);
+  } else if(pickMode==="editor" && editorDraft){
+    syncEditorFromDom();
+    editorDraft.exercises.push(ex);
+    closePicker();
+    render();
+  }
+}
 $("woNotes").onchange = () => { ensureWo(woDate).notes=$("woNotes").value.trim(); save(); };
 $("woDoneBtn").onclick = () => {
   const w=ensureWo(woDate), p=planFor(woDate);
-  if(isWoDone(woDate)){ w.done=false; p.exercises.forEach((_,i)=>{ if(w.exercises[i]) w.exercises[i].checked=false; }); toast("Marked not done"); }
-  else { w.done=true; p.exercises.forEach((_,i)=>{ w.exercises[i]=Object.assign(w.exercises[i]||{},{checked:true}); }); toast("Workout complete 💪"); }
+  if(isWoDone(woDate)){
+    w.done=false;
+    p.exercises.forEach(ex=>{ if(w.exercises[ex.id]) w.exercises[ex.id].checked=false; });
+    toast("Marked not done");
+  } else {
+    w.done=true;
+    p.exercises.forEach(ex=>{ w.exercises[ex.id]=Object.assign(w.exercises[ex.id]||{log:""},{checked:true}); });
+    toast("Workout complete 💪");
+  }
   save(); render();
 };
+$("planEditBtn").onclick = () => { planEditing=!planEditing; render(); };
+$("planAddBtn").onclick = () => openPicker("plan");
+$("planTitle").onchange = () => {
+  const v=$("planTitle").value.trim();
+  if(!v){ toast("Day name can't be empty"); render(); return; }
+  ensurePlan()[parseYmd(woDate).getDay()].title=v;
+  save(); render();
+};
+$("planShort").onchange = () => {
+  const v=$("planShort").value.trim().slice(0,8);
+  if(!v){ toast("Short label can't be empty"); render(); return; }
+  ensurePlan()[parseYmd(woDate).getDay()].short=v;
+  save(); render();
+};
+$("btnLibrary").onclick = () => { returnView = woView==="editor" ? "editor" : "home"; woView="library"; render(); window.scrollTo(0,0); };
+$("libBack").onclick = () => { woView = returnView==="editor" && editorDraft ? "editor" : "home"; render(); window.scrollTo(0,0); };
+$("btnNewWo").onclick = () => openEditor(null);
+$("btnResetPlan").onclick = () => {
+  if(!confirm("Reset the weekly plan to the original exercises? Custom workouts are kept.")) return;
+  S.plan=null;
+  planEditing=false;
+  save(); render(); toast("Plan reset to default");
+};
+$("libSearch").oninput = () => { if(woView==="library") renderLibrary(); };
+$("libAdd").onclick = () => {
+  const name=$("libName").value.trim();
+  const group=$("libGroup").value;
+  const cue=$("libCue").value.trim();
+  const videoRaw=$("libVideo").value.trim();
+  if(!name){ toast("Name the exercise"); $("libName").focus(); return; }
+  if(allExercises().some(e=>e.name.toLowerCase()===name.toLowerCase())){ toast("That exercise is already in the library"); return; }
+  let video="";
+  if(videoRaw){
+    video=safeUrl(videoRaw);
+    if(!video){ toast("Video link must start with http or https"); $("libVideo").focus(); return; }
+  }
+  S.customExercises.push({id:uid(), name, group, cue, video});
+  save();
+  $("libName").value=""; $("libCue").value=""; $("libVideo").value="";
+  libGroup=group;
+  render();
+  toast("Added to library");
+};
+$("edCancel").onclick = () => { editorDraft=null; woView="home"; render(); };
+$("edSave").onclick = () => saveEditor();
+$("edAdd").onclick = () => { syncEditorFromDom(); openPicker("editor"); };
+$("edDelete").onclick = () => { if(editorDraft) deleteCustom(editorDraft.id); };
+$("edName").onchange = () => { if(editorDraft) editorDraft.name=$("edName").value; };
+$("pickerClose").onclick = () => closePicker();
+$("picker").addEventListener("click", e=>{ if(e.target===$("picker")) closePicker(); });
+$("pickerSearch").oninput = () => renderPicker();
+$("pickerKind").querySelectorAll("[data-kind]").forEach(b=>b.onclick=()=>setPickKind(b.dataset.kind));
+$("pickerBack").onclick = () => {
+  pickedItem=null;
+  $("pickerTarget").style.display="none";
+  $("pickerBrowse").style.display="";
+  $("pickerTitle").textContent="Add exercise";
+};
+$("pickerAdd").onclick = () => commitPicked();
+$("pickerToLib").onclick = () => {
+  const back = (woView==="editor" && editorDraft) ? "editor" : "home";
+  closePicker();
+  returnView = back;
+  woView="library";
+  render();
+  window.scrollTo(0,0);
+};
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("picker").style.display==="flex") closePicker(); });
+$("page-workout").addEventListener("change", e=>{
+  const t=e.target;
+  if(t.matches("[data-log]")){
+    const token=t.dataset.log;
+    if(token.indexOf("plan:")===0){
+      patchEx(ensureWo(woDate), token.slice(5), {log:t.value.trim()});
+    } else if(token.indexOf("cw:")===0){
+      const parts=token.split(":");
+      patchEx(ensureCustom(woDate, parts[1]), parts.slice(2).join(":"), {log:t.value.trim()});
+    }
+    save();
+  } else if(t.matches("[data-chk]")){
+    const token=t.dataset.chk;
+    if(token.indexOf("plan:")===0){
+      const w=ensureWo(woDate);
+      patchEx(w, token.slice(5), {checked:t.checked});
+      if(!t.checked) w.done=false;
+    } else if(token.indexOf("cw:")===0){
+      const parts=token.split(":");
+      const w=ensureCustom(woDate, parts[1]);
+      patchEx(w, parts.slice(2).join(":"), {checked:t.checked});
+      if(!t.checked) w.done=false;
+    }
+    save(); render();
+  } else if(t.matches("[data-cnote]")){
+    ensureCustom(woDate, t.dataset.cnote).notes=t.value.trim();
+    save();
+  } else if(t.matches("[data-plantarget]")){
+    const dow=parseYmd(woDate).getDay();
+    const day=ensurePlan()[dow];
+    const ex=day.exercises.find(x=>x.id===t.dataset.plantarget);
+    if(ex){ ex.target=t.value.trim(); ex.kind=inferKind(ex); save(); }
+  } else if(t.matches("[data-edtarget]") && editorDraft){
+    const ex=editorDraft.exercises.find(x=>x.id===t.dataset.edtarget);
+    if(ex) ex.target=t.value.trim();
+  }
+});
+$("page-workout").addEventListener("click", e=>{
+  const rm=e.target.closest("[data-planrm]");
+  if(rm){
+    const dow=parseYmd(woDate).getDay();
+    const day=ensurePlan()[dow];
+    day.exercises=day.exercises.filter(ex=>ex.id!==rm.dataset.planrm);
+    if(!day.exercises.length) day.rest = PLAN[dow].rest && day.title===PLAN[dow].title;
+    save(); render(); return;
+  }
+  const edit=e.target.closest("[data-editwo]");
+  if(edit){ const wo=S.customWorkouts.find(w=>w.id===edit.dataset.editwo); if(wo) openEditor(wo); return; }
+  const del=e.target.closest("[data-delwo]");
+  if(del){ deleteCustom(del.dataset.delwo); return; }
+  const done=e.target.closest("[data-cwdone]");
+  if(done){ toggleCustomDone(done.dataset.cwdone); return; }
+  const edrm=e.target.closest("[data-edrm]");
+  if(edrm && editorDraft){
+    syncEditorFromDom();
+    editorDraft.exercises=editorDraft.exercises.filter(ex=>ex.id!==edrm.dataset.edrm);
+    renderEditor(); return;
+  }
+  const dellib=e.target.closest("[data-dellib]");
+  if(dellib){
+    const item=S.customExercises.find(x=>x.id===dellib.dataset.dellib);
+    if(!item) return;
+    if(!confirm('Delete "'+item.name+'" from your library?')) return;
+    S.customExercises=S.customExercises.filter(x=>x.id!==item.id);
+    save(); render(); toast("Removed from library");
+  }
+});
 
 /* ---------- Weight ---------- */
 let chart=null;
