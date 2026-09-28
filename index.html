@@ -85,7 +85,7 @@ button:active{transform:scale(.98)}
 .week div.logged::after{content:"✓";display:block;color:var(--accent);font-weight:700}
 .chartwrap{position:relative;height:240px}
 nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;background:rgba(20,23,29,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--safe-b))}
-nav.tabs button{flex:1;background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:11px;font-weight:600}
+nav.tabs button{flex:1;min-width:0;overflow:hidden;background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:10px;font-weight:600;white-space:nowrap}
 nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button.active{color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#2a2f3a;color:var(--text);padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:20;font-size:14px}
@@ -115,6 +115,16 @@ a.howto:active{opacity:.75}
 .modalbox h2{font-size:16px;margin:0;text-transform:none;letter-spacing:0;color:var(--text);font-weight:700}
 .pickhit{display:block;width:100%;text-align:left;background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:10px 2px}
 .pickhit .meta{color:var(--muted);font-size:12.5px;font-weight:500;white-space:normal}
+textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;outline:none;min-width:0;font:inherit;color:var(--text);min-height:96px;resize:vertical}
+textarea:focus{border-color:var(--accent)}
+.macros{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.macros div{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 2px;text-align:center}
+.macros b{display:block;font-size:15px}
+.macros span{color:var(--muted);font-size:11px}
+.ing,.steps{margin:6px 0 0;padding-left:18px}
+.ing li,.steps li{margin:4px 0}
+.hub{display:block;width:100%;text-align:left;padding:14px}
+.hub b{display:block;font-size:16px;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -177,6 +187,7 @@ a.howto:active{opacity:.75}
     <h2>Quick add from your plan</h2>
     <div class="chips" id="presetChips"></div>
     <div class="note" style="margin-top:8px">Preset macros are <b>rough estimates</b>. Tapping one fills the form below so you can adjust before adding. Edit the defaults in Settings.</div>
+    <button class="full" id="mealsCook" style="margin-top:10px">Browse cookbook</button>
   </div>
   <div class="card">
     <h2>Add food</h2>
@@ -235,6 +246,33 @@ a.howto:active{opacity:.75}
     <button class="full" id="btnResetPlan">Reset to default plan</button>
   </div>
 
+  <div id="woEditor" style="display:none">
+    <div class="toolbar">
+      <button class="sm" id="edCancel">Cancel</button>
+      <button class="sm primary" id="edSave">Save workout</button>
+    </div>
+    <div class="card">
+      <h2 id="edHeading">New workout</h2>
+      <div class="field"><label class="f">Name</label><input id="edName" placeholder="e.g. Arm day" maxlength="60"></div>
+      <div class="field">
+        <label class="f">Weekdays</label>
+        <div class="chips" id="edDays"></div>
+        <div class="note" id="edDaysNote" style="margin-top:6px"></div>
+      </div>
+      <h2 style="margin-top:4px">Exercises</h2>
+      <div id="edList"></div>
+      <button class="sm" id="edAdd" style="margin-top:8px">+ Add exercise</button>
+    </div>
+    <button class="danger full" id="edDelete" style="display:none">Delete workout</button>
+  </div>
+</section>
+
+<!-- ============ LIBRARY ============ -->
+<section class="page" id="page-library">
+  <div id="libHome">
+    <button class="card hub" id="openExercises" type="button"><b>Exercise library</b><span class="note">Search moves by muscle group, with a short cue and a how-to video.</span></button>
+    <button class="card hub" id="openCookbook" type="button"><b>Cookbook</b><span class="note">Keto, bulking, and lean recipes. Log one serving to today.</span></button>
+  </div>
   <div id="woLibrary" style="display:none">
     <div class="toolbar">
       <button class="sm" id="libBack">‹ Back</button>
@@ -254,25 +292,47 @@ a.howto:active{opacity:.75}
       <div id="libList"></div>
     </div>
   </div>
-
-  <div id="woEditor" style="display:none">
-    <div class="toolbar">
-      <button class="sm" id="edCancel">Cancel</button>
-      <button class="sm primary" id="edSave">Save workout</button>
-    </div>
-    <div class="card">
-      <h2 id="edHeading">New workout</h2>
-      <div class="field"><label class="f">Name</label><input id="edName" placeholder="e.g. Arm day" maxlength="60"></div>
-      <div class="field">
-        <label class="f">Weekdays</label>
-        <div class="chips" id="edDays"></div>
-        <div class="note" id="edDaysNote" style="margin-top:6px"></div>
+  <div id="cookRoot" style="display:none">
+    <div id="cookListView">
+      <div class="toolbar">
+        <button class="sm" id="cookHome">‹ Library</button>
+        <button class="sm primary" id="cookNew">+ Recipe</button>
       </div>
-      <h2 style="margin-top:4px">Exercises</h2>
-      <div id="edList"></div>
-      <button class="sm" id="edAdd" style="margin-top:8px">+ Add exercise</button>
+      <div class="card">
+        <h2>Cookbook</h2>
+        <div class="field"><input id="cookSearch" placeholder="Search recipes or ingredients" autocomplete="off"></div>
+        <div class="chips" id="cookCats" style="margin-bottom:8px"></div>
+        <div class="note">Macros are <b>estimates per serving</b>. Ingredient amounts are for the whole recipe.</div>
+        <div id="cookResults"></div>
+      </div>
     </div>
-    <button class="danger full" id="edDelete" style="display:none">Delete workout</button>
+    <div id="cookDetailView" style="display:none"></div>
+    <div id="cookEditView" style="display:none">
+      <div class="toolbar">
+        <button class="sm" id="rcCancel">Cancel</button>
+        <button class="sm primary" id="rcSave">Save recipe</button>
+      </div>
+      <div class="card">
+        <h2 id="rcHeading">New recipe</h2>
+        <div class="note" style="margin-bottom:8px">Numbers are <b>estimates per serving</b>.</div>
+        <div class="field"><label class="f">Name</label><input id="rcName" maxlength="80" placeholder="e.g. Garlic shrimp"></div>
+        <div class="row">
+          <div class="field"><label class="f">Category</label><select id="rcCat"><option value="keto">Keto</option><option value="bulking">Bulking</option><option value="lean">Lean</option></select></div>
+          <div class="field" style="max-width:110px"><label class="f">Servings</label><input id="rcServ" type="number" inputmode="numeric" min="1" value="1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label class="f">Calories</label><input id="rcCal" type="number" inputmode="numeric" min="0" placeholder="kcal"></div>
+          <div class="field"><label class="f">Protein (g)</label><input id="rcPro" type="number" inputmode="decimal" min="0" step="0.1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label class="f">Carbs (g)</label><input id="rcCarb" type="number" inputmode="decimal" min="0" step="0.1"></div>
+          <div class="field"><label class="f">Fat (g)</label><input id="rcFat" type="number" inputmode="decimal" min="0" step="0.1"></div>
+        </div>
+        <div class="field"><label class="f">Ingredients (one per line, with amounts)</label><textarea id="rcIng" placeholder="6 oz chicken breast&#10;2 cups spinach"></textarea></div>
+        <div class="field"><label class="f">Steps (one per line)</label><textarea id="rcSteps" placeholder="Heat a pan over medium.&#10;Cook the chicken through."></textarea></div>
+      </div>
+      <button class="danger full" id="rcDelete" style="display:none">Delete recipe</button>
+    </div>
   </div>
 </section>
 
@@ -336,6 +396,7 @@ a.howto:active{opacity:.75}
   <button data-tab="today" class="active"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Today</button>
   <button data-tab="meals"><svg viewBox="0 0 24 24"><path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2"/><path d="M17 2c-2 2-3 5-3 8h3v12"/></svg>Meals</button>
   <button data-tab="workout"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg>Workout</button>
+  <button data-tab="library"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</button>
   <button data-tab="weight"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Weight</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
 </nav>
@@ -596,10 +657,111 @@ function normalizeCustomLogs(logs){
   }
   return out;
 }
+const COOK_CATS = [["keto","Keto"],["bulking","Bulking"],["lean","Lean"]];
+function cookCatLabel(id){ const c=COOK_CATS.find(x=>x[0]===id); return c?c[1]:""; }
+/* Macros are estimates per serving. Ingredient amounts are for the whole recipe. */
+const RECIPES = [
+  {id:"k1", category:"keto", name:"Bacon avocado eggs", servings:1, calories:480, protein:22, carbs:6, fat:41,
+    ingredients:["2 large eggs","1/2 avocado","2 slices bacon","1 tsp olive oil","Salt and pepper"],
+    steps:["Cook the bacon until crisp.","Fry the eggs in a teaspoon of the bacon fat or olive oil.","Slice the avocado and plate it with the eggs and bacon."]},
+  {id:"k2", category:"keto", name:"Garlic butter salmon", servings:2, calories:430, protein:36, carbs:6, fat:29,
+    ingredients:["12 oz salmon","1 bunch asparagus","1 tbsp butter","2 garlic cloves, minced","Lemon and salt"],
+    steps:["Heat the oven to 400°F.","Toss asparagus with a little of the butter and salt.","Roast salmon and asparagus 12–14 minutes.","Melt the rest of the butter with garlic and spoon it over the salmon."]},
+  {id:"k3", category:"keto", name:"Cheeseburger salad", servings:2, calories:520, protein:34, carbs:6, fat:40,
+    ingredients:["12 oz ground beef","4 cups romaine","1 oz cheddar, shredded","2 tbsp mayonnaise","Pickles and mustard"],
+    steps:["Brown the beef and season with salt.","Chop the romaine and add pickles.","Toss with mayo and a little mustard.","Top with beef and cheddar."]},
+  {id:"k4", category:"keto", name:"Zucchini lasagna", servings:4, calories:390, protein:32, carbs:9, fat:25,
+    ingredients:["4 medium zucchini","1 lb ground beef","1 cup no-sugar marinara","1 cup ricotta","1 cup shredded mozzarella","1 tsp Italian seasoning"],
+    steps:["Slice zucchini lengthwise and salt it for 10 minutes, then pat dry.","Brown the beef with seasoning and stir in the marinara.","Layer zucchini, meat, ricotta, and mozzarella in a dish.","Bake at 375°F about 30 minutes, until bubbling."]},
+  {id:"k5", category:"keto", name:"Chicken thighs and broccoli", servings:2, calories:470, protein:40, carbs:8, fat:31,
+    ingredients:["1 lb boneless chicken thighs","4 cups broccoli florets","1 tbsp olive oil","1 tsp paprika","Salt"],
+    steps:["Heat the oil in a skillet and season the chicken.","Cook the thighs 5–6 minutes per side, until cooked through.","Add broccoli with a splash of water, cover, and steam until tender."]},
+  {id:"k6", category:"keto", name:"Egg salad lettuce wraps", servings:2, calories:250, protein:13, carbs:2, fat:21,
+    ingredients:["4 large eggs","2 tbsp mayonnaise","1 tsp mustard","4 large lettuce leaves","Chives, salt, and pepper"],
+    steps:["Hard-boil the eggs, cool, and chop them.","Stir in mayo, mustard, chives, salt, and pepper.","Spoon into lettuce leaves."]},
+  {id:"k7", category:"keto", name:"Creamy garlic shrimp", servings:2, calories:410, protein:32, carbs:5, fat:29,
+    ingredients:["12 oz shrimp, peeled","1/2 cup heavy cream","2 garlic cloves, minced","1 tbsp butter","2 cups baby spinach"],
+    steps:["Melt the butter and soften the garlic for 30 seconds.","Cook the shrimp 2 minutes, until pink.","Stir in the cream and spinach and simmer until the spinach wilts."]},
+  {id:"k8", category:"keto", name:"Keto chili", servings:4, calories:430, protein:33, carbs:8, fat:29,
+    ingredients:["1 lb ground beef","1/2 lb ground pork","1 can diced tomatoes","1 bell pepper, chopped","1 small onion, chopped","1 tbsp chili powder","1/2 cup shredded cheddar"],
+    steps:["Brown the beef and pork with the onion.","Add pepper, tomatoes, chili powder, and a pinch of salt.","Simmer 20 minutes.","Serve with a sprinkle of cheddar."]},
+  {id:"b1", category:"bulking", name:"Chicken rice bowl", servings:2, calories:640, protein:48, carbs:64, fat:16,
+    ingredients:["12 oz chicken breast","2 cups cooked rice","2 cups broccoli","1 tbsp olive oil","1 tbsp soy sauce"],
+    steps:["Slice the chicken and stir-fry it in the oil until cooked through.","Add broccoli and soy sauce and cook until tender.","Serve over rice."]},
+  {id:"b2", category:"bulking", name:"Beef and sweet potato", servings:2, calories:590, protein:42, carbs:50, fat:22,
+    ingredients:["12 oz lean ground beef","2 medium sweet potatoes","2 cups green beans","1 tbsp olive oil","Salt and cumin"],
+    steps:["Pierce the potatoes and microwave or roast until soft.","Brown the beef with cumin and salt.","Sauté the green beans in the oil.","Split the potatoes and top with beef and beans."]},
+  {id:"b3", category:"bulking", name:"Protein oatmeal", servings:1, calories:650, protein:42, carbs:78, fat:18,
+    ingredients:["1/2 cup dry oats","1 cup milk","1 scoop whey protein","1 banana","1 tbsp peanut butter"],
+    steps:["Cook the oats in the milk.","Let it cool a minute, then stir in the protein powder.","Top with sliced banana and peanut butter."]},
+  {id:"b4", category:"bulking", name:"Salmon pasta", servings:2, calories:720, protein:42, carbs:74, fat:24,
+    ingredients:["6 oz dry pasta","10 oz salmon","1 cup peas","1 tbsp olive oil","2 garlic cloves","Lemon"],
+    steps:["Boil the pasta. Add the peas for the last 2 minutes.","Sear the salmon in the oil, then flake it.","Toss pasta, peas, salmon, garlic, and lemon."]},
+  {id:"b5", category:"bulking", name:"Turkey burrito bowl", servings:2, calories:690, protein:46, carbs:72, fat:22,
+    ingredients:["12 oz ground turkey","2 cups cooked rice","1 cup black beans, rinsed","1/2 avocado","1/2 cup salsa","2 cups lettuce"],
+    steps:["Brown the turkey and season with salt and cumin.","Warm the beans.","Build bowls with rice, turkey, beans, lettuce, salsa, and avocado."]},
+  {id:"b6", category:"bulking", name:"Yogurt granola parfait", servings:1, calories:560, protein:32, carbs:74, fat:14,
+    ingredients:["1 1/2 cups plain Greek yogurt","1 cup granola","1 cup mixed berries","1 tbsp honey"],
+    steps:["Spoon half the yogurt into a bowl.","Add berries, granola, and the rest of the yogurt.","Drizzle with honey."]},
+  {id:"b7", category:"bulking", name:"Steak fried rice", servings:2, calories:750, protein:44, carbs:80, fat:26,
+    ingredients:["10 oz sirloin","3 cups cooked rice, cold","2 eggs","1 cup mixed vegetables","1 tbsp oil","1 tbsp soy sauce"],
+    steps:["Slice and sear the steak, then set it aside.","Scramble the eggs in the same pan and set them aside.","Fry the rice and vegetables in the oil, then toss with soy sauce, steak, and egg."]},
+  {id:"b8", category:"bulking", name:"Peanut banana shake", servings:1, calories:780, protein:56, carbs:74, fat:28,
+    ingredients:["1 1/2 cups milk","2 scoops whey protein","1 banana","2 tbsp peanut butter","1/2 cup oats","Ice"],
+    steps:["Add everything to a blender.","Blend until smooth.","Drink right away."]},
+  {id:"l1", category:"lean", name:"Grilled chicken salad", servings:1, calories:320, protein:42, carbs:10, fat:11,
+    ingredients:["6 oz chicken breast","3 cups mixed greens","1 cup cucumber and tomato","1 tbsp balsamic vinegar","Cooking spray","Salt and pepper"],
+    steps:["Season the chicken and grill or pan-cook it through.","Slice it.","Toss the greens and vegetables with vinegar and top with chicken."]},
+  {id:"l2", category:"lean", name:"Lemon cod and greens", servings:1, calories:240, protein:38, carbs:6, fat:7,
+    ingredients:["6 oz cod","2 cups spinach","1 cup sliced zucchini","1 tsp olive oil","Lemon and salt"],
+    steps:["Sear the cod in the oil 3–4 minutes per side.","In the same pan, wilt the spinach and zucchini.","Finish with lemon and salt."]},
+  {id:"l3", category:"lean", name:"Turkey veggie stir-fry", servings:2, calories:290, protein:38, carbs:12, fat:8,
+    ingredients:["12 oz turkey breast, sliced","4 cups mixed vegetables","1 tsp oil","1 tbsp soy sauce","1 garlic clove","1 tsp grated ginger"],
+    steps:["Stir-fry the turkey in the oil until cooked.","Add vegetables, garlic, and ginger.","Splash in soy sauce and cook until the vegetables are crisp-tender."]},
+  {id:"l4", category:"lean", name:"Egg white veggie omelet", servings:1, calories:210, protein:30, carbs:6, fat:6,
+    ingredients:["1 cup egg whites","1 cup peppers and spinach","1 oz low-fat feta","Cooking spray","Salt"],
+    steps:["Spray a nonstick pan and soften the vegetables.","Pour in the egg whites and cook until just set.","Add feta, fold, and slide onto a plate."]},
+  {id:"l5", category:"lean", name:"Shrimp zucchini noodles", servings:1, calories:250, protein:36, carbs:8, fat:8,
+    ingredients:["6 oz shrimp","2 cups zucchini noodles","1 tsp olive oil","1 garlic clove","Lemon and chili flakes"],
+    steps:["Cook the shrimp in the oil until pink.","Add garlic and zucchini noodles for 1–2 minutes.","Finish with lemon and chili flakes."]},
+  {id:"l6", category:"lean", name:"Cottage cheese berry bowl", servings:1, calories:270, protein:34, carbs:24, fat:4,
+    ingredients:["1 1/2 cups low-fat cottage cheese","1 cup berries","Cinnamon"],
+    steps:["Add the cottage cheese to a bowl.","Top with berries and a pinch of cinnamon."]},
+  {id:"l7", category:"lean", name:"Lean turkey chili", servings:4, calories:310, protein:36, carbs:22, fat:7,
+    ingredients:["1 1/2 lb extra-lean ground turkey","2 cans diced tomatoes","1 can beans, rinsed","1 onion, chopped","1 bell pepper, chopped","1 tbsp chili powder"],
+    steps:["Brown the turkey with the onion.","Add pepper, tomatoes, beans, and chili powder.","Simmer 25 minutes and salt to taste."]},
+  {id:"l8", category:"lean", name:"Tofu vegetable soup", servings:4, calories:180, protein:16, carbs:12, fat:7,
+    ingredients:["14 oz firm tofu, cubed","6 cups low-sodium broth","4 cups mixed vegetables","2 garlic cloves","1 tsp grated ginger","1 tbsp soy sauce"],
+    steps:["Simmer broth, garlic, ginger, and vegetables 10 minutes.","Add tofu and soy sauce.","Heat through and serve."]}
+];
+function normalizeCustomRecipes(list){
+  if(!Array.isArray(list)) return [];
+  const cats=COOK_CATS.map(c=>c[0]);
+  return list.map(r=>{
+    if(!r || typeof r!=="object") return null;
+    const name=String(r.name||"").trim();
+    if(!name) return null;
+    const lines=v=>Array.isArray(v)?v.map(x=>String(x).trim()).filter(Boolean):[];
+    const n=v=>{ const x=parseFloat(v); return isFinite(x)&&x>=0?Math.round(x*10)/10:0; };
+    const servings=Math.round(n(r.servings));
+    return {
+      id:String(r.id||nid()),
+      name,
+      category:cats.includes(r.category)?r.category:"lean",
+      servings:servings>=1?servings:1,
+      calories:Math.round(n(r.calories)),
+      protein:n(r.protein),
+      carbs:n(r.carbs),
+      fat:n(r.fat),
+      ingredients:lines(r.ingredients),
+      steps:lines(r.steps)
+    };
+  }).filter(Boolean);
+}
 function blankState(){
   return {version:2, settings:{calTarget:null, proteinTarget:null, goalWeight:null},
     presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], weights:[], steps:{}, workouts:{},
-    plan:null, customWorkouts:[], customExercises:[], customLogs:{}};
+    plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[]};
 }
 function load(){
   try{
@@ -622,7 +784,8 @@ function normalize(d){
     plan:normalizePlan(d.plan),
     customWorkouts:normalizeCustomWorkouts(d.customWorkouts),
     customExercises:normalizeCustomExercises(d.customExercises),
-    customLogs:normalizeCustomLogs(d.customLogs)
+    customLogs:normalizeCustomLogs(d.customLogs),
+    customRecipes:normalizeCustomRecipes(d.customRecipes)
   };
 }
 let S = load();
@@ -694,7 +857,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meal Log", workout:"Workout", weight:"Weight", settings:"Settings"};
+const TITLES = {today:"Today", meals:"Meal Log", workout:"Workout", library:"Library", weight:"Weight", settings:"Settings"};
 let currentTab = "today";
 function go(tab){
   currentTab = tab;
@@ -705,7 +868,10 @@ function go(tab){
   window.scrollTo(0,0);
   if(location.hash!=="#"+tab) history.replaceState(null,"","#"+tab);
 }
-document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.tab==="library") libSection="home";
+  go(b.dataset.tab);
+}));
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
 
 /* ---------- Today ---------- */
@@ -809,7 +975,12 @@ $("fAdd").onclick = () => {
 
 /* ---------- Workout ---------- */
 let woDate = todayStr();
-let woView = "home"; // home | library | editor
+let woView = "home"; // home | editor
+let libSection = "home"; // home | exercises | cookbook
+let cookView = "list"; // list | detail | edit
+let cookCat = "all";
+let cookOpenId = null;
+let cookDraft = null;
 let returnView = "home";
 let planEditing = false;
 let editorDraft = null;
@@ -878,14 +1049,14 @@ function patchEx(bucket, id, patch){
   bucket.exercises[id]=Object.assign(bucket.exercises[id]||{checked:false, log:""}, patch);
 }
 function showWoViews(){
-  $("woHome").style.display = woView==="home"?"":"none";
-  $("woLibrary").style.display = woView==="library"?"":"none";
-  $("woEditor").style.display = woView==="editor"?"":"none";
+  const editor=woView==="editor";
+  $("woHome").style.display = editor?"none":"";
+  $("woEditor").style.display = editor?"":"none";
 }
 function renderWorkout(){
+  if(woView==="library") woView="home";
   showWoViews();
-  if(woView==="library") renderLibrary();
-  else if(woView==="editor") renderEditor();
+  if(woView==="editor") renderEditor();
   else renderWorkoutHome();
 }
 function renderWorkoutHome(){
@@ -1160,8 +1331,13 @@ $("planShort").onchange = () => {
   ensurePlan()[parseYmd(woDate).getDay()].short=v;
   save(); render();
 };
-$("btnLibrary").onclick = () => { returnView = woView==="editor" ? "editor" : "home"; woView="library"; render(); window.scrollTo(0,0); };
-$("libBack").onclick = () => { woView = returnView==="editor" && editorDraft ? "editor" : "home"; render(); window.scrollTo(0,0); };
+$("btnLibrary").onclick = () => { returnView="workout"; libSection="exercises"; go("library"); };
+$("libBack").onclick = () => {
+  if(returnView==="editor" && editorDraft){ woView="editor"; go("workout"); return; }
+  if(returnView==="workout"){ woView="home"; go("workout"); return; }
+  libSection="home";
+  if(currentTab!=="library") go("library"); else { render(); window.scrollTo(0,0); }
+};
 $("btnNewWo").onclick = () => openEditor(null);
 $("btnResetPlan").onclick = () => {
   if(!confirm("Reset the weekly plan to the original exercises? Custom workouts are kept.")) return;
@@ -1169,7 +1345,7 @@ $("btnResetPlan").onclick = () => {
   planEditing=false;
   save(); render(); toast("Plan reset to default");
 };
-$("libSearch").oninput = () => { if(woView==="library") renderLibrary(); };
+$("libSearch").oninput = () => { if(currentTab==="library" && libSection==="exercises") renderLibrary(); };
 $("libAdd").onclick = () => {
   const name=$("libName").value.trim();
   const group=$("libGroup").value;
@@ -1206,12 +1382,11 @@ $("pickerBack").onclick = () => {
 };
 $("pickerAdd").onclick = () => commitPicked();
 $("pickerToLib").onclick = () => {
-  const back = (woView==="editor" && editorDraft) ? "editor" : "home";
+  const back = (woView==="editor" && editorDraft) ? "editor" : "workout";
   closePicker();
   returnView = back;
-  woView="library";
-  render();
-  window.scrollTo(0,0);
+  libSection="exercises";
+  go("library");
 };
 document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("picker").style.display==="flex") closePicker(); });
 $("page-workout").addEventListener("change", e=>{
@@ -1271,14 +1446,6 @@ $("page-workout").addEventListener("click", e=>{
     syncEditorFromDom();
     editorDraft.exercises=editorDraft.exercises.filter(ex=>ex.id!==edrm.dataset.edrm);
     renderEditor(); return;
-  }
-  const dellib=e.target.closest("[data-dellib]");
-  if(dellib){
-    const item=S.customExercises.find(x=>x.id===dellib.dataset.dellib);
-    if(!item) return;
-    if(!confirm('Delete "'+item.name+'" from your library?')) return;
-    S.customExercises=S.customExercises.filter(x=>x.id!==item.id);
-    save(); render(); toast("Removed from library");
   }
 });
 
@@ -1387,9 +1554,173 @@ $("wipeBtn").onclick = () => {
   S = blankState(); save(); render(); toast("All data erased");
 };
 
+/* ---------- Library & cookbook ---------- */
+function allRecipes(){
+  return RECIPES.map(r=>Object.assign({custom:false}, r))
+    .concat((S.customRecipes||[]).map(r=>Object.assign({custom:true}, r)));
+}
+function findRecipe(id){ return allRecipes().find(r=>r.id===id)||null; }
+function renderLibraryPage(){
+  $("libHome").style.display = libSection==="home"?"":"none";
+  $("woLibrary").style.display = libSection==="exercises"?"":"none";
+  $("cookRoot").style.display = libSection==="cookbook"?"":"none";
+  if(libSection==="home"){
+    $("hdrTitle").textContent = "Library";
+    $("hdrSub").textContent = "Exercises and cookbook";
+  } else if(libSection==="exercises") renderLibrary();
+  else renderCookbook();
+}
+function recipeMatches(r, q){
+  if(!q) return true;
+  const blob=[r.name, cookCatLabel(r.category)].concat(r.ingredients||[], r.steps||[]).join(" ").toLowerCase();
+  return blob.includes(q);
+}
+function filteredRecipes(){
+  const q=($("cookSearch").value||"").trim().toLowerCase();
+  return allRecipes().filter(r=>(cookCat==="all"||r.category===cookCat) && recipeMatches(r, q));
+}
+function renderCookList(){
+  const chips=[["all","All"]].concat(COOK_CATS);
+  $("cookCats").innerHTML = chips.map(([id,label])=>`<button type="button" class="chip ${cookCat===id?"sel":""}" data-cookcat="${id}">${label}</button>`).join("");
+  $("cookCats").querySelectorAll("[data-cookcat]").forEach(b=>b.onclick=()=>{ cookCat=b.dataset.cookcat; renderCookList(); });
+  const list=filteredRecipes();
+  if(!list.length){ $("cookResults").innerHTML='<div class="empty">No recipes match.</div>'; return; }
+  const cats=cookCat==="all"?COOK_CATS:COOK_CATS.filter(c=>c[0]===cookCat);
+  $("cookResults").innerHTML = cats.map(([id,label])=>{
+    const items=list.filter(r=>r.category===id);
+    if(!items.length) return "";
+    return `<div class="libgroup"><h3>${label}</h3>`+items.map(r=>{
+      const badge=r.custom?'<span class="badge">Custom</span>':"";
+      return `<button type="button" class="pickhit" data-recipe="${esc(r.id)}"><div class="name">${esc(r.name)}${badge}</div><div class="meta">Estimates per serving · ${Math.round(r.calories)} kcal · ${r1(r.protein)}g protein</div></button>`;
+    }).join("")+`</div>`;
+  }).join("");
+}
+function macroGrid(r){
+  return `<div class="note">Estimates per serving</div><div class="macros"><div><b>${Math.round(r.calories)}</b><span>kcal</span></div><div><b>${r1(r.protein)}g</b><span>protein</span></div><div><b>${r1(r.carbs)}g</b><span>carbs</span></div><div><b>${r1(r.fat)}g</b><span>fat</span></div></div>`;
+}
+function renderCookDetail(){
+  const r=findRecipe(cookOpenId);
+  if(!r){ cookView="list"; renderCookList(); $("cookDetailView").style.display="none"; $("cookListView").style.display=""; return; }
+  const actions=r.custom?`<div class="toolbar" style="margin-top:10px"><button class="sm" id="cookEditBtn">Edit</button><button class="sm danger" id="cookDelBtn">Delete</button></div>`:"";
+  $("cookDetailView").innerHTML = `<div class="toolbar"><button class="sm" id="cookDetailBack">‹ Recipes</button></div><div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="note">${esc(cookCatLabel(r.category))}${r.custom?" · Custom":""} · Serves ${r.servings}</div></div></div>${macroGrid(r)}<h2>Ingredients</h2><div class="note">Amounts for the whole recipe.</div><ul class="ing">${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join("")||'<li>None listed</li>'}</ul><h2 style="margin-top:12px">Steps</h2><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")||"<li>No steps yet.</li>"}</ol><button class="primary full" id="cookLog" style="margin-top:14px">Log this meal</button><div class="note" style="margin-top:6px">Adds 1 serving to today's meal log (${Math.round(r.calories)} kcal, ${r1(r.protein)}g protein).</div>${actions}</div>`;
+  $("cookDetailBack").onclick=()=>{ cookView="list"; renderCookbook(); window.scrollTo(0,0); };
+  $("cookLog").onclick=()=>logRecipe(r);
+  if(r.custom){
+    $("cookEditBtn").onclick=()=>openRecipeEditor(r);
+    $("cookDelBtn").onclick=()=>deleteRecipe(r.id);
+  }
+}
+function renderCookbook(){
+  $("hdrTitle").textContent = cookView==="edit" ? (cookDraft&&cookDraft.isNew?"New recipe":"Edit recipe") : "Cookbook";
+  $("hdrSub").textContent = "Keto, bulking, and lean";
+  $("cookListView").style.display = cookView==="list"?"":"none";
+  $("cookDetailView").style.display = cookView==="detail"?"":"none";
+  $("cookEditView").style.display = cookView==="edit"?"":"none";
+  if(cookView==="list") renderCookList();
+  else if(cookView==="detail") renderCookDetail();
+  else renderRecipeEditor();
+}
+function renderRecipeEditor(){
+  if(!cookDraft) return;
+  $("rcHeading").textContent = cookDraft.isNew?"New recipe":"Edit recipe";
+  $("rcDelete").style.display = cookDraft.isNew?"none":"";
+  if(document.activeElement!==$("rcName")) $("rcName").value=cookDraft.name||"";
+  if(document.activeElement!==$("rcCat")) $("rcCat").value=cookDraft.category||"lean";
+  if(document.activeElement!==$("rcServ")) $("rcServ").value=cookDraft.servings||1;
+  if(document.activeElement!==$("rcCal")) $("rcCal").value=cookDraft.calories??"";
+  if(document.activeElement!==$("rcPro")) $("rcPro").value=cookDraft.protein??"";
+  if(document.activeElement!==$("rcCarb")) $("rcCarb").value=cookDraft.carbs??"";
+  if(document.activeElement!==$("rcFat")) $("rcFat").value=cookDraft.fat??"";
+  if(document.activeElement!==$("rcIng")) $("rcIng").value=(cookDraft.ingredients||[]).join("\n");
+  if(document.activeElement!==$("rcSteps")) $("rcSteps").value=(cookDraft.steps||[]).join("\n");
+}
+function openRecipeEditor(existing){
+  if(existing){
+    cookDraft=JSON.parse(JSON.stringify(existing));
+    delete cookDraft.custom;
+    cookDraft.isNew=false;
+  } else {
+    cookDraft={id:uid(), name:"", category:cookCat==="all"?"lean":cookCat, servings:1, calories:"", protein:"", carbs:"", fat:"", ingredients:[], steps:[], isNew:true};
+  }
+  cookView="edit";
+  libSection="cookbook";
+  if(currentTab!=="library") go("library"); else { render(); window.scrollTo(0,0); }
+}
+function linesOf(id){ return $(id).value.split(/\n/).map(s=>s.trim()).filter(Boolean); }
+function nonneg(v){ const n=num(v); return n!=null&&n>0?n:0; }
+function saveRecipe(){
+  const name=$("rcName").value.trim();
+  if(!name){ toast("Name the recipe"); $("rcName").focus(); return; }
+  const servings=Math.round(num($("rcServ").value)||0);
+  if(servings<1){ toast("Enter servings"); $("rcServ").focus(); return; }
+  const ingredients=linesOf("rcIng"), steps=linesOf("rcSteps");
+  if(!ingredients.length){ toast("Add at least one ingredient"); $("rcIng").focus(); return; }
+  if(!steps.length){ toast("Add at least one step"); $("rcSteps").focus(); return; }
+  const recipe={
+    id:cookDraft.id,
+    name,
+    category:$("rcCat").value,
+    servings,
+    calories:Math.round(nonneg($("rcCal").value)),
+    protein:r1(nonneg($("rcPro").value)),
+    carbs:r1(nonneg($("rcCarb").value)),
+    fat:r1(nonneg($("rcFat").value)),
+    ingredients,
+    steps
+  };
+  const i=S.customRecipes.findIndex(r=>r.id===recipe.id);
+  if(i>=0) S.customRecipes[i]=recipe; else S.customRecipes.push(recipe);
+  save();
+  cookOpenId=recipe.id;
+  cookDraft=null;
+  cookView="detail";
+  toast("Recipe saved");
+  render();
+}
+function deleteRecipe(id){
+  const r=S.customRecipes.find(x=>x.id===id);
+  if(!r) return;
+  if(!confirm('Delete "'+r.name+'"?')) return;
+  S.customRecipes=S.customRecipes.filter(x=>x.id!==id);
+  save();
+  cookDraft=null;
+  cookOpenId=null;
+  cookView="list";
+  toast("Recipe deleted");
+  render();
+}
+function logRecipe(r){
+  S.meals.push({id:uid(), date:todayStr(), name:r.name, cal:Math.round(+r.calories||0), protein:r1(+r.protein||0), type:defaultMealType(), ts:Date.now()});
+  mealDate=todayStr();
+  save();
+  toast("Logged 1 serving to today");
+  render();
+}
+$("openExercises").onclick = () => { returnView="home"; libSection="exercises"; render(); window.scrollTo(0,0); };
+$("openCookbook").onclick = () => { cookView="list"; libSection="cookbook"; render(); window.scrollTo(0,0); };
+$("mealsCook").onclick = () => { cookView="list"; libSection="cookbook"; go("library"); };
+$("cookHome").onclick = () => { libSection="home"; render(); window.scrollTo(0,0); };
+$("cookNew").onclick = () => openRecipeEditor(null);
+$("rcCancel").onclick = () => { cookDraft=null; cookView=cookOpenId?"detail":"list"; render(); };
+$("rcSave").onclick = () => saveRecipe();
+$("rcDelete").onclick = () => { if(cookDraft) deleteRecipe(cookDraft.id); };
+$("cookSearch").oninput = () => { if(currentTab==="library" && libSection==="cookbook" && cookView==="list") renderCookList(); };
+$("page-library").addEventListener("click", e=>{
+  const hit=e.target.closest("[data-recipe]");
+  if(hit){ cookOpenId=hit.dataset.recipe; cookView="detail"; renderCookbook(); window.scrollTo(0,0); return; }
+  const dellib=e.target.closest("[data-dellib]");
+  if(dellib){
+    const item=S.customExercises.find(x=>x.id===dellib.dataset.dellib);
+    if(!item) return;
+    if(!confirm('Delete "'+item.name+'" from your library?')) return;
+    S.customExercises=S.customExercises.filter(x=>x.id!==item.id);
+    save(); render(); toast("Removed from library");
+  }
+});
+
 /* ---------- Render ---------- */
 function render(){
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, weight:renderWeight, settings:renderSettings})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, settings:renderSettings})[currentTab]();
 }
 // roll over at midnight / when returning to app
 let lastDay = todayStr();
