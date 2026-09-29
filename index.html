@@ -3,26 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f1115">
+<meta name="theme-color" content="#7c3aed">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Fit">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%2322c55e'/%3E%3Ctext x='50' y='68' font-size='56' text-anchor='middle' font-family='Arial' font-weight='bold' fill='%230f1115'%3EF%3C/text%3E%3C/svg%3E">
-<title>Nic's Fitness Tracker</title>
+<meta name="apple-mobile-web-app-title" content="Curly Girl">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23fbbf24'/%3E%3Cstop offset='.5' stop-color='%23fb7185'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='68' font-size='54' text-anchor='middle' font-family='Arial' font-weight='bold' fill='%23fff'%3EC%3C/text%3E%3C/svg%3E">
+<title>Curly Girl Fitness</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#0f1115; --card:#181b22; --card2:#1f232c; --line:#2a2f3a; --text:#e8eaf0; --muted:#8b93a5;
-  --accent:#22c55e; --accent2:#3b82f6; --warn:#f59e0b; --danger:#ef4444; --radius:16px;
+  --bg:#4c1d95; --card:rgba(22,16,36,.94); --card2:#2a2438; --line:#3d3550; --text:#f8f5ff; --muted:#c4bdd4;
+  --accent:#22c55e; --accent2:#38bdf8; --warn:#fbbf24; --danger:#fb7185; --radius:16px;
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:15px;line-height:1.4}
-body{padding-bottom:calc(76px + var(--safe-b))}
-header{position:sticky;top:0;z-index:5;background:rgba(15,17,21,.92);backdrop-filter:blur(10px);padding:calc(14px + env(safe-area-inset-top,0px)) 18px 10px;border-bottom:1px solid var(--line)}
-header h1{margin:0;font-size:20px;font-weight:700}
-header .sub{color:var(--muted);font-size:13px}
+html,body{margin:0;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:15px;line-height:1.4;
+  background:
+    radial-gradient(920px 520px at -8% -12%, rgba(251,191,36,.95), transparent 56%),
+    radial-gradient(780px 540px at 112% -8%, rgba(244,114,182,.92), transparent 52%),
+    radial-gradient(720px 520px at 86% 112%, rgba(34,211,238,.88), transparent 48%),
+    linear-gradient(165deg, #6d28d9 0%, #db2777 48%, #ea580c 100%);
+  background-attachment:fixed}
+body{padding-bottom:calc(76px + var(--safe-b));min-height:100vh}
+header{position:sticky;top:0;z-index:5;background:rgba(28,16,48,.86);backdrop-filter:blur(12px);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16)}
+header h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.15}
+header .screentitle{font-size:15px;font-weight:700;margin-top:3px;color:#fff}
+header .sub{color:#e4dcf5;font-size:13px}
 main{padding:14px 14px 20px;max-width:560px;margin:0 auto}
 .page{display:none}.page.active{display:block}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:12px}
@@ -84,8 +91,9 @@ button:active{transform:scale(.98)}
 .week div.sel{background:rgba(34,197,94,.15)}
 .week div.logged::after{content:"✓";display:block;color:var(--accent);font-weight:700}
 .chartwrap{position:relative;height:240px}
-nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;background:rgba(20,23,29,.97);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--safe-b))}
-nav.tabs button{flex:1;min-width:0;overflow:hidden;background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:10px;font-weight:600;white-space:nowrap}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;background:rgba(28,16,48,.94);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.16);padding:6px 2px calc(6px + var(--safe-b));overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{flex:1 0 52px;min-width:0;overflow:hidden;background:none;border:none;color:#d9d0ea;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:10px;font-weight:600;white-space:nowrap}
 nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button.active{color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#2a2f3a;color:var(--text);padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:20;font-size:14px}
@@ -125,12 +133,49 @@ textarea:focus{border-color:var(--accent)}
 .ing li,.steps li{margin:4px 0}
 .hub{display:block;width:100%;text-align:left;padding:14px}
 .hub b{display:block;font-size:16px;margin-bottom:4px}
+.demobanner{margin:8px 0 0;background:#fff;color:#7c2d12;border-radius:10px;padding:8px 10px;font-size:12.5px;font-weight:700;line-height:1.35}
+.demobanner[hidden]{display:none}
+.gate{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(49,10,72,.45)}
+.gatebox{background:#fff;color:#1c1230;border-radius:20px;padding:18px 16px;width:100%;max-width:400px;box-shadow:0 16px 50px rgba(40,0,60,.28)}
+.gatebox h2{margin:0 0 6px;font-size:22px;color:#1c1230}
+.gatebox p{margin:0 0 12px;color:#3f3454}
+.gatebox button{color:#1c1230;background:#f6f0ff;border-color:#e4d4f5;margin-top:8px}
+.gatebox button.primary{background:#16a34a;border-color:#16a34a;color:#fff}
+.setupcard{background:#fffdf8;color:#1c1230;border:none}
+.setupcard h2{color:#9d174d;text-transform:none;letter-spacing:0;font-size:16px}
+.setupcard p,.setupcard .note,.setupcard label.f{color:#4a3b5c}
+.setupcard input,.setupcard textarea{background:#fff;color:#1c1230;border-color:#ecd9c8}
+.setupcard button{color:#1c1230;background:#fff;border-color:#ecd9c8}
+.setupcard button.primary{background:#db2777;border-color:#db2777;color:#fff}
+.setupcard details summary{color:#9d174d}
+.pairhead{font-size:18px;font-weight:800}
+.codebig{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:28px;letter-spacing:.18em;font-weight:800;color:#fff}
+.thread{max-height:240px;overflow:auto;margin-bottom:8px}
+.bubble{max-width:86%;padding:8px 10px;border-radius:14px;margin:6px 0;background:var(--card2)}
+.bubble.me{margin-left:auto;background:rgba(34,197,94,.22)}
+.bubble .who{font-size:11px;color:var(--muted);margin-bottom:2px}
+.photogrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photogrid figure{margin:0}
+.photogrid img{width:100%;height:96px;object-fit:cover;border-radius:10px;background:#120c1c;display:block}
+.photogrid figcaption{font-size:11px;color:var(--muted);text-align:center;margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.calllayer{position:fixed;inset:0;z-index:80;background:#1a0f2e;display:flex;flex-direction:column;height:100dvh}
+.calllayer[hidden]{display:none !important}
+.callbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:rgba(0,0,0,.35);color:#fff}
+.calldemo{padding:16px;overflow:auto}
+.callbadge{display:inline-block;background:#fff;color:#9d174d;font-weight:800;border-radius:99px;padding:6px 10px;margin-bottom:8px}
+.calldemo p{color:#f8f5ff}
+.calldemo video{width:100%;max-height:280px;border-radius:14px;background:#120c1c;margin:8px 0}
+.calllive{flex:1;position:relative;min-height:0}
+.calllive[hidden]{display:none}
+#callDemo[hidden]{display:none}
 </style>
 </head>
 <body>
 <header>
-  <h1 id="hdrTitle">Today</h1>
+  <h1 class="brandline">Curly Girl Fitness</h1>
+  <div class="screentitle" id="hdrTitle">Today</div>
   <div class="sub" id="hdrSub"></div>
+  <p class="demobanner" id="demoBanner" hidden>Demo mode · two tabs on this browser. Add Supabase and Daily keys in Settings to connect two phones.</p>
 </header>
 
 <main>
@@ -361,8 +406,130 @@ textarea:focus{border-color:var(--accent)}
   </div>
 </section>
 
+<!-- ============ COACH ============ -->
+<section class="page" id="page-coach">
+  <div class="card setupcard" id="coachDemoCard" hidden>
+    <h2>Demo mode</h2>
+    <p>Two tabs in this browser: Trainer in one, Client in the other. Chat, photos, weigh-ins, and a simulated call sync here.</p>
+    <div class="row" style="margin-top:8px">
+      <button class="sm" id="demoAsTrainer" type="button">This tab: Trainer</button>
+      <button class="sm" id="demoAsClient" type="button">This tab: Client</button>
+    </div>
+    <button class="primary full" id="coachOpenSettings" type="button" style="margin-top:8px">Add phone keys in Settings</button>
+  </div>
+  <div id="coachSolo">
+    <div class="card">
+      <h2>On your own</h2>
+      <p>Workouts, meals, the cookbook, the exercise library, and weight all stay on this phone.</p>
+      <p class="note">Switch to Trainer or Client in Settings when you want to connect with someone.</p>
+      <button class="full" id="soloSettings" type="button">Open Settings</button>
+    </div>
+  </div>
+  <div id="coachTrainer" style="display:none">
+    <div id="trHome">
+      <div class="card">
+        <h2>New client</h2>
+        <div class="field"><label class="f">Client name</label><input id="trName" maxlength="40" placeholder="e.g. Alex" autocomplete="name"></div>
+        <button class="primary full" id="trCreate" type="button">Create invite code</button>
+      </div>
+      <div class="card">
+        <h2>Clients</h2>
+        <div id="trList"></div>
+      </div>
+    </div>
+  </div>
+  <div id="coachClient" style="display:none">
+    <div id="clJoin">
+      <div class="card">
+        <h2>Join your trainer</h2>
+        <p class="note" style="margin-bottom:8px">Enter the invite code from your trainer. In demo mode, create that code in another tab of this browser.</p>
+        <div class="field"><label class="f">Invite code</label><input id="clCode" maxlength="12" autocapitalize="characters" autocomplete="off" placeholder="e.g. K7MQ2P"></div>
+        <button class="primary full" id="clJoinBtn" type="button">Join</button>
+      </div>
+    </div>
+  </div>
+  <div id="pairPanel" style="display:none">
+    <div class="toolbar">
+      <button class="sm" id="pairBack" type="button">‹ Clients</button>
+    </div>
+    <div class="card">
+      <div class="pairhead" id="pairName"></div>
+      <div class="note" id="pairMeta"></div>
+      <div class="codebig" id="pairCode"></div>
+      <button class="sm" id="pairCopy" type="button" style="margin-top:8px">Copy code</button>
+    </div>
+    <div class="card">
+      <h2>Weekly weigh-ins</h2>
+      <div id="pairWeighForm">
+        <div class="row">
+          <div class="field"><label class="f">Date</label><input type="date" id="cwDate"></div>
+          <div class="field"><label class="f">Weight (lb)</label><input type="number" inputmode="decimal" step="0.1" id="cwVal" placeholder="e.g. 154.2"></div>
+        </div>
+        <div class="field"><label class="f">Note (optional)</label><input id="cwNote" maxlength="200" placeholder="How the week felt"></div>
+        <button class="primary full" id="cwSave" type="button">Save weekly weigh-in</button>
+      </div>
+      <div id="pairWeighList"></div>
+    </div>
+    <div class="card">
+      <h2>Progress photos</h2>
+      <div id="pairPhotoForm">
+        <div class="note" style="margin-bottom:8px">Front, side, and back. Take a photo or upload one, and it is sent to your trainer.</div>
+        <div class="toolbar" style="margin-bottom:0">
+          <button class="sm" type="button" data-angle="front" data-cam="1">Take front</button>
+          <button class="sm" type="button" data-angle="side" data-cam="1">Take side</button>
+          <button class="sm" type="button" data-angle="back" data-cam="1">Take back</button>
+          <button class="sm" type="button" data-angle="front">Upload front</button>
+          <button class="sm" type="button" data-angle="side">Upload side</button>
+          <button class="sm" type="button" data-angle="back">Upload back</button>
+        </div>
+      </div>
+      <div id="pairPhotos"></div>
+    </div>
+    <div class="card">
+      <h2>Messages</h2>
+      <div class="thread" id="pairThread"></div>
+      <div class="row">
+        <input id="pairMsg" maxlength="2000" placeholder="Write a message" autocomplete="off">
+        <button class="primary" id="pairSend" type="button">Send</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Video call</h2>
+      <p class="note" id="pairCallNote"></p>
+      <button class="primary full" id="pairCall" type="button">Start video call</button>
+    </div>
+  </div>
+  <input type="file" id="photoCam" accept="image/*" capture="environment" hidden>
+  <input type="file" id="photoLib" accept="image/*" hidden>
+</section>
+
 <!-- ============ SETTINGS ============ -->
 <section class="page" id="page-settings">
+  <div class="card">
+    <h2>Mode</h2>
+    <div class="note" style="margin-bottom:8px">Pick how this phone is used. You can change this any time. Your meals, workouts, and weight stay put.</div>
+    <div class="chips" id="modePicks">
+      <button type="button" class="chip" data-mode="trainer">Trainer</button>
+      <button type="button" class="chip" data-mode="client">Client</button>
+      <button type="button" class="chip" data-mode="solo">Just me</button>
+    </div>
+    <div class="note" id="modeNote" style="margin-top:8px"></div>
+  </div>
+  <div class="card setupcard" id="keysCard">
+    <h2 id="keysHeading">Setup</h2>
+    <p class="note" id="keysIntro"></p>
+    <div class="field"><label class="f">Supabase project URL</label><input id="keyUrl" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://xxxx.supabase.co"></div>
+    <div class="field"><label class="f">Supabase anon key</label><input id="keyAnon" autocomplete="off" spellcheck="false" placeholder="eyJhbGciOi..."></div>
+    <div class="field"><label class="f">Daily API key</label><input id="keyDaily" autocomplete="off" spellcheck="false" placeholder="From Daily → Developers"></div>
+    <button class="primary full" id="keysSave" type="button">Save keys</button>
+    <p class="note" style="margin-top:8px">Keys stay in this browser only. They are never built into the page.</p>
+    <details style="margin-top:8px">
+      <summary>Supabase setup SQL</summary>
+      <p class="note">Run this once in the Supabase SQL editor. It creates invite codes, weigh-ins, realtime chat, and the progress photo bucket.</p>
+      <textarea id="setupSql" readonly style="min-height:140px;font-size:11px"></textarea>
+      <button class="sm" id="copySql" type="button" style="margin-top:6px">Copy SQL</button>
+    </details>
+  </div>
   <div class="card">
     <h2>Targets</h2>
     <div class="field"><label class="f">Daily calorie target (kcal)</label><input type="number" inputmode="numeric" id="sCal" placeholder="Not set — e.g. 2000"></div>
@@ -398,9 +565,33 @@ textarea:focus{border-color:var(--accent)}
   <button data-tab="workout"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg>Workout</button>
   <button data-tab="library"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</button>
   <button data-tab="weight"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Weight</button>
+  <button data-tab="coach"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Coach</button>
   <button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
 </nav>
 <div class="toast" id="toast"></div>
+<div class="gate" id="roleGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <div class="gatebox">
+    <h2 id="gateTitle">Curly Girl Fitness</h2>
+    <p>Who is using this phone? You can change this later in Settings. Meals, workouts, and weight stay on this device either way.</p>
+    <button class="primary full" id="pickTrainer" type="button">I'm the trainer</button>
+    <button class="full" id="pickClient" type="button">I'm a client</button>
+    <button class="full" id="pickSolo" type="button">Just me — personal tracker</button>
+  </div>
+</div>
+<div class="calllayer" id="callLayer" hidden>
+  <div class="callbar">
+    <b id="callTitle">Video call</b>
+    <button class="danger sm" id="callEnd" type="button">End</button>
+  </div>
+  <div id="callDemo" class="calldemo">
+    <div class="callbadge">Simulated call · Demo mode</div>
+    <p id="callDemoText">This is a practice call inside this browser. It is not a live Daily.co connection. The other tab can join the same simulated call.</p>
+    <video id="callPreview" autoplay playsinline muted hidden></video>
+    <button class="sm" id="callCam" type="button">Preview my camera</button>
+    <div id="callTimer" class="note" style="margin-top:8px;color:#fde68a"></div>
+  </div>
+  <div id="callLive" class="calllive" hidden></div>
+</div>
 <div class="modalback" id="picker" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
   <div class="modalbox">
     <div class="row" style="justify-content:space-between;margin-bottom:10px">
@@ -857,7 +1048,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meal Log", workout:"Workout", library:"Library", weight:"Weight", settings:"Settings"};
+const TITLES = {today:"Today", meals:"Meal Log", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings"};
 let currentTab = "today";
 function go(tab){
   currentTab = tab;
@@ -865,6 +1056,7 @@ function go(tab){
   document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
   $("hdrTitle").textContent = TITLES[tab];
   render();
+  if(typeof syncCoachTab==="function") syncCoachTab(tab);
   window.scrollTo(0,0);
   if(location.hash!=="#"+tab) history.replaceState(null,"","#"+tab);
 }
@@ -1506,6 +1698,7 @@ function renderSettings(){
   const st=S.settings;
   $("sCal").value = st.calTarget??""; $("sPro").value = st.proteinTarget??""; $("sGoal").value = st.goalWeight??"";
   renderPresetEditor(S.presets);
+  if(typeof fillConnectionSettings==="function") fillConnectionSettings();
 }
 function renderPresetEditor(list){
   $("presetEditor").innerHTML = list.map((p,i)=>`<div class="presetedit" data-prow="${i}"><input value="${esc(p.name)}" data-k="name" placeholder="Name"><input type="number" inputmode="numeric" value="${p.cal}" data-k="cal" placeholder="kcal"><input type="number" inputmode="decimal" value="${p.protein}" data-k="protein" placeholder="g"><button class="x" data-pdel="${i}" aria-label="Remove">×</button></div>`).join("");
@@ -1718,9 +1911,853 @@ $("page-library").addEventListener("click", e=>{
   }
 });
 
+
+/* ---------- Coaching: demo (this browser) or live (Supabase + Daily) ---------- */
+const PROFILE_KEY = "curlyGirlFitness.profile.v1";
+const SESSION_KEY = "curlyGirlFitness.session.v1";
+const KEYS_KEY = "curlyGirlFitness.keys.v1";
+const DEMO_KEY = "curlyGirlFitness.demo.v1";
+const DEMO_CH = "curly-girl-fitness";
+const SETUP_SQL = [
+"-- Curly Girl Fitness: run once in the Supabase SQL editor.",
+"create table if not exists public.pairs (",
+"  id text primary key,",
+"  invite_code text unique not null,",
+"  client_name text not null,",
+"  trainer_device text not null,",
+"  client_device text,",
+"  daily_room_url text,",
+"  daily_room_name text,",
+"  created_at timestamptz default now()",
+");",
+"create table if not exists public.weigh_ins (",
+"  id text primary key,",
+"  pair_id text not null references public.pairs(id) on delete cascade,",
+"  weight numeric not null,",
+"  logged_on date not null,",
+"  note text default '',",
+"  created_at timestamptz default now()",
+");",
+"create table if not exists public.messages (",
+"  id text primary key,",
+"  pair_id text not null references public.pairs(id) on delete cascade,",
+"  sender text not null check (sender in ('trainer','client')),",
+"  body text not null,",
+"  created_at timestamptz default now()",
+");",
+"create table if not exists public.photos (",
+"  id text primary key,",
+"  pair_id text not null references public.pairs(id) on delete cascade,",
+"  angle text not null check (angle in ('front','side','back')),",
+"  storage_path text not null,",
+"  created_at timestamptz default now()",
+");",
+"alter table public.pairs enable row level security;",
+"alter table public.weigh_ins enable row level security;",
+"alter table public.messages enable row level security;",
+"alter table public.photos enable row level security;",
+"grant select, insert, update, delete on public.pairs, public.weigh_ins, public.messages, public.photos to anon;",
+"drop policy if exists \"cgf pairs\" on public.pairs;",
+"create policy \"cgf pairs\" on public.pairs for all to anon using (true) with check (true);",
+"drop policy if exists \"cgf weigh\" on public.weigh_ins;",
+"create policy \"cgf weigh\" on public.weigh_ins for all to anon using (true) with check (true);",
+"drop policy if exists \"cgf messages\" on public.messages;",
+"create policy \"cgf messages\" on public.messages for all to anon using (true) with check (true);",
+"drop policy if exists \"cgf photos\" on public.photos;",
+"create policy \"cgf photos\" on public.photos for all to anon using (true) with check (true);",
+"insert into storage.buckets (id, name, public)",
+"values ('progress-photos', 'progress-photos', true)",
+"on conflict (id) do update set public = true;",
+"drop policy if exists \"cgf photo read\" on storage.objects;",
+"create policy \"cgf photo read\" on storage.objects for select to anon using (bucket_id = 'progress-photos');",
+"drop policy if exists \"cgf photo write\" on storage.objects;",
+"create policy \"cgf photo write\" on storage.objects for insert to anon with check (bucket_id = 'progress-photos');",
+"drop policy if exists \"cgf photo update\" on storage.objects;",
+"create policy \"cgf photo update\" on storage.objects for update to anon using (bucket_id = 'progress-photos');",
+"do $$ begin alter publication supabase_realtime add table public.messages; exception when duplicate_object then null; end $$;",
+"do $$ begin alter publication supabase_realtime add table public.weigh_ins; exception when duplicate_object then null; end $$;",
+"do $$ begin alter publication supabase_realtime add table public.photos; exception when duplicate_object then null; end $$;",
+"do $$ begin alter publication supabase_realtime add table public.pairs; exception when duplicate_object then null; end $$;"
+].join("\n");
+
+function readStore(store, key){
+  try { return JSON.parse(store.getItem(key) || "null"); }
+  catch(e){ return null; }
+}
+function makeId(){
+  const bytes = new Uint8Array(12);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2,"0")).join("");
+}
+function makeCode(){
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(6);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => alphabet[b % alphabet.length]).join("");
+}
+function loadIdentity(){
+  let session = readStore(sessionStorage, SESSION_KEY);
+  const saved = readStore(localStorage, PROFILE_KEY);
+  if(!session || !session.deviceId){
+    if(saved && saved.deviceId) session = {role:saved.role||"", deviceId:saved.deviceId, activePairId:saved.activePairId||""};
+    else session = {role:"", deviceId:makeId(), activePairId:""};
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    if(!saved || !saved.deviceId) localStorage.setItem(PROFILE_KEY, JSON.stringify(session));
+  }
+  session.role = session.role || "";
+  session.activePairId = session.activePairId || "";
+  return session;
+}
+let ID = loadIdentity();
+function persistIdentity(){
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({role:ID.role, deviceId:ID.deviceId, activePairId:ID.activePairId||""}));
+  localStorage.setItem(PROFILE_KEY, JSON.stringify({role:ID.role, deviceId:ID.deviceId, activePairId:ID.activePairId||""}));
+}
+function readKeys(){
+  const k = readStore(localStorage, KEYS_KEY) || {};
+  return {
+    supabaseUrl: String(k.supabaseUrl||"").trim(),
+    supabaseAnonKey: String(k.supabaseAnonKey||"").trim(),
+    dailyApiKey: String(k.dailyApiKey||"").trim()
+  };
+}
+function dataReady(){
+  const k = readKeys();
+  try {
+    const u = new URL(k.supabaseUrl);
+    return u.protocol==="https:" && !!u.hostname && k.supabaseAnonKey.length>20;
+  } catch(e){ return false; }
+}
+function videoReady(){ return readKeys().dailyApiKey.length>8; }
+function linkMode(){ return dataReady() ? "live" : "demo"; }
+function normalizeCode(raw){ return String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
+function updateDemoBanner(){
+  const show = (ID.role==="trainer" || ID.role==="client") && !dataReady();
+  $("demoBanner").hidden = !show;
+}
+function run(fn){
+  Promise.resolve().then(fn).catch(e => toast(e && e.message ? e.message : "Something went wrong"));
+}
+
+let pairOpen = !!(ID.activePairId && ID.role==="trainer");
+let openPair = null;
+let photoAngle = "front";
+let liveChannel = null;
+let livePairId = "";
+let sb = null;
+let sbSig = "";
+let callFrame = null;
+let camStream = null;
+let tickTimer = null;
+let inSimCall = false;
+let simStarted = 0;
+let pollTimer = null;
+let refreshQueued = false;
+let demoChannel = null;
+
+function showingPair(){
+  if(ID.role==="client") return !!ID.activePairId;
+  if(ID.role==="trainer") return !!(pairOpen && ID.activePairId);
+  return false;
+}
+function safePhotoSrc(url){
+  if(typeof url!=="string") return "";
+  if(url.indexOf("data:image/jpeg;")===0 || url.indexOf("data:image/png;")===0) return url;
+  try {
+    const u = new URL(url);
+    if(u.protocol==="https:" && u.pathname.indexOf("/storage/v1/object/public/progress-photos/")>=0) return url;
+  } catch(e){}
+  return "";
+}
+function demoLoad(){
+  const d = readStore(localStorage, DEMO_KEY) || {pairs:[]};
+  if(!Array.isArray(d.pairs)) d.pairs = [];
+  d.pairs.forEach(p=>{
+    if(!Array.isArray(p.weighIns)) p.weighIns = [];
+    if(!Array.isArray(p.photos)) p.photos = [];
+    if(!Array.isArray(p.messages)) p.messages = [];
+    if(!p.call) p.call = {active:false, startedAt:0, by:""};
+  });
+  return d;
+}
+function demoSave(bus){
+  const raw = JSON.stringify(bus);
+  if(raw.length>4500000) throw new Error("Demo storage is full on this browser. Remove a photo or switch to live mode.");
+  localStorage.setItem(DEMO_KEY, raw);
+  if(demoChannel){ try { demoChannel.postMessage({type:"sync"}); } catch(e){} }
+}
+function demoCopy(pair){ return pair ? JSON.parse(JSON.stringify(pair)) : null; }
+
+const scriptLoads = {};
+function loadScript(src){
+  if(scriptLoads[src]) return scriptLoads[src];
+  scriptLoads[src] = new Promise((resolve, reject)=>{
+    const s = document.createElement("script");
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve();
+    s.onerror = () => { delete scriptLoads[src]; reject(new Error("Could not load a required library")); };
+    document.head.appendChild(s);
+  });
+  return scriptLoads[src];
+}
+async function getSb(){
+  const k = readKeys();
+  const sig = k.supabaseUrl+"|"+k.supabaseAnonKey;
+  if(sb && sbSig===sig) return sb;
+  await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js");
+  if(!window.supabase || !window.supabase.createClient) throw new Error("Could not load Supabase");
+  sb = window.supabase.createClient(k.supabaseUrl.replace(/\/$/,""), k.supabaseAnonKey);
+  sbSig = sig;
+  return sb;
+}
+async function sbFetch(path, options){
+  const k = readKeys();
+  const opt = options || {};
+  const res = await fetch(k.supabaseUrl.replace(/\/$/,"")+"/rest/v1/"+path, {
+    method: opt.method || "GET",
+    headers: {
+      apikey: k.supabaseAnonKey,
+      Authorization: "Bearer "+k.supabaseAnonKey,
+      "Content-Type": "application/json",
+      Prefer: "return=representation"
+    },
+    body: opt.body!=null ? JSON.stringify(opt.body) : undefined
+  });
+  const text = await res.text();
+  let data = null;
+  if(text){ try { data = JSON.parse(text); } catch(e){ data = {message:text}; } }
+  if(!res.ok){
+    const msg = (data && (data.message || data.error_description || data.hint)) || ("Request failed ("+res.status+")");
+    const err = new Error(typeof msg==="string" ? msg : "Request failed");
+    err.code = data && data.code;
+    throw err;
+  }
+  return data;
+}
+function mapPairRow(row, extras){
+  const extra = extras || {};
+  return {
+    id: row.id,
+    inviteCode: row.invite_code,
+    clientName: row.client_name,
+    trainerDevice: row.trainer_device,
+    clientDevice: row.client_device || "",
+    dailyRoomUrl: row.daily_room_url || "",
+    dailyRoomName: row.daily_room_name || "",
+    weighIns: extra.weighIns || [],
+    photos: extra.photos || [],
+    messages: extra.messages || [],
+    call: null,
+    createdAt: Date.parse(row.created_at)||Date.now()
+  };
+}
+function photoPublicUrl(path){
+  const base = readKeys().supabaseUrl.replace(/\/$/,"");
+  return base+"/storage/v1/object/public/progress-photos/"+String(path).split("/").map(encodeURIComponent).join("/");
+}
+async function ensureLiveChannel(pairId){
+  if(!dataReady() || !pairId) return;
+  if(liveChannel && livePairId===pairId) return;
+  try {
+    const client = await getSb();
+    if(liveChannel){ client.removeChannel(liveChannel); liveChannel = null; }
+    livePairId = pairId;
+    liveChannel = client.channel("cgf-"+pairId)
+      .on("postgres_changes", {event:"*", schema:"public", table:"messages", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
+      .on("postgres_changes", {event:"*", schema:"public", table:"weigh_ins", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
+      .on("postgres_changes", {event:"*", schema:"public", table:"photos", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
+      .on("postgres_changes", {event:"*", schema:"public", table:"pairs", filter:"id=eq."+pairId}, () => scheduleRefresh())
+      .subscribe();
+  } catch(e){ /* polling still updates the screen */ }
+}
+async function dailyCreateOrGet(name){
+  const key = readKeys().dailyApiKey.trim();
+  const headers = {Authorization:"Bearer "+key, "Content-Type":"application/json"};
+  let res = await fetch("https://api.daily.co/v1/rooms", {
+    method:"POST",
+    headers,
+    body: JSON.stringify({name:name, privacy:"public", properties:{enable_chat:true, enable_prejoin_ui:true}})
+  });
+  let data = {};
+  try { data = await res.json(); } catch(e){ data = {}; }
+  if(!res.ok){
+    res = await fetch("https://api.daily.co/v1/rooms/"+encodeURIComponent(name), {headers:headers});
+    try { data = await res.json(); } catch(e){ data = {}; }
+    if(!res.ok) throw new Error(data.error || data.info || "Could not open the video room");
+  }
+  if(!data.url) throw new Error("Daily did not return a room URL");
+  return data;
+}
+
+const Link = {
+  async pairsForTrainer(){
+    if(linkMode()==="demo"){
+      return demoLoad().pairs.filter(p=>p.trainerDevice===ID.deviceId).map(demoCopy);
+    }
+    const rows = await sbFetch("pairs?trainer_device=eq."+encodeURIComponent(ID.deviceId)+"&select=*&order=created_at.desc");
+    return (rows||[]).map(r=>mapPairRow(r));
+  },
+  async createClient(name){
+    if(linkMode()==="demo"){
+      const bus = demoLoad();
+      const pair = {
+        id:makeId(), inviteCode:makeCode(), clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
+        dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[],
+        call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
+      };
+      bus.pairs.unshift(pair);
+      demoSave(bus);
+      return demoCopy(pair);
+    }
+    let last = null;
+    for(let i=0;i<5;i++){
+      const row = {id:makeId(), invite_code:makeCode(), client_name:name, trainer_device:ID.deviceId};
+      try {
+        const data = await sbFetch("pairs", {method:"POST", body:row});
+        const saved = Array.isArray(data) ? data[0] : data;
+        return mapPairRow(saved || row);
+      } catch(e){
+        last = e;
+        if(String(e.code)!=="23505" && !/duplicate|unique/i.test(e.message||"")) throw e;
+      }
+    }
+    throw last || new Error("Could not create a client");
+  },
+  async joinWithCode(raw){
+    const code = normalizeCode(raw);
+    if(code.length<4) throw new Error("Enter the invite code");
+    if(linkMode()==="demo"){
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.inviteCode===code);
+      if(!pair) throw new Error("That invite code was not found. In demo mode, create it in another tab of this browser.");
+      pair.clientDevice = ID.deviceId;
+      demoSave(bus);
+      return demoCopy(pair);
+    }
+    const rows = await sbFetch("pairs?invite_code=eq."+encodeURIComponent(code)+"&select=*");
+    const row = Array.isArray(rows) ? rows[0] : null;
+    if(!row) throw new Error("That invite code was not found");
+    const updated = await sbFetch("pairs?id=eq."+encodeURIComponent(row.id), {method:"PATCH", body:{client_device:ID.deviceId}});
+    const saved = Array.isArray(updated) && updated[0] ? updated[0] : Object.assign({}, row, {client_device:ID.deviceId});
+    return mapPairRow(saved);
+  },
+  async loadPair(id){
+    if(!id) return null;
+    if(linkMode()==="demo"){
+      const pair = demoLoad().pairs.find(p=>p.id===id);
+      return demoCopy(pair);
+    }
+    const rows = await sbFetch("pairs?id=eq."+encodeURIComponent(id)+"&select=*");
+    const row = Array.isArray(rows) ? rows[0] : null;
+    if(!row) return null;
+    const q = encodeURIComponent(id);
+    const weigh = await sbFetch("weigh_ins?pair_id=eq."+q+"&select=*");
+    const msgs = await sbFetch("messages?pair_id=eq."+q+"&select=*");
+    const photos = await sbFetch("photos?pair_id=eq."+q+"&select=*");
+    return mapPairRow(row, {
+      weighIns:(weigh||[]).map(w=>({id:w.id, weight:Number(w.weight), date:w.logged_on, note:w.note||"", createdAt:Date.parse(w.created_at)||0})),
+      messages:(msgs||[]).map(m=>({id:m.id, sender:m.sender, body:m.body, createdAt:Date.parse(m.created_at)||0})),
+      photos:(photos||[]).map(p=>({id:p.id, angle:p.angle, url:photoPublicUrl(p.storage_path), createdAt:Date.parse(p.created_at)||0}))
+    });
+  },
+  async saveWeighIn(pairId, entry){
+    if(linkMode()==="demo"){
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.id===pairId);
+      if(!pair) throw new Error("Join your trainer first");
+      const prev = pair.weighIns.find(w=>w.date===entry.date);
+      if(prev){ prev.weight = entry.weight; prev.note = entry.note; }
+      else pair.weighIns.push({id:makeId(), weight:entry.weight, date:entry.date, note:entry.note, createdAt:Date.now()});
+      demoSave(bus);
+      return;
+    }
+    const existing = await sbFetch("weigh_ins?pair_id=eq."+encodeURIComponent(pairId)+"&logged_on=eq."+entry.date+"&select=*");
+    if(existing && existing[0]){
+      await sbFetch("weigh_ins?id=eq."+encodeURIComponent(existing[0].id), {method:"PATCH", body:{weight:entry.weight, note:entry.note}});
+    } else {
+      await sbFetch("weigh_ins", {method:"POST", body:{id:makeId(), pair_id:pairId, weight:entry.weight, logged_on:entry.date, note:entry.note}});
+    }
+  },
+  async sendMessage(pairId, sender, body){
+    if(linkMode()==="demo"){
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.id===pairId);
+      if(!pair) throw new Error("That conversation is missing");
+      pair.messages.push({id:makeId(), sender:sender, body:body, createdAt:Date.now()});
+      demoSave(bus);
+      return;
+    }
+    await sbFetch("messages", {method:"POST", body:{id:makeId(), pair_id:pairId, sender:sender, body:body}});
+  },
+  async sendPhoto(pairId, angle, blob){
+    if(angle!=="front" && angle!=="side" && angle!=="back") throw new Error("Pick front, side, or back");
+    if(linkMode()==="demo"){
+      const dataUrl = await blobToDataUrl(blob);
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.id===pairId);
+      if(!pair) throw new Error("Join your trainer first");
+      pair.photos.push({id:makeId(), angle:angle, url:dataUrl, createdAt:Date.now()});
+      demoSave(bus);
+      return;
+    }
+    const id = makeId();
+    const path = pairId+"/"+id+".jpg";
+    const k = readKeys();
+    const res = await fetch(k.supabaseUrl.replace(/\/$/,"")+"/storage/v1/object/progress-photos/"+path, {
+      method:"POST",
+      headers:{
+        apikey:k.supabaseAnonKey,
+        Authorization:"Bearer "+k.supabaseAnonKey,
+        "Content-Type":"image/jpeg",
+        "x-upsert":"true"
+      },
+      body:blob
+    });
+    if(!res.ok){
+      let msg = "Could not upload the photo";
+      try { const j = await res.json(); if(j && (j.message||j.error)) msg = j.message||j.error; } catch(e){}
+      throw new Error(msg);
+    }
+    await sbFetch("photos", {method:"POST", body:{id:id, pair_id:pairId, angle:angle, storage_path:path}});
+  },
+  async setDemoCall(pairId, call){
+    const bus = demoLoad();
+    const pair = bus.pairs.find(p=>p.id===pairId);
+    if(!pair) throw new Error("That client is no longer here");
+    pair.call = call;
+    demoSave(bus);
+  },
+  async ensureDailyRoom(pair){
+    if(pair.dailyRoomUrl) return pair.dailyRoomUrl;
+    const name = "cgf"+String(pair.id).toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,40);
+    const room = await dailyCreateOrGet(name);
+    await sbFetch("pairs?id=eq."+encodeURIComponent(pair.id), {method:"PATCH", body:{daily_room_url:room.url, daily_room_name:room.name||name}});
+    return room.url;
+  }
+};
+
+function blobToDataUrl(blob){
+  return new Promise((resolve, reject)=>{
+    const rd = new FileReader();
+    rd.onload = () => resolve(String(rd.result||""));
+    rd.onerror = () => reject(new Error("Could not read that photo"));
+    rd.readAsDataURL(blob);
+  });
+}
+function compressImage(file, maxEdge, quality){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxEdge / Math.max(img.width, img.height, 1));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.width*scale));
+      canvas.height = Math.max(1, Math.round(img.height*scale));
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Could not read that photo")), "image/jpeg", quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read that photo")); };
+    img.src = url;
+  });
+}
+
+function paintWeighIns(list){
+  const rows = (list||[]).slice().sort((a,b)=> a.date<b.date?1:a.date>b.date?-1:0);
+  if(!rows.length){ $("pairWeighList").innerHTML = '<div class="empty">No weekly weigh-ins yet.</div>'; return; }
+  const today = parseYmd(todayStr());
+  $("pairWeighList").innerHTML = '<ul class="list">'+rows.map(w=>{
+    let tag = "";
+    if(/^\d{4}-\d{2}-\d{2}$/.test(w.date||"")){
+      const days = Math.round((today - parseYmd(w.date))/86400000);
+      if(days>=0 && days<7) tag = " · this week";
+    }
+    const note = w.note ? " · "+esc(w.note) : "";
+    return '<li><div class="grow"><div class="name">'+esc(String(w.weight))+' lb</div><div class="meta">'+esc(fmtDate(w.date))+tag+note+'</div></div></li>';
+  }).join("")+'</ul>';
+}
+function paintPhotos(list){
+  const rows = (list||[]).slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  if(!rows.length){ $("pairPhotos").innerHTML = '<div class="empty">No progress photos yet.</div>'; return; }
+  $("pairPhotos").innerHTML = '<div class="photogrid">'+rows.map(p=>{
+    const src = safePhotoSrc(p.url);
+    if(!src) return "";
+    return '<figure><img alt="'+esc(p.angle)+' progress photo" src="'+src+'"><figcaption>'+esc(p.angle)+'</figcaption></figure>';
+  }).join("")+'</div>';
+}
+function paintMessages(list){
+  const box = $("pairThread");
+  const nearBottom = box.scrollHeight-box.scrollTop-box.clientHeight < 48;
+  const rows = (list||[]).slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+  if(!rows.length){ box.innerHTML = '<div class="empty">No messages yet.</div>'; return; }
+  box.innerHTML = rows.map(m=>{
+    const mine = m.sender===ID.role;
+    const who = mine ? "You" : (m.sender==="trainer" ? "Trainer" : ((openPair && openPair.clientName) || "Client"));
+    return '<div class="bubble'+(mine?' me':'')+'"><div class="who">'+esc(who)+'</div>'+esc(m.body)+'</div>';
+  }).join("");
+  if(nearBottom) box.scrollTop = box.scrollHeight;
+}
+function paintCallStatus(pair){
+  if(linkMode()==="demo"){
+    const on = !!(pair.call && pair.call.active);
+    $("pairCallNote").textContent = on
+      ? "A simulated call is on. It stays in this browser and is labeled demo."
+      : "Demo mode uses a simulated call so two tabs can practice without Daily.";
+    $("pairCall").disabled = ID.role==="client" && !on;
+    $("pairCall").textContent = ID.role==="trainer"
+      ? (on ? "Rejoin simulated call" : "Start simulated call")
+      : (on ? "Join simulated call" : "Waiting for trainer");
+    return;
+  }
+  $("pairCall").disabled = false;
+  if(pair.dailyRoomUrl){
+    $("pairCallNote").textContent = "A Daily.co room is ready for this trainer and client.";
+    $("pairCall").textContent = ID.role==="trainer" ? "Rejoin live video call" : "Join video call";
+  } else if(ID.role==="trainer"){
+    $("pairCallNote").textContent = videoReady()
+      ? "Starts one Daily.co room for you and this client."
+      : "Add your Daily API key in Settings to start a live call.";
+    $("pairCall").textContent = "Start live video call";
+  } else {
+    $("pairCallNote").textContent = "Join after your trainer starts the call.";
+    $("pairCall").textContent = "Join video call";
+  }
+}
+async function paintTrainerList(){
+  const pairs = await Link.pairsForTrainer();
+  if(!pairs.length){
+    $("trList").innerHTML = '<div class="empty">No clients yet. Create one to get an invite code.</div>';
+    return;
+  }
+  $("trList").innerHTML = '<ul class="list">'+pairs.map(p=>'<li><div class="grow"><div class="name">'+esc(p.clientName)+'</div><div class="meta">'+esc(p.inviteCode)+(p.clientDevice?' · joined':' · waiting to join')+'</div></div><button class="sm" type="button" data-open="'+esc(p.id)+'">Open</button></li>').join("")+'</ul>';
+}
+async function paintPair(){
+  const pair = await Link.loadPair(ID.activePairId);
+  openPair = pair;
+  if(!pair){
+    if(ID.role==="client") ID.activePairId = "";
+    pairOpen = false;
+    persistIdentity();
+    renderCoach();
+    if(ID.role==="trainer") await paintTrainerList();
+    return;
+  }
+  $("pairName").textContent = pair.clientName || "Client";
+  $("pairMeta").textContent = ID.role==="trainer"
+    ? (pair.clientDevice ? "Joined on their phone" : "Waiting for them to enter the code")
+    : "You're checked in with your trainer";
+  $("pairCode").textContent = pair.inviteCode || "";
+  paintWeighIns(pair.weighIns);
+  paintPhotos(pair.photos);
+  paintMessages(pair.messages);
+  paintCallStatus(pair);
+  if(inSimCall && linkMode()==="demo" && !(pair.call && pair.call.active)){
+    hideCall(false);
+    toast("Call ended");
+  }
+  ensureLiveChannel(pair.id);
+}
+async function refreshCoachData(){
+  if(ID.role==="trainer" && !showingPair()){ await paintTrainerList(); return; }
+  if(showingPair()) await paintPair();
+}
+function scheduleRefresh(){
+  if(refreshQueued) return;
+  refreshQueued = true;
+  setTimeout(()=>{
+    refreshQueued = false;
+    const callOpen = $("callLayer") && !$("callLayer").hidden;
+    if(currentTab!=="coach" && !callOpen) return;
+    refreshCoachData().catch(()=>{});
+  }, 150);
+}
+function syncCoachTab(tab){
+  if(pollTimer){ clearInterval(pollTimer); pollTimer = null; }
+  if(tab!=="coach") return;
+  refreshCoachData().catch(()=>{});
+  pollTimer = setInterval(()=>{
+    if(!document.hidden && currentTab==="coach") refreshCoachData().catch(()=>{});
+  }, 3000);
+}
+function renderCoach(){
+  const coaching = ID.role==="trainer" || ID.role==="client";
+  $("hdrSub").textContent = ID.role==="trainer" ? "Clients, check-ins, and calls" : ID.role==="client" ? "Weigh-ins, photos, and your trainer" : "Personal tracker";
+  $("coachDemoCard").hidden = !(coaching && !dataReady() && !showingPair());
+  $("coachSolo").style.display = (ID.role==="solo" || !ID.role) ? "" : "none";
+  $("coachTrainer").style.display = (ID.role==="trainer" && !showingPair()) ? "" : "none";
+  $("coachClient").style.display = (ID.role==="client" && !ID.activePairId) ? "" : "none";
+  $("pairPanel").style.display = showingPair() ? "" : "none";
+  $("pairBack").style.display = ID.role==="trainer" ? "" : "none";
+  $("pairWeighForm").style.display = ID.role==="client" ? "" : "none";
+  $("pairPhotoForm").style.display = ID.role==="client" ? "" : "none";
+  if(ID.role==="client" && $("cwDate") && !$("cwDate").value) $("cwDate").value = todayStr();
+}
+function fillConnectionSettings(){
+  const k = readKeys();
+  const live = dataReady();
+  $("keysHeading").textContent = live ? "Connection" : "Setup";
+  if(!live){
+    $("keysIntro").textContent = "Demo mode stays on until these are saved. On each phone, fill in Supabase project URL, Supabase anon key, and Daily API key. Run the SQL once in Supabase.";
+  } else if(!videoReady()){
+    $("keysIntro").textContent = "Supabase is connected for invite codes, chat, weigh-ins, and photos. Add the Daily API key on the trainer phone to start a live video call.";
+  } else {
+    $("keysIntro").textContent = "Live mode is on. These keys stay on this phone and are not part of the page.";
+  }
+  if(document.activeElement!==$("keyUrl")) $("keyUrl").value = k.supabaseUrl;
+  if(document.activeElement!==$("keyAnon")) $("keyAnon").value = k.supabaseAnonKey;
+  if(document.activeElement!==$("keyDaily")) $("keyDaily").value = k.dailyApiKey;
+  document.querySelectorAll("#modePicks [data-mode]").forEach(btn=>{
+    btn.classList.toggle("sel", btn.dataset.mode===ID.role);
+  });
+  $("modeNote").textContent = ID.role==="trainer" ? "This phone can create clients and review their check-ins."
+    : ID.role==="client" ? "This phone can join with an invite code and check in with your trainer."
+    : ID.role==="solo" ? "Personal tracker only. Coaching stays off until you switch mode."
+    : "Choose a mode to continue.";
+  if(!$("setupSql").value) $("setupSql").value = SETUP_SQL;
+}
+function setRole(role){
+  if(role!=="trainer" && role!=="client" && role!=="solo") return;
+  if(ID.role!==role){ ID.activePairId = ""; pairOpen = false; }
+  ID.role = role;
+  persistIdentity();
+  $("roleGate").style.display = "none";
+  updateDemoBanner();
+  toast(role==="trainer"?"Trainer mode":role==="client"?"Client mode":"Personal tracker");
+  if(role==="trainer" || role==="client") go("coach");
+  else if(currentTab==="coach" || currentTab==="settings") render();
+  else updateDemoBanner();
+}
+function maybeGate(){
+  $("roleGate").style.display = ID.role ? "none" : "flex";
+}
+function stopCamera(){
+  if(camStream){ camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
+  const v = $("callPreview");
+  if(v){ v.srcObject = null; v.hidden = true; }
+}
+function hideCall(notify){
+  const shouldNotify = !!(notify && inSimCall && ID.activePairId && linkMode()==="demo");
+  const pairId = ID.activePairId;
+  inSimCall = false;
+  document.body.style.overflow = "";
+  if(tickTimer){ clearInterval(tickTimer); tickTimer = null; }
+  stopCamera();
+  const frame = callFrame;
+  callFrame = null;
+  if(frame){
+    try { const left = frame.leave(); if(left && left.catch) left.catch(()=>{}); } catch(e){}
+    try { frame.destroy(); } catch(e){}
+  }
+  $("callLive").innerHTML = "";
+  $("callLayer").hidden = true;
+  if(shouldNotify) Link.setDemoCall(pairId, {active:false, startedAt:0, by:""}).catch(e=>toast(e.message||"Could not end the call"));
+}
+function showSimCall(){
+  inSimCall = true;
+  document.body.style.overflow = "hidden";
+  $("callLive").hidden = true;
+  $("callDemo").hidden = false;
+  $("callLayer").hidden = false;
+  $("callTitle").textContent = "Simulated call · Demo mode";
+  simStarted = Date.now();
+  if(tickTimer) clearInterval(tickTimer);
+  const tick = ()=>{
+    const s = Math.floor((Date.now()-simStarted)/1000);
+    $("callTimer").textContent = "Connected "+String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  };
+  tick();
+  tickTimer = setInterval(tick, 1000);
+}
+async function showLiveCall(url){
+  document.body.style.overflow = "hidden";
+  try {
+  await loadScript("https://unpkg.com/@daily-co/daily-js");
+  if(!window.DailyIframe) throw new Error("Could not load video");
+  if(callFrame){
+    try { await callFrame.leave(); } catch(e){}
+    try { callFrame.destroy(); } catch(e){}
+    callFrame = null;
+  }
+  $("callDemo").hidden = true;
+  $("callLive").hidden = false;
+  $("callLive").innerHTML = "";
+  $("callLayer").hidden = false;
+  $("callTitle").textContent = "Curly Girl Fitness";
+  callFrame = window.DailyIframe.createFrame($("callLive"), {
+    showLeaveButton: true,
+    iframeStyle: {position:"absolute", top:"0", left:"0", width:"100%", height:"100%", border:"0"}
+  });
+  callFrame.on("left-meeting", () => hideCall(false));
+  callFrame.on("error", () => toast("The video call hit a problem"));
+  await callFrame.join({url:url});
+  } catch(err) {
+    document.body.style.overflow = "";
+    $("callLayer").hidden = true;
+    throw err;
+  }
+}
+
+try {
+  demoChannel = new BroadcastChannel(DEMO_CH);
+  demoChannel.onmessage = () => scheduleRefresh();
+} catch(e){ demoChannel = null; }
+window.addEventListener("storage", (e)=>{ if(e.key===DEMO_KEY) scheduleRefresh(); });
+
+$("pickTrainer").onclick = () => setRole("trainer");
+$("pickClient").onclick = () => setRole("client");
+$("pickSolo").onclick = () => setRole("solo");
+$("demoAsTrainer").onclick = () => setRole("trainer");
+$("demoAsClient").onclick = () => setRole("client");
+$("coachOpenSettings").onclick = () => go("settings");
+$("soloSettings").onclick = () => go("settings");
+document.querySelectorAll("#modePicks [data-mode]").forEach(btn=>{ btn.onclick = () => setRole(btn.dataset.mode); });
+$("keysSave").onclick = () => {
+  localStorage.setItem(KEYS_KEY, JSON.stringify({
+    supabaseUrl:$("keyUrl").value.trim(),
+    supabaseAnonKey:$("keyAnon").value.trim(),
+    dailyApiKey:$("keyDaily").value.trim()
+  }));
+  if(liveChannel && sb){ try { sb.removeChannel(liveChannel); } catch(e){} }
+  liveChannel = null; livePairId = ""; sb = null; sbSig = "";
+  updateDemoBanner();
+  if(currentTab==="settings" || currentTab==="coach") render();
+  if(dataReady()) toast(videoReady() ? "Live mode on" : "Supabase saved. Add the Daily API key for video.");
+  else toast("Saved. Demo mode stays on until the Supabase fields are set.");
+};
+$("copySql").onclick = () => {
+  const text = $("setupSql").value;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>toast("SQL copied"), ()=>toast("Select the SQL and copy it"));
+  } else toast("Select the SQL and copy it");
+};
+$("trCreate").onclick = () => run(async ()=>{
+  const name = $("trName").value.trim();
+  if(!name) throw new Error("Enter a client name");
+  const pair = await Link.createClient(name.slice(0,40));
+  $("trName").value = "";
+  ID.activePairId = pair.id;
+  pairOpen = true;
+  persistIdentity();
+  toast("Invite code ready");
+  renderCoach();
+  await refreshCoachData();
+});
+$("clJoinBtn").onclick = () => run(async ()=>{
+  const pair = await Link.joinWithCode($("clCode").value);
+  ID.activePairId = pair.id;
+  persistIdentity();
+  $("clCode").value = "";
+  toast("Joined "+(pair.clientName||"your trainer"));
+  renderCoach();
+  await refreshCoachData();
+});
+$("pairBack").onclick = () => {
+  pairOpen = false;
+  ID.activePairId = "";
+  persistIdentity();
+  renderCoach();
+  refreshCoachData().catch(()=>{});
+};
+$("pairCopy").onclick = () => {
+  const code = ($("pairCode").textContent||"").trim();
+  if(!code) return;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(()=>toast("Code copied"), ()=>toast("Code "+code));
+  } else toast("Code "+code);
+};
+$("cwSave").onclick = () => run(async ()=>{
+  if(!ID.activePairId) throw new Error("Join your trainer first");
+  const date = $("cwDate").value || todayStr();
+  const v = num($("cwVal").value);
+  if(v==null || v<=0 || v>1000) throw new Error("Enter a valid weight");
+  await Link.saveWeighIn(ID.activePairId, {weight:r1(v), date:date, note:$("cwNote").value.trim().slice(0,200)});
+  $("cwVal").value = "";
+  $("cwNote").value = "";
+  toast("Weigh-in sent");
+  await refreshCoachData();
+});
+$("pairSend").onclick = () => run(async ()=>{
+  if(!ID.activePairId) throw new Error("Nobody is connected yet");
+  const body = $("pairMsg").value.trim();
+  if(!body) throw new Error("Write a message");
+  await Link.sendMessage(ID.activePairId, ID.role==="trainer"?"trainer":"client", body.slice(0,2000));
+  $("pairMsg").value = "";
+  await refreshCoachData();
+});
+$("pairMsg").addEventListener("keydown", (e)=>{
+  if(e.key==="Enter"){ e.preventDefault(); $("pairSend").click(); }
+});
+$("page-coach").addEventListener("click", (e)=>{
+  const open = e.target.closest("[data-open]");
+  if(open){
+    ID.activePairId = open.dataset.open;
+    pairOpen = true;
+    persistIdentity();
+    renderCoach();
+    refreshCoachData().catch(err=>toast(err.message||"Could not open that client"));
+    return;
+  }
+  const angleBtn = e.target.closest("[data-angle]");
+  if(!angleBtn) return;
+  photoAngle = angleBtn.dataset.angle;
+  const input = angleBtn.dataset.cam ? $("photoCam") : $("photoLib");
+  input.value = "";
+  input.click();
+});
+function onPickedPhoto(e){
+  const file = e.target.files && e.target.files[0];
+  e.target.value = "";
+  if(!file) return;
+  run(async ()=>{
+    if(!ID.activePairId) throw new Error("Join your trainer first");
+    const demo = linkMode()==="demo";
+    const blob = await compressImage(file, demo?480:1280, demo?0.55:0.72);
+    await Link.sendPhoto(ID.activePairId, photoAngle, blob);
+    toast("Photo sent");
+    await refreshCoachData();
+  });
+}
+$("photoCam").addEventListener("change", onPickedPhoto);
+$("photoLib").addEventListener("change", onPickedPhoto);
+$("pairCall").onclick = () => run(async ()=>{
+  if(!ID.activePairId) throw new Error("Open a client first");
+  const pair = await Link.loadPair(ID.activePairId);
+  if(!pair) throw new Error("This connection is missing");
+  if(linkMode()==="demo"){
+    const on = !!(pair.call && pair.call.active);
+    if(ID.role==="trainer" && !on) await Link.setDemoCall(pair.id, {active:true, startedAt:Date.now(), by:"trainer"});
+    else if(!on) throw new Error("Your trainer hasn't started the call");
+    showSimCall();
+    await refreshCoachData();
+    return;
+  }
+  let url = pair.dailyRoomUrl;
+  if(!url){
+    if(ID.role!=="trainer") throw new Error("Your trainer hasn't started the call yet");
+    if(!videoReady()) throw new Error("Add your Daily API key in Settings to start a live call");
+    url = await Link.ensureDailyRoom(pair);
+  }
+  await showLiveCall(url);
+});
+$("callEnd").onclick = () => hideCall(true);
+$("callCam").onclick = () => run(async ()=>{
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("Camera unavailable — the simulated call still works");
+  stopCamera();
+  try { camStream = await navigator.mediaDevices.getUserMedia({video:true, audio:false}); }
+  catch(e){ throw new Error("Camera unavailable — the simulated call still works"); }
+  const v = $("callPreview");
+  v.hidden = false;
+  v.srcObject = camStream;
+  try { await v.play(); } catch(e){}
+});
+
+maybeGate();
+
 /* ---------- Render ---------- */
 function render(){
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, settings:renderSettings})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, coach:renderCoach, settings:renderSettings})[currentTab]();
+  if(typeof updateDemoBanner==="function") updateDemoBanner();
 }
 // roll over at midnight / when returning to app
 let lastDay = todayStr();
@@ -1728,6 +2765,7 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden && todayS
 $("fType").value = defaultMealType();
 const initial = (location.hash||"").slice(1);
 go(TITLES[initial] ? initial : "today");
+maybeGate();
 window.__fitness = {get state(){return S;}, KEY};
 })();
 </script>
