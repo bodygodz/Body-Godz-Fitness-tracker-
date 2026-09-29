@@ -9,7 +9,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Curly Girl">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23fbbf24'/%3E%3Cstop offset='.5' stop-color='%23fb7185'/%3E%3Cstop offset='1' stop-color='%2322d3ee'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='100' height='100' rx='22' fill='url(%23g)'/%3E%3Ctext x='50' y='68' font-size='54' text-anchor='middle' font-family='Arial' font-weight='bold' fill='%23fff'%3EC%3C/text%3E%3C/svg%3E">
-<title>Curly Girl Fitness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&display=swap" rel="stylesheet">
+<title>Curly Gurl Fitness</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -26,7 +29,7 @@ html,body{margin:0;color:var(--text);font-family:-apple-system,BlinkMacSystemFon
     linear-gradient(165deg, #6d28d9 0%, #db2777 48%, #ea580c 100%);
   background-attachment:fixed}
 body{padding-bottom:calc(76px + var(--safe-b));min-height:100vh}
-header{position:sticky;top:0;z-index:5;background:rgba(28,16,48,.86);backdrop-filter:blur(12px);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16)}
+header{position:sticky;top:0;z-index:5;background:rgba(28,16,48,.86);backdrop-filter:blur(12px);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16);font-family:"Playfair Display",Georgia,"Times New Roman",serif}
 header h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.15}
 header .screentitle{font-size:15px;font-weight:700;margin-top:3px;color:#fff}
 header .sub{color:#e4dcf5;font-size:13px}
@@ -172,7 +175,7 @@ textarea:focus{border-color:var(--accent)}
 </head>
 <body>
 <header>
-  <h1 class="brandline">Curly Girl Fitness</h1>
+  <h1 class="brandline">Curly Gurl Fitness</h1>
   <div class="screentitle" id="hdrTitle">Today</div>
   <div class="sub" id="hdrSub"></div>
   <p class="demobanner" id="demoBanner" hidden>Demo mode · two tabs on this browser. Add Supabase and Daily keys in Settings to connect two phones.</p>
@@ -571,7 +574,7 @@ textarea:focus{border-color:var(--accent)}
 <div class="toast" id="toast"></div>
 <div class="gate" id="roleGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
   <div class="gatebox">
-    <h2 id="gateTitle">Curly Girl Fitness</h2>
+    <h2 id="gateTitle">Curly Gurl Fitness</h2>
     <p>Who is using this phone? You can change this later in Settings. Meals, workouts, and weight stay on this device either way.</p>
     <button class="primary full" id="pickTrainer" type="button">I'm the trainer</button>
     <button class="full" id="pickClient" type="button">I'm a client</button>
@@ -2583,7 +2586,7 @@ async function showLiveCall(url){
   $("callLive").hidden = false;
   $("callLive").innerHTML = "";
   $("callLayer").hidden = false;
-  $("callTitle").textContent = "Curly Girl Fitness";
+  $("callTitle").textContent = "Curly Gurl Fitness";
   callFrame = window.DailyIframe.createFrame($("callLive"), {
     showLeaveButton: true,
     iframeStyle: {position:"absolute", top:"0", left:"0", width:"100%", height:"100%", border:"0"}
