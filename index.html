@@ -169,6 +169,10 @@ textarea:focus{border-color:var(--accent)}
 .calllive{flex:1;position:relative;min-height:0}
 .calllive[hidden]{display:none}
 #callDemo[hidden]{display:none}
+.modechips{display:flex;gap:8px;margin-bottom:10px}
+.modechips .chip{flex:1;text-align:center}
+.planbadge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent2);margin-left:6px}
+
 </style>
 </head>
 <body>
@@ -215,6 +219,11 @@ textarea:focus{border-color:var(--accent)}
     </div>
     <div class="note" id="stepsNote" style="margin-top:6px"></div>
   </div>
+  <div class="card" id="dPlanCard" hidden>
+    <h2>Today's plan</h2>
+    <ul class="list" id="dPlan"></ul>
+    <div class="note" style="margin-top:6px">Tap Log to add a planned item to today's meal log.</div>
+  </div>
   <div class="card">
     <h2>Today's meals</h2>
     <ul class="list" id="dMeals"></ul>
@@ -229,25 +238,47 @@ textarea:focus{border-color:var(--accent)}
     <b id="mDate"></b>
     <button class="sm" id="mNext">Next ›</button>
   </div>
-  <div class="card">
-    <h2>Quick add from your plan</h2>
+  <div class="note" id="mModeNote" style="margin-bottom:12px;text-align:center"></div>
+
+  <div id="mealPlanSection">
+    <div class="card">
+      <h2>Meal plan <span id="mPlanTotals" style="text-transform:none;letter-spacing:0;float:right"></span></h2>
+      <div id="mealPlanList"></div>
+      <details style="margin-top:10px">
+        <summary>Copy plan</summary>
+        <div class="field" style="margin-top:8px"><label class="f">Copy another day's plan here</label>
+          <div class="row"><input type="date" id="mCopyFromDate"><button class="sm" id="mCopyFromBtn">Copy here</button></div>
+        </div>
+        <div class="field"><label class="f">Copy this plan to another day</label>
+          <div class="row"><input type="date" id="mCopyToDate"><button class="sm" id="mCopyToBtn">Copy there</button></div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <div class="card" id="mealAddCard">
+    <h2 id="mealAddHeading">Quick add</h2>
+    <div class="modechips" id="mealAddModeWrap">
+      <button type="button" class="chip sel" data-addmode="log" id="addModeLog">Log (eaten)</button>
+      <button type="button" class="chip" data-addmode="plan" id="addModePlan">Plan ahead</button>
+    </div>
     <div class="chips" id="presetChips"></div>
     <div class="note" style="margin-top:8px">Preset macros are <b>rough estimates</b>. Tapping one fills the form below so you can adjust before adding. Edit the defaults in Settings.</div>
     <button class="full" id="mealsCook" style="margin-top:10px">Browse cookbook</button>
-  </div>
-  <div class="card">
-    <h2>Add food</h2>
-    <div class="field"><label class="f">Food</label><input id="fName" placeholder="e.g. Turkey sandwich"></div>
-    <div class="row">
-      <div class="field"><label class="f">Calories</label><input id="fCal" type="number" inputmode="numeric" min="0"></div>
-      <div class="field"><label class="f">Protein (g)</label><input id="fPro" type="number" inputmode="decimal" min="0" step="0.1"></div>
+    <div style="margin-top:12px">
+      <div class="field"><label class="f">Food</label><input id="fName" placeholder="e.g. Turkey sandwich"></div>
+      <div class="row">
+        <div class="field"><label class="f">Calories</label><input id="fCal" type="number" inputmode="numeric" min="0"></div>
+        <div class="field"><label class="f">Protein (g)</label><input id="fPro" type="number" inputmode="decimal" min="0" step="0.1"></div>
+      </div>
+      <div class="field"><label class="f">Meal</label>
+        <select id="fType"><option value="breakfast">Breakfast</option><option value="lunch">Lunch</option><option value="snack">Snack</option><option value="dinner">Dinner</option></select>
+      </div>
+      <button class="primary full" id="fAdd">Add to log</button>
     </div>
-    <div class="field"><label class="f">Meal</label>
-      <select id="fType"><option value="breakfast">Breakfast</option><option value="lunch">Lunch</option><option value="snack">Snack</option><option value="dinner">Dinner</option></select>
-    </div>
-    <button class="primary full" id="fAdd">Add to log</button>
   </div>
-  <div class="card">
+
+  <div class="card" id="mealLogSection">
     <h2>Log <span id="mTotals" style="text-transform:none;letter-spacing:0;float:right"></span></h2>
     <div id="mealLog"></div>
   </div>
@@ -952,7 +983,7 @@ function normalizeCustomRecipes(list){
 }
 function blankState(){
   return {version:2, settings:{calTarget:null, proteinTarget:null, goalWeight:null},
-    presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], weights:[], steps:{}, workouts:{},
+    presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], mealPlans:{}, weights:[], steps:{}, workouts:{},
     plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[]};
 }
 function load(){
@@ -962,6 +993,27 @@ function load(){
     return normalize(JSON.parse(raw));
   }catch(e){ console.warn("Could not load data", e); return blankState(); }
 }
+function normalizeMealPlans(mp){
+  if(!mp || typeof mp!=="object" || Array.isArray(mp)) return {};
+  const nid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  const round1 = n => Math.round(n*10)/10;
+  const out = {};
+  Object.keys(mp).forEach(date=>{
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    const items = mp[date];
+    if(!Array.isArray(items)) return;
+    out[date] = items.map(it=>{
+      if(!it || typeof it!=="object") return null;
+      const name = String(it.name||"").trim();
+      if(!name) return null;
+      const cal = Math.round(+it.cal||0);
+      const protein = round1(Math.max(0, +it.protein||0));
+      const type = MEAL_TYPES.includes(it.type) ? it.type : "snack";
+      return {id:String(it.id||nid()), name, cal:cal>=0?cal:0, protein, type};
+    }).filter(Boolean);
+  });
+  return out;
+}
 function normalize(d){
   const b = blankState();
   if(!d || typeof d!=="object") return b;
@@ -970,6 +1022,7 @@ function normalize(d){
     settings:Object.assign(b.settings, d.settings||{}),
     presets:Array.isArray(d.presets)&&d.presets.length ? d.presets : b.presets,
     meals:Array.isArray(d.meals)?d.meals:[],
+    mealPlans:normalizeMealPlans(d.mealPlans),
     weights:Array.isArray(d.weights)?d.weights:[],
     steps:(d.steps&&typeof d.steps==="object")?d.steps:{},
     workouts:migrateWorkoutLogs(d.workouts),
@@ -999,6 +1052,11 @@ function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("sho
 function defaultMealType(){ const h=new Date().getHours(); return h<11?"breakfast":h<15?"lunch":h<17?"snack":"dinner"; }
 function mealsOn(date){ return S.meals.filter(m=>m.date===date); }
 function totals(date){ return mealsOn(date).reduce((a,m)=>({cal:a.cal+(+m.cal||0), protein:a.protein+(+m.protein||0)}),{cal:0,protein:0}); }
+function ensureMealPlans(){ if(!S.mealPlans || typeof S.mealPlans!=="object" || Array.isArray(S.mealPlans)) S.mealPlans={}; }
+function plansOn(date){ ensureMealPlans(); return Array.isArray(S.mealPlans[date]) ? S.mealPlans[date] : []; }
+function planTotals(date){ return plansOn(date).reduce((a,m)=>({cal:a.cal+(+m.cal||0), protein:a.protein+(+m.protein||0)}),{cal:0,protein:0}); }
+function setPlans(date, items){ ensureMealPlans(); if(!items || !items.length) delete S.mealPlans[date]; else S.mealPlans[date]=items; }
+function clonePlanItem(it){ return {id:uid(), name:it.name, cal:Math.round(+it.cal||0), protein:r1(+it.protein||0), type:MEAL_TYPES.includes(it.type)?it.type:"snack"}; }
 function sortedWeights(){ return [...S.weights].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0); }
 function woEntry(date){ return S.workouts[date] || {done:false, exercises:{}, notes:""}; }
 function planDay(dow){
@@ -1049,7 +1107,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meal Log", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings"};
+const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings"};
 let currentTab = "today";
 function go(tab){
   currentTab = tab;
@@ -1109,6 +1167,22 @@ function renderToday(){
   if(document.activeElement!==$("stepsInput")) $("stepsInput").value = steps!=null?steps:"";
   $("stepsNote").textContent = steps!=null ? `Logged: ${Number(steps).toLocaleString()} steps` : "Enter your step count from your phone or watch.";
 
+  const planItems = plansOn(t);
+  const dPlanCard = $("dPlanCard");
+  if(planItems.length){
+    dPlanCard.hidden = false;
+    $("dPlan").innerHTML = planItems.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${cap(m.type)} · ${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="sm primary" data-logplan="${m.id}">Log</button></li>`).join("");
+    document.querySelectorAll("[data-logplan]").forEach(b=>b.onclick=()=>{
+      const item = plansOn(t).find(x=>x.id===b.dataset.logplan);
+      if(!item) return;
+      S.meals.push({id:uid(), date:t, name:item.name, cal:Math.round(+item.cal||0), protein:r1(+item.protein||0), type:item.type||defaultMealType(), ts:Date.now()});
+      save(); render(); toast("Logged "+item.name);
+    });
+  } else {
+    dPlanCard.hidden = true;
+    $("dPlan").innerHTML = "";
+  }
+
   const ms = mealsOn(t);
   $("dMeals").innerHTML = ms.length ? ms.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${cap(m.type)} · ${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div></li>`).join("") : '<li class="empty" style="justify-content:center">Nothing logged yet today</li>';
 }
@@ -1131,19 +1205,55 @@ $("stepsSave").onclick = () => {
 
 /* ---------- Meals ---------- */
 let mealDate = todayStr();
+let mealAddMode = "log"; // "log" | "plan" — used on today; forced by date otherwise
+let mealCookReturn = false;
 $("mPrev").onclick=()=>{ mealDate=addDays(mealDate,-1); render(); };
-$("mNext").onclick=()=>{ if(mealDate<todayStr()){ mealDate=addDays(mealDate,1); render(); } };
-function renderMeals(){
+$("mNext").onclick=()=>{ mealDate=addDays(mealDate,1); render(); };
+function mealDayKind(){
   const t=todayStr();
-  $("hdrSub").textContent = "Food, calories & protein";
-  $("mDate").textContent = mealDate===t ? "Today" : mealDate===addDays(t,-1) ? "Yesterday" : fmtDate(mealDate);
-  $("mNext").disabled = mealDate>=t; $("mNext").style.opacity = mealDate>=t?.4:1;
-  $("presetChips").innerHTML = S.presets.map((p,i)=>`<button class="chip" data-preset="${i}">${esc(p.name)} <small>~${p.cal} · ${p.protein}g</small></button>`).join("");
-  document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{
-    const p=S.presets[+b.dataset.preset];
-    $("fName").value=p.name; $("fCal").value=p.cal; $("fPro").value=p.protein;
-    $("fAdd").scrollIntoView({behavior:"smooth",block:"center"}); toast("Filled — adjust if needed, then Add");
+  if(mealDate<t) return "past";
+  if(mealDate>t) return "future";
+  return "today";
+}
+function effectiveAddMode(){
+  const k=mealDayKind();
+  if(k==="past") return "log";
+  if(k==="future") return "plan";
+  return mealAddMode==="plan" ? "plan" : "log";
+}
+function syncAddModeChips(){
+  const mode=effectiveAddMode();
+  document.querySelectorAll("[data-addmode]").forEach(b=>{
+    b.classList.toggle("sel", b.dataset.addmode===mode);
   });
+  $("fAdd").textContent = mode==="plan" ? "Add to plan" : "Add to log";
+  $("mealAddHeading").textContent = mode==="plan" ? "Add to meal plan" : "Add to log";
+}
+document.querySelectorAll("[data-addmode]").forEach(b=>b.onclick=()=>{
+  if(mealDayKind()!=="today") return;
+  mealAddMode = b.dataset.addmode;
+  syncAddModeChips();
+});
+function renderMealPlanList(){
+  const items = plansOn(mealDate), tot = planTotals(mealDate), st=S.settings;
+  $("mPlanTotals").textContent = `${Math.round(tot.cal)}${st.calTarget?"/"+st.calTarget:""} kcal · ${r1(tot.protein)}${st.proteinTarget?"/"+st.proteinTarget:""}g`;
+  if(!items.length){
+    $("mealPlanList").innerHTML='<div class="empty">No planned meals for this day.</div>';
+    return;
+  }
+  $("mealPlanList").innerHTML = MEAL_TYPES.map(type=>{
+    const g = items.filter(m=>m.type===type); if(!g.length) return "";
+    const gc = g.reduce((a,m)=>a+(+m.cal||0),0), gp=g.reduce((a,m)=>a+(+m.protein||0),0);
+    return `<div class="mealgroup"><h3>${cap(type)} <span>${Math.round(gc)} kcal · ${r1(gp)}g</span></h3><ul class="list">${
+      g.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delplan="${m.id}" aria-label="Delete">×</button></li>`).join("")
+    }</ul></div>`;
+  }).join("");
+  document.querySelectorAll("[data-delplan]").forEach(b=>b.onclick=()=>{
+    setPlans(mealDate, plansOn(mealDate).filter(m=>m.id!==b.dataset.delplan));
+    save(); render(); toast("Removed from plan");
+  });
+}
+function renderMealLogList(){
   const ms = mealsOn(mealDate), tot = totals(mealDate), st=S.settings;
   $("mTotals").textContent = `${Math.round(tot.cal)}${st.calTarget?"/"+st.calTarget:""} kcal · ${r1(tot.protein)}${st.proteinTarget?"/"+st.proteinTarget:""}g`;
   if(!ms.length){ $("mealLog").innerHTML='<div class="empty">No food logged for this day.</div>'; return; }
@@ -1158,12 +1268,74 @@ function renderMeals(){
     S.meals = S.meals.filter(m=>m.id!==b.dataset.delmeal); save(); render(); toast("Removed");
   });
 }
-$("fAdd").onclick = () => {
+function renderMeals(){
+  const t=todayStr();
+  const kind=mealDayKind();
+  ensureMealPlans();
+  $("hdrSub").textContent = kind==="future" ? "Plan meals ahead" : kind==="today" ? "Plan & log today's food" : "Food log";
+  $("mDate").textContent = mealDate===t ? "Today" : mealDate===addDays(t,-1) ? "Yesterday" : mealDate===addDays(t,1) ? "Tomorrow" : fmtDate(mealDate);
+  $("mNext").disabled = false; $("mNext").style.opacity = 1;
+  if(kind==="past"){
+    $("mModeNote").textContent = "Past day · meal log (what you ate)";
+  } else if(kind==="future"){
+    $("mModeNote").textContent = "Future day · meal plan (what you'll eat)";
+  } else {
+    $("mModeNote").textContent = "Today · plan ahead and log what you eat";
+  }
+  $("mealPlanSection").style.display = kind==="past" ? "none" : "";
+  $("mealLogSection").style.display = kind==="future" ? "none" : "";
+  $("mealAddModeWrap").style.display = kind==="today" ? "" : "none";
+  if(kind==="past") mealAddMode = "log";
+  if(kind==="future") mealAddMode = "plan";
+  syncAddModeChips();
+
+  $("presetChips").innerHTML = S.presets.map((p,i)=>`<button class="chip" data-preset="${i}">${esc(p.name)} <small>~${p.cal} · ${p.protein}g</small></button>`).join("");
+  document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{
+    const p=S.presets[+b.dataset.preset];
+    $("fName").value=p.name; $("fCal").value=p.cal; $("fPro").value=p.protein;
+    $("fAdd").scrollIntoView({behavior:"smooth",block:"center"}); toast("Filled — adjust if needed, then Add");
+  });
+
+  if(kind!=="past") renderMealPlanList();
+  if(kind!=="future") renderMealLogList();
+
+  if(!$("mCopyFromDate").value) $("mCopyFromDate").value = t;
+  if(!$("mCopyToDate").value) $("mCopyToDate").value = addDays(t,1);
+}
+function addMealOrPlan(){
   const name=$("fName").value.trim(), cal=num($("fCal").value), pro=num($("fPro").value);
   if(!name){ toast("Enter a food name"); $("fName").focus(); return; }
   if(cal==null||cal<0){ toast("Enter calories"); $("fCal").focus(); return; }
-  S.meals.push({id:uid(), date:mealDate, name, cal:Math.round(cal), protein:pro!=null&&pro>=0?r1(pro):0, type:$("fType").value, ts:Date.now()});
-  save(); $("fName").value=$("fCal").value=$("fPro").value=""; render(); toast("Added "+name);
+  const item = {id:uid(), name, cal:Math.round(cal), protein:pro!=null&&pro>=0?r1(pro):0, type:$("fType").value};
+  if(effectiveAddMode()==="plan"){
+    const list = plansOn(mealDate).slice();
+    list.push(item);
+    setPlans(mealDate, list);
+    save(); $("fName").value=$("fCal").value=$("fPro").value=""; render(); toast("Planned "+name);
+  } else {
+    S.meals.push(Object.assign({}, item, {date:mealDate, ts:Date.now()}));
+    save(); $("fName").value=$("fCal").value=$("fPro").value=""; render(); toast("Added "+name);
+  }
+}
+$("fAdd").onclick = addMealOrPlan;
+function copyPlans(fromDate, toDate){
+  if(!fromDate || !toDate){ toast("Pick a date"); return false; }
+  if(fromDate===toDate){ toast("Pick a different day"); return false; }
+  const src = plansOn(fromDate);
+  if(!src.length){ toast("No plan on "+fmtDate(fromDate)); return false; }
+  const existing = plansOn(toDate);
+  if(existing.length && !confirm("Replace the plan on "+fmtDate(toDate)+" with "+src.length+" item(s) from "+fmtDate(fromDate)+"?")) return false;
+  setPlans(toDate, src.map(clonePlanItem));
+  save();
+  return true;
+}
+$("mCopyFromBtn").onclick = () => {
+  const from = $("mCopyFromDate").value;
+  if(copyPlans(from, mealDate)){ render(); toast("Plan copied here"); }
+};
+$("mCopyToBtn").onclick = () => {
+  const to = $("mCopyToDate").value;
+  if(copyPlans(mealDate, to)){ render(); toast("Plan copied to "+fmtDate(to)); }
 };
 
 /* ---------- Workout ---------- */
@@ -1735,7 +1907,7 @@ $("importFile").onchange = e => {
   rd.onload = () => {
     try{
       const parsed=JSON.parse(rd.result); const d = parsed && parsed.data ? parsed.data : parsed;
-      if(!d || typeof d!=="object" || !("meals" in d || "weights" in d || "settings" in d)) throw new Error("Not a fitness tracker backup");
+      if(!d || typeof d!=="object" || !("meals" in d || "mealPlans" in d || "weights" in d || "settings" in d)) throw new Error("Not a fitness tracker backup");
       if(!confirm("Replace all current data with this backup?")) return;
       S = normalize(d); save(); render(); toast("Data imported");
     }catch(err){ alert("Import failed: "+err.message); }
@@ -1796,7 +1968,12 @@ function renderCookDetail(){
   const r=findRecipe(cookOpenId);
   if(!r){ cookView="list"; renderCookList(); $("cookDetailView").style.display="none"; $("cookListView").style.display=""; return; }
   const actions=r.custom?`<div class="toolbar" style="margin-top:10px"><button class="sm" id="cookEditBtn">Edit</button><button class="sm danger" id="cookDelBtn">Delete</button></div>`:"";
-  $("cookDetailView").innerHTML = `<div class="toolbar"><button class="sm" id="cookDetailBack">‹ Recipes</button></div><div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="note">${esc(cookCatLabel(r.category))}${r.custom?" · Custom":""} · Serves ${r.servings}</div></div></div>${macroGrid(r)}<h2>Ingredients</h2><div class="note">Amounts for the whole recipe.</div><ul class="ing">${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join("")||'<li>None listed</li>'}</ul><h2 style="margin-top:12px">Steps</h2><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")||"<li>No steps yet.</li>"}</ol><button class="primary full" id="cookLog" style="margin-top:14px">Log this meal</button><div class="note" style="margin-top:6px">Adds 1 serving to today's meal log (${Math.round(r.calories)} kcal, ${r1(r.protein)}g protein).</div>${actions}</div>`;
+  const cookToPlan = mealCookReturn && effectiveAddMode()==="plan";
+  const cookBtn = cookToPlan ? "Add to meal plan" : "Log this meal";
+  const cookNote = cookToPlan
+    ? `Adds 1 serving to the plan for ${mealDate===todayStr()?"today":fmtDate(mealDate)} (${Math.round(r.calories)} kcal, ${r1(r.protein)}g protein).`
+    : `Adds 1 serving to today's meal log (${Math.round(r.calories)} kcal, ${r1(r.protein)}g protein).`;
+  $("cookDetailView").innerHTML = `<div class="toolbar"><button class="sm" id="cookDetailBack">‹ Recipes</button></div><div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="note">${esc(cookCatLabel(r.category))}${r.custom?" · Custom":""} · Serves ${r.servings}</div></div></div>${macroGrid(r)}<h2>Ingredients</h2><div class="note">Amounts for the whole recipe.</div><ul class="ing">${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join("")||'<li>None listed</li>'}</ul><h2 style="margin-top:12px">Steps</h2><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")||"<li>No steps yet.</li>"}</ol><button class="primary full" id="cookLog" style="margin-top:14px">${cookBtn}</button><div class="note" style="margin-top:6px">${cookNote}</div>${actions}</div>`;
   $("cookDetailBack").onclick=()=>{ cookView="list"; renderCookbook(); window.scrollTo(0,0); };
   $("cookLog").onclick=()=>logRecipe(r);
   if(r.custom){
@@ -1884,15 +2061,28 @@ function deleteRecipe(id){
   render();
 }
 function logRecipe(r){
-  S.meals.push({id:uid(), date:todayStr(), name:r.name, cal:Math.round(+r.calories||0), protein:r1(+r.protein||0), type:defaultMealType(), ts:Date.now()});
+  const item = {id:uid(), name:r.name, cal:Math.round(+r.calories||0), protein:r1(+r.protein||0), type:defaultMealType()};
+  if(mealCookReturn && effectiveAddMode()==="plan"){
+    const list = plansOn(mealDate).slice();
+    list.push(item);
+    setPlans(mealDate, list);
+    save();
+    toast("Added to plan");
+    mealCookReturn = false;
+    cookView="list"; cookOpenId=null; libSection="home";
+    go("meals");
+    return;
+  }
+  S.meals.push(Object.assign({}, item, {date:todayStr(), ts:Date.now()}));
   mealDate=todayStr();
   save();
   toast("Logged 1 serving to today");
-  render();
+  if(mealCookReturn){ mealCookReturn=false; cookView="list"; cookOpenId=null; libSection="home"; go("meals"); }
+  else render();
 }
 $("openExercises").onclick = () => { returnView="home"; libSection="exercises"; render(); window.scrollTo(0,0); };
-$("openCookbook").onclick = () => { cookView="list"; libSection="cookbook"; render(); window.scrollTo(0,0); };
-$("mealsCook").onclick = () => { cookView="list"; libSection="cookbook"; go("library"); };
+$("openCookbook").onclick = () => { mealCookReturn=false; cookView="list"; libSection="cookbook"; render(); window.scrollTo(0,0); };
+$("mealsCook").onclick = () => { mealCookReturn=true; cookView="list"; libSection="cookbook"; go("library"); };
 $("cookHome").onclick = () => { libSection="home"; render(); window.scrollTo(0,0); };
 $("cookNew").onclick = () => openRecipeEditor(null);
 $("rcCancel").onclick = () => { cookDraft=null; cookView=cookOpenId?"detail":"list"; render(); };
