@@ -211,6 +211,38 @@ img.person{object-position:center 24%}
 .brief p{margin:0 0 8px;color:#1c1430}
 .briefmore{margin:8px 0 0;padding:0;list-style:none}
 .briefmore button{width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--line);border-radius:0;padding:8px 0;font-weight:600;color:#1c1430}
+.apptools{display:flex;align-items:center;gap:16px;background:#fff;margin:10px -16px -10px;padding:8px 16px;position:relative}
+.toolplus{width:46px;height:46px;padding:0;border:none;border-radius:8px;background:#4c1d95;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.toolplus svg,.toolicon svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.toolicon{width:44px;height:44px;padding:0;border:none;background:transparent;color:#1c1430;display:flex;align-items:center;justify-content:center;position:relative;flex:none}
+.tooldot{position:absolute;top:7px;right:7px;width:10px;height:10px;border-radius:50%;background:#e11d48;border:2px solid #fff}
+.tooldot[hidden]{display:none !important}
+.toolpanel{position:absolute;left:12px;right:12px;top:calc(100% + 8px);z-index:40;background:#fff;color:#1c1430;border-radius:14px;box-shadow:0 12px 32px rgba(40,0,60,.28);padding:8px 12px 12px;text-align:left}
+.toolpanel[hidden]{display:none !important}
+.toolpanel h3{margin:6px 0 8px;font-size:15px;color:#1c1430}
+.toolpanel .addpick{display:block;width:100%;text-align:left;background:#fff;border:none;border-bottom:1px solid var(--line);border-radius:0;padding:12px 2px;font-weight:700;color:#1c1430}
+.toolpanel .addpick:last-child{border-bottom:none}
+.checkrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);color:#1c1430}
+.checkrow input{width:22px;height:22px;accent-color:#16a34a;flex:none;margin-top:2px}
+.checkrow b{display:block}
+.checkrow small{color:#6b6280;font-weight:600}
+.eventfilters{display:flex;background:#fff;border-radius:8px;overflow:hidden;margin:0 0 12px}
+.eventfilters button{flex:1;border:none;border-radius:0;background:#fff;color:#4c1d95;font-size:11px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;padding:10px 4px}
+.eventfilters button.sel{background:#4c1d95;color:#fff}
+.eventhead{color:#fff;font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px}
+.eventrow{display:flex;gap:12px;align-items:flex-start}
+.eventrow img{width:112px;height:84px;object-fit:cover;object-position:center 68%;border-radius:10px;flex:none;background:#efeaf6}
+.eventrow b{display:block;font-size:16px;color:#4c1d95}
+.calnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calnav b{color:#1c1430;font-size:16px}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.calgrid .dow{font-size:11px;font-weight:700;color:#6b6280;padding:4px 0}
+.calgrid button{position:relative;background:#f6f3fb;border:none;border-radius:8px;padding:8px 0 12px;color:#1c1430;font-weight:700}
+.calgrid button.out{visibility:hidden}
+.calgrid button.today{box-shadow:inset 0 0 0 2px #4c1d95}
+.calgrid button.sel{background:#4c1d95;color:#fff}
+.calgrid button.mark::after{content:"";position:absolute;left:50%;bottom:4px;width:6px;height:6px;border-radius:50%;background:#db2777;transform:translateX(-50%)}
+.calgrid button.sel.mark::after{background:#fff}
 
 </style>
 </head>
@@ -224,6 +256,25 @@ img.person{object-position:center 24%}
   <div class="screentitle" id="hdrTitle">Today</div>
   <div class="sub" id="hdrSub"></div>
   <p class="demobanner" id="demoBanner" hidden>Demo mode · two tabs on this browser. Add Supabase and Daily keys in Settings to connect two phones.</p>
+  <div class="apptools" id="appTools">
+    <button type="button" class="toolplus" id="toolPlus" aria-label="Add" aria-expanded="false" aria-controls="addPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="toolicon" id="toolCheck" aria-label="Today's workout checklist" aria-expanded="false" aria-controls="checkPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6.5l1.2 1.2L7.5 5.5M4 12.5l1.2 1.2L7.5 11.5M4 18.5l1.2 1.2L7.5 17.5"/></svg></button>
+    <button type="button" class="toolicon" id="toolBell" aria-label="Notifications" aria-expanded="false" aria-controls="bellPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span class="tooldot" id="toolDot" hidden></span></button>
+    <div class="toolpanel" id="addPanel" hidden>
+      <button type="button" class="addpick" data-add="meals">Log a meal</button>
+      <button type="button" class="addpick" data-add="weight">Log weight</button>
+      <button type="button" class="addpick" data-add="workout">Add a workout</button>
+      <button type="button" class="addpick" data-add="event">Create an event</button>
+    </div>
+    <div class="toolpanel" id="checkPanel" hidden>
+      <h3 id="checkTitle">Today's workout</h3>
+      <div id="checkList"></div>
+    </div>
+    <div class="toolpanel" id="bellPanel" hidden>
+      <h3>Notifications</h3>
+      <div id="bellList"></div>
+    </div>
+  </div>
 </header>
 
 <main>
@@ -645,12 +696,74 @@ img.person{object-position:center 24%}
     <button class="danger full" id="wipeBtn">Erase all data</button>
   </div>
 </section>
+
+<!-- ============ EVENTS ============ -->
+<section class="page" id="page-events">
+  <div class="card">
+    <h2>Events</h2>
+    <p>Schedule a group class, a one-on-one session, or an open booking. Everything here stays on this phone.</p>
+  </div>
+  <div class="eventfilters" id="eventFilters">
+    <button type="button" class="sel" data-ekind="group">Groups / Classes</button>
+    <button type="button" data-ekind="one">1 on 1</button>
+    <button type="button" data-ekind="open">Open booking</button>
+  </div>
+  <div class="toolbar">
+    <button type="button" class="primary" id="eventNew">New</button>
+  </div>
+  <form class="card" id="eventForm" hidden>
+    <h2>New event</h2>
+    <div class="field"><label class="f">Name</label><input id="evName" maxlength="80" placeholder="e.g. Pool class"></div>
+    <div class="field"><label class="f">Type</label>
+      <select id="evKind"><option value="group">Groups / Classes</option><option value="one">1 on 1</option><option value="open">Open booking</option></select>
+    </div>
+    <div class="row">
+      <div class="field"><label class="f">Date</label><input type="date" id="evDate"></div>
+      <div class="field"><label class="f">Time</label><input type="time" id="evTime" value="18:00"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label class="f">Length (min)</label><input type="number" id="evLength" min="5" max="480" value="60"></div>
+      <div class="field"><label class="f">Spots</label><input type="number" id="evSpots" min="1" max="500" value="20"></div>
+    </div>
+    <div class="field"><label class="f">Where</label>
+      <select id="evMode"><option value="inperson">In person</option><option value="virtual">Virtual</option></select>
+    </div>
+    <div class="row">
+      <button type="button" class="full" id="evCancel">Cancel</button>
+      <button type="submit" class="primary full" id="evSave">Save event</button>
+    </div>
+  </form>
+  <div class="eventhead">Future events</div>
+  <div id="eventFuture"></div>
+  <div id="eventPastWrap" hidden>
+    <div class="eventhead">Past</div>
+    <div id="eventPast"></div>
+  </div>
+</section>
+
+<!-- ============ CALENDAR ============ -->
+<section class="page" id="page-calendar">
+  <div class="card">
+    <div class="calnav">
+      <button type="button" class="sm" id="calPrev" aria-label="Previous month">‹</button>
+      <b id="calTitle"></b>
+      <button type="button" class="sm" id="calNext" aria-label="Next month">›</button>
+    </div>
+    <div class="calgrid" id="calGrid"></div>
+  </div>
+  <div class="card" id="calDayCard">
+    <h2 id="calDayTitle"></h2>
+    <div id="calDayBody"></div>
+  </div>
+</section>
 </main>
 
 <nav class="navmenu" id="navMenu" hidden>
   <button type="button" class="navitem" data-tab="today">Today</button>
   <button type="button" class="navitem" data-tab="meals">Meals</button>
   <button type="button" class="navitem" data-tab="workout">Workout</button>
+  <button type="button" class="navitem" data-tab="events">Events</button>
+  <button type="button" class="navitem" data-tab="calendar">Calendar</button>
   <div class="navsplit">
     <button type="button" class="navitem" data-tab="library" data-lib="home">Library</button>
     <button type="button" class="caretbtn" id="libToggle" aria-expanded="false" aria-controls="libSub" aria-label="Library sections"><span class="caret"></span></button>
@@ -1048,7 +1161,7 @@ function normalizeCustomRecipes(list){
 function blankState(){
   return {version:2, settings:{calTarget:null, proteinTarget:null, goalWeight:null},
     presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], mealPlans:{}, weights:[], steps:{}, workouts:{},
-    plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[]};
+    plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[], events:[]};
 }
 function load(){
   try{
@@ -1078,6 +1191,35 @@ function normalizeMealPlans(mp){
   });
   return out;
 }
+function normalizeEvents(list){
+  if(!Array.isArray(list)) return [];
+  const kinds=["group","one","open"];
+  const modes=["inperson","virtual"];
+  const nid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  return list.map(ev=>{
+    if(!ev || typeof ev!=="object") return null;
+    const name=String(ev.name||"").trim();
+    if(!name || !/^\d{4}-\d{2}-\d{2}$/.test(String(ev.date||""))) return null;
+    const tm=String(ev.time||"").match(/^(\d{2}):(\d{2})/);
+    const time=tm?tm[1]+":"+tm[2]:"09:00";
+    let length=Math.round(+ev.length||60);
+    if(!isFinite(length)) length=60;
+    length=Math.max(5, Math.min(480, length));
+    let spots=Math.round(+ev.spots||1);
+    if(!isFinite(spots)) spots=1;
+    spots=Math.max(1, Math.min(500, spots));
+    return {
+      id:String(ev.id||nid()),
+      name:name.slice(0,80),
+      date:ev.date,
+      time,
+      length,
+      spots,
+      kind:kinds.includes(ev.kind)?ev.kind:"group",
+      mode:modes.includes(ev.mode)?ev.mode:"inperson"
+    };
+  }).filter(Boolean);
+}
 function normalize(d){
   const b = blankState();
   if(!d || typeof d!=="object") return b;
@@ -1094,7 +1236,8 @@ function normalize(d){
     customWorkouts:normalizeCustomWorkouts(d.customWorkouts),
     customExercises:normalizeCustomExercises(d.customExercises),
     customLogs:normalizeCustomLogs(d.customLogs),
-    customRecipes:normalizeCustomRecipes(d.customRecipes)
+    customRecipes:normalizeCustomRecipes(d.customRecipes),
+    events:normalizeEvents(d.events)
   };
 }
 let S = load();
@@ -1171,7 +1314,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings"};
+const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar"};
 let currentTab = "today";
 function go(tab){
   currentTab = tab;
@@ -1235,7 +1378,11 @@ $("menuAction").onclick = () => {
   woDate = todayStr();
   go("workout");
 };
-document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("navMenu").hidden) closeMenu(); });
+document.addEventListener("keydown", e=>{
+  if(e.key!=="Escape") return;
+  if(!$("navMenu").hidden) closeMenu();
+  closeTools();
+});
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
 
 /* ---------- Today ---------- */
@@ -3236,10 +3383,235 @@ $("callCam").onclick = () => run(async ()=>{
 
 maybeGate();
 
+/* ---------- Events, calendar, toolbar ---------- */
+let eventFilter="group";
+let calCursor=null;
+let calSelected="";
+const EVENT_LABEL={group:"Groups / Classes", one:"1 on 1", open:"Open booking"};
+function eventPhoto(kind){
+  if(kind==="one") return "images/work/glute.jpg";
+  if(kind==="open") return "images/library-step.jpg";
+  return "images/work/lower-body.jpg";
+}
+function fmtTime(t){
+  const parts=String(t||"00:00").split(":");
+  const h=+parts[0]||0, m=+parts[1]||0;
+  const ap=h>=12?"PM":"AM";
+  return (h%12||12)+":"+pad(m)+" "+ap;
+}
+function upcomingToday(){
+  const t=todayStr();
+  const now=new Date();
+  const mins=now.getHours()*60+now.getMinutes();
+  return (S.events||[]).filter(ev=>{
+    if(ev.date!==t) return false;
+    const parts=String(ev.time||"00:00").split(":");
+    const start=(+parts[0]||0)*60+(+parts[1]||0);
+    return start+Math.max(0,+ev.length||0)>mins;
+  }).sort((a,b)=>a.time.localeCompare(b.time)||a.name.localeCompare(b.name));
+}
+function hasLoggedWorkout(date){
+  const w=S.workouts && S.workouts[date];
+  if(w){
+    if(w.done) return true;
+    const ex=w.exercises||{};
+    if(Object.keys(ex).some(id=>ex[id]&&(ex[id].checked||ex[id].log))) return true;
+  }
+  const day=S.customLogs && S.customLogs[date];
+  if(!day) return false;
+  return Object.keys(day).some(id=>{
+    const c=day[id];
+    if(!c) return false;
+    if(c.done) return true;
+    const ex=c.exercises||{};
+    return Object.keys(ex).some(k=>ex[k]&&ex[k].checked);
+  });
+}
+function eventsOn(date){
+  return (S.events||[]).filter(ev=>ev.date===date).sort((a,b)=>a.time.localeCompare(b.time)||a.name.localeCompare(b.name));
+}
+function eventCard(ev){
+  const where=ev.mode==="virtual"?"Virtual":"In person";
+  const photo=eventPhoto(ev.kind);
+  return `<div class="card"><div class="eventrow"><img src="${esc(photo)}" alt=""><div class="grow"><b>${esc(ev.name)}</b><div class="note">${ev.length} min · ${ev.spots} spot${ev.spots===1?"":"s"}</div><div class="note">${where} · ${esc(fmtDate(ev.date))} · ${esc(fmtTime(ev.time))}</div><button type="button" class="sm danger" data-del-event="${esc(ev.id)}" style="margin-top:8px">Delete</button></div></div></div>`;
+}
+function renderEvents(){
+  $("hdrTitle").textContent="Events";
+  $("hdrSub").textContent="Classes and sessions on this phone";
+  document.querySelectorAll("#eventFilters button").forEach(b=>b.classList.toggle("sel", b.dataset.ekind===eventFilter));
+  const mine=(S.events||[]).filter(ev=>ev.kind===eventFilter);
+  const today=todayStr();
+  const future=mine.filter(ev=>ev.date>=today).sort((a,b)=>a.date.localeCompare(b.date)||a.time.localeCompare(b.time)||a.name.localeCompare(b.name));
+  const past=mine.filter(ev=>ev.date<today).sort((a,b)=>b.date.localeCompare(a.date)||b.time.localeCompare(a.time));
+  $("eventFuture").innerHTML=future.length?future.map(eventCard).join(""):'<div class="card"><div class="empty">No upcoming events in this list.</div></div>';
+  $("eventPastWrap").hidden=!past.length;
+  $("eventPast").innerHTML=past.map(eventCard).join("");
+}
+function showEventForm(open){
+  $("eventForm").hidden=!open;
+  if(!open) return;
+  $("evKind").value=eventFilter;
+  if(!$("evDate").value) $("evDate").value=todayStr();
+  $("evName").focus();
+}
+function renderCalendar(){
+  if(!calCursor){ const n=new Date(); calCursor=new Date(n.getFullYear(), n.getMonth(), 1); }
+  if(!calSelected) calSelected=todayStr();
+  const y=calCursor.getFullYear(), m=calCursor.getMonth();
+  $("hdrTitle").textContent="Calendar";
+  $("hdrSub").textContent="Events and logged workouts";
+  $("calTitle").textContent=calCursor.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  const today=todayStr();
+  let html=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="dow">${d}</div>`).join("");
+  for(let i=0;i<first;i++) html+='<button type="button" class="out" tabindex="-1"></button>';
+  for(let day=1;day<=days;day++){
+    const date=y+"-"+pad(m+1)+"-"+pad(day);
+    const mark=eventsOn(date).length || hasLoggedWorkout(date);
+    const cls=(date===today?" today":"")+(date===calSelected?" sel":"")+(mark?" mark":"");
+    html+=`<button type="button" class="${cls.trim()}" data-calday="${date}">${day}</button>`;
+  }
+  $("calGrid").innerHTML=html;
+  $("calGrid").querySelectorAll("[data-calday]").forEach(b=>b.onclick=()=>{ calSelected=b.dataset.calday; renderCalendar(); });
+  const p=planFor(calSelected);
+  const w=woEntry(calSelected);
+  const evs=eventsOn(calSelected);
+  const workoutBits=[];
+  if(p.rest && !scheduledCustoms(calSelected).length) workoutBits.push("Rest day");
+  else {
+    const done=p.exercises.filter(ex=>exState(w, ex.id).checked).length;
+    workoutBits.push(esc(p.title)+(p.exercises.length?` · ${done}/${p.exercises.length} checked`:""));
+  }
+  scheduledCustoms(calSelected).forEach(c=>workoutBits.push(esc(customProgress(calSelected, c))));
+  $("calDayTitle").textContent=fmtDate(calSelected,{weekday:"long",month:"long",day:"numeric"});
+  const evHtml=evs.length?evs.map(ev=>`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"} · ${ev.spots} spots</small></span></div>`).join(""):'<div class="empty">No events this day.</div>';
+  $("calDayBody").innerHTML=`<div class="note" style="margin-bottom:8px">Workout · ${workoutBits.join(" · ")||"None"}</div>`+evHtml;
+}
+function closeTools(){
+  ["addPanel","checkPanel","bellPanel"].forEach(id=>{ $(id).hidden=true; });
+  $("toolPlus").setAttribute("aria-expanded","false");
+  $("toolCheck").setAttribute("aria-expanded","false");
+  $("toolBell").setAttribute("aria-expanded","false");
+}
+function paintCheck(){
+  const date=todayStr();
+  const p=planFor(date);
+  const rows=[];
+  if(!p.rest){
+    const w=woEntry(date);
+    p.exercises.forEach(ex=>{
+      const st=exState(w, ex.id);
+      rows.push(`<label class="checkrow"><input type="checkbox" data-todaychk="plan:${esc(ex.id)}" ${st.checked?"checked":""}><span><b>${esc(ex.name)}</b><small>${esc(ex.target||"")}</small></span></label>`);
+    });
+  }
+  scheduledCustoms(date).forEach(c=>{
+    const w=customEntry(date, c.id);
+    c.exercises.forEach(ex=>{
+      const st=exState(w, ex.id);
+      rows.push(`<label class="checkrow"><input type="checkbox" data-todaychk="cw:${esc(c.id)}:${esc(ex.id)}" ${st.checked?"checked":""}><span><b>${esc(c.name)} · ${esc(ex.name)}</b><small>${esc(ex.target||"")}</small></span></label>`);
+    });
+  });
+  $("checkTitle").textContent=p.title?p.title:"Today's workout";
+  $("checkList").innerHTML=rows.length?rows.join(""):'<div class="empty">Nothing to check off today.</div>';
+}
+function paintBell(list){
+  const ups=list||upcomingToday();
+  $("bellList").innerHTML=ups.length?ups.map(ev=>`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"}</small></span></div>`).join(""):'<div class="empty">No notifications.</div>';
+}
+function paintTools(){
+  const ups=upcomingToday();
+  $("toolDot").hidden=!ups.length;
+  $("toolBell").setAttribute("aria-label", ups.length?`Notifications, ${ups.length} today`:"Notifications");
+  if(!$("bellPanel").hidden) paintBell(ups);
+  if(!$("checkPanel").hidden) paintCheck();
+}
+function openTool(which){
+  const map={add:"addPanel", check:"checkPanel", bell:"bellPanel"};
+  const buttons={add:"toolPlus", check:"toolCheck", bell:"toolBell"};
+  const id=map[which];
+  const willOpen=$(id).hidden;
+  closeTools();
+  if(!willOpen) return;
+  $(id).hidden=false;
+  $(buttons[which]).setAttribute("aria-expanded","true");
+  if(which==="check") paintCheck();
+  if(which==="bell") paintBell();
+}
+$("toolPlus").onclick=e=>{ e.stopPropagation(); openTool("add"); };
+$("toolCheck").onclick=e=>{ e.stopPropagation(); openTool("check"); };
+$("toolBell").onclick=e=>{ e.stopPropagation(); openTool("bell"); };
+document.querySelectorAll("#addPanel [data-add]").forEach(b=>b.onclick=()=>{
+  const which=b.dataset.add;
+  closeTools();
+  if(which==="meals"){ go("meals"); $("fName").focus(); }
+  else if(which==="weight"){ go("weight"); $("wVal").focus(); }
+  else if(which==="workout"){ woView="home"; go("workout"); openEditor(null); }
+  else if(which==="event"){ go("events"); showEventForm(true); }
+});
+$("checkPanel").addEventListener("change", e=>{
+  const t=e.target;
+  if(!t.matches || !t.matches("[data-todaychk]")) return;
+  const token=t.dataset.todaychk;
+  const date=todayStr();
+  if(token.indexOf("plan:")===0){
+    const w=ensureWo(date);
+    patchEx(w, token.slice(5), {checked:t.checked});
+    if(!t.checked) w.done=false;
+  } else if(token.indexOf("cw:")===0){
+    const parts=token.split(":");
+    const w=ensureCustom(date, parts[1]);
+    patchEx(w, parts.slice(2).join(":"), {checked:t.checked});
+    if(!t.checked) w.done=false;
+  }
+  save();
+  render();
+});
+document.querySelectorAll("#eventFilters button").forEach(b=>b.onclick=()=>{ eventFilter=b.dataset.ekind; renderEvents(); });
+$("eventNew").onclick=()=>showEventForm($("eventForm").hidden);
+$("evCancel").onclick=()=>showEventForm(false);
+$("eventForm").onsubmit=e=>{
+  e.preventDefault();
+  const name=$("evName").value.trim();
+  const date=$("evDate").value;
+  if(!name){ toast("Name the event"); $("evName").focus(); return; }
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){ toast("Pick a date"); $("evDate").focus(); return; }
+  const length=Math.round(+$("evLength").value||0);
+  const spots=Math.round(+$("evSpots").value||0);
+  if(length<5){ toast("Enter a length in minutes"); $("evLength").focus(); return; }
+  if(spots<1){ toast("Enter how many spots"); $("evSpots").focus(); return; }
+  const ev={id:uid(), name:name.slice(0,80), date, time:$("evTime").value||"09:00", length:Math.min(480,length), spots:Math.min(500,spots), kind:$("evKind").value, mode:$("evMode").value};
+  S.events.push(normalizeEvents([ev])[0]);
+  save();
+  eventFilter=ev.kind;
+  $("evName").value="";
+  showEventForm(false);
+  toast("Event saved");
+  render();
+};
+$("page-events").addEventListener("click", e=>{
+  const b=e.target.closest("[data-del-event]");
+  if(!b) return;
+  const ev=(S.events||[]).find(x=>x.id===b.dataset.delEvent);
+  if(!ev) return;
+  if(!confirm('Delete "'+ev.name+'"?')) return;
+  S.events=S.events.filter(x=>x.id!==ev.id);
+  save();
+  toast("Event deleted");
+  render();
+});
+$("calPrev").onclick=()=>{ calCursor=new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1); renderCalendar(); };
+$("calNext").onclick=()=>{ calCursor=new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1); renderCalendar(); };
+document.addEventListener("click", e=>{
+  if(e.target.closest("#appTools")) return;
+  closeTools();
+});
+
 /* ---------- Render ---------- */
 function render(){
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, coach:renderCoach, settings:renderSettings})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
+  paintTools();
 }
 // roll over at midnight / when returning to app
 let lastDay = todayStr();
