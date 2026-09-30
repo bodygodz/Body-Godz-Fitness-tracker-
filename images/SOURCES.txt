@@ -59,3 +59,4 @@ Training — Pexels. These show Black women and Black men working out.
 Owner photos — files supplied for this app and stored in the repo.
 - images/library-step.jpg — step class on green turf, shown on the exercise library card
 - images/header-portrait.jpg — portrait on the right of the Curly Gurl Fitness title
+- images/work/lower-body.jpg — group class on pink mats by a pool, used for the Lower Body workout

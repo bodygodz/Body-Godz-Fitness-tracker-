@@ -189,6 +189,7 @@ textarea:focus{border-color:var(--accent)}
 .mini{width:36px;height:36px;border-radius:50%;flex:none}
 .shot{width:100%;height:180px;border-radius:14px;margin:0 0 10px}
 img.person{object-position:center 24%}
+img.lowerbody{object-position:center 62%}
 .strip{width:100%;height:72px;border-radius:10px 10px 0 0}
 .wohead{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .wohead .thumb{width:58px;height:58px}
@@ -1557,7 +1558,7 @@ const CAT_PHOTO = {keto:"salmon", bulking:"chicken-rice", lean:"salad"};
 const MEAL_IDEAS = [["breakfast","Breakfast","bacon"],["lunch","Lunch","chicken-rice"],["snack","Snack","yogurt"],["dinner","Dinner","salmon"]];
 const WORK_FILES = {
   bench:"work/bench.jpg", row:"work/row.jpg", pullup:"work/pullup.jpg", press:"work/press.jpg",
-  curl:"work/curl.jpg", squat:"work/squat.jpg", lunge:"work/lunge.jpg", glute:"work/glute.jpg",
+  curl:"work/curl.jpg", squat:"work/squat.jpg", lunge:"work/lunge.jpg", glute:"work/glute.jpg", lower:"work/lower-body.jpg",
   plank:"work/plank.jpg", side:"work/sideplank.jpg", walk:"work/treadmill.jpg", bike:"work/bike.jpg",
   box:"work/boxing.jpg", dumbbell:"work/dumbbell.jpg", power:"work/tire.jpg"
 };
@@ -1615,7 +1616,7 @@ function workFileForDay(p){
   const title=String(p.title||"").toLowerCase();
   if(p.rest || /walk/.test(title)) return workSrc("walk");
   if(/cardio/.test(title)) return workSrc("walk");
-  if(/lower/.test(title)) return workSrc("squat");
+  if(/lower/.test(title)) return workSrc("lower");
   if(/upper/.test(title)) return workSrc("bench");
   if(/circuit|full/.test(title)) return workSrc("dumbbell");
   if(p.exercises && p.exercises[0]) return workFileForName(p.exercises[0].name);
@@ -1627,7 +1628,8 @@ function photoTag(src, alt, cls, eager){
   const w = cls==="thumb" || cls==="mini" ? 320 : 640;
   const h = cls==="strip" ? 180 : (cls==="thumb" || cls==="mini" ? 320 : 400);
   const person = String(src).indexOf("/work/")>=0 ? " person" : "";
-  return `<img class="${cls}${person}" src="${esc(src)}" alt="${esc(alt||"")}" width="${w}" height="${h}" loading="${load}" decoding="async"${pri}>`;
+  const lower = String(src).indexOf("lower-body")>=0 ? " lowerbody" : "";
+  return `<img class="${cls}${person}${lower}" src="${esc(src)}" alt="${esc(alt||"")}" width="${w}" height="${h}" loading="${load}" decoding="async"${pri}>`;
 }
 function setPhotoBox(el, src, alt, cls, eager){
   if(!el) return;
