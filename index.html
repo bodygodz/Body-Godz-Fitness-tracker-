@@ -198,9 +198,11 @@ img.person{object-position:center 24%}
 .brief p{margin:0 0 8px;color:#1c1430}
 .briefmore{margin:8px 0 0;padding:0;list-style:none}
 .briefmore button{width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--line);border-radius:0;padding:8px 0;font-weight:600;color:#1c1430}
-.musicslot{margin:10px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
-.musicbtns{display:flex;flex-wrap:wrap;gap:8px}
-a.musicbtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#fff;border:1px solid #e4dced;border-radius:12px;padding:8px 12px;font-weight:700;color:#1c1430;font-size:13px}
+.musiccard{margin-bottom:12px}
+.musiccard h2{font-size:18px;text-transform:none;letter-spacing:0;color:#1c1430;margin-bottom:6px}
+.musiccard .note{margin:0 0 10px}
+.musicbtns{display:flex;flex-direction:column;gap:8px}
+a.musicbtn{display:flex;align-items:center;justify-content:center;min-height:48px;text-decoration:none;background:#4c1d95;border:none;border-radius:12px;padding:12px 14px;font-weight:800;color:#fff;font-size:16px}
 
 </style>
 </head>
@@ -218,6 +220,17 @@ a.musicbtn{display:inline-flex;align-items:center;justify-content:center;text-de
 <main>
 <!-- ============ TODAY ============ -->
 <section class="page active" id="page-today">
+  <div class="card musiccard">
+    <h2>Music</h2>
+    <div class="note">Tap a service to open it. Music plays in that app or on its website, not inside this tracker.</div>
+    <div class="musicbtns">
+      <a class="musicbtn" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Apple Music</a>
+      <a class="musicbtn" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">Spotify</a>
+      <a class="musicbtn" href="https://music.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube Music</a>
+      <a class="musicbtn" href="https://music.amazon.com/" target="_blank" rel="noopener noreferrer">Amazon Music</a>
+      <a class="musicbtn" href="https://www.pandora.com/" target="_blank" rel="noopener noreferrer">Pandora</a>
+    </div>
+  </div>
   <div id="targetBanner"></div>
   <div class="grid2">
     <div class="stat">
@@ -326,6 +339,17 @@ a.musicbtn{display:inline-flex;align-items:center;justify-content:center;text-de
 <!-- ============ WORKOUT ============ -->
 <section class="page" id="page-workout">
   <div id="woHome">
+    <div class="card musiccard">
+      <h2>Music</h2>
+      <div class="note">Tap a service to open it. Music plays in that app or on its website, not inside this tracker.</div>
+      <div class="musicbtns">
+        <a class="musicbtn" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Apple Music</a>
+        <a class="musicbtn" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">Spotify</a>
+        <a class="musicbtn" href="https://music.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube Music</a>
+        <a class="musicbtn" href="https://music.amazon.com/" target="_blank" rel="noopener noreferrer">Amazon Music</a>
+        <a class="musicbtn" href="https://www.pandora.com/" target="_blank" rel="noopener noreferrer">Pandora</a>
+      </div>
+    </div>
     <div class="toolbar">
       <button class="sm" id="btnLibrary">Exercise library</button>
       <button class="sm" id="btnNewWo">+ Custom workout</button>
@@ -342,14 +366,6 @@ a.musicbtn{display:inline-flex;align-items:center;justify-content:center;text-de
           <div class="note" id="woDate"></div>
         </div>
         <span class="pill" id="woStatus"></span>
-      </div>
-      <div class="musicslot">
-        <div class="note">Your music stays in your music app. These buttons only open it. Nothing plays inside this tracker.</div>
-        <div class="musicbtns">
-          <a class="musicbtn" id="musicApple" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Apple Music</a>
-          <a class="musicbtn" id="musicSpotify" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">Spotify</a>
-          <a class="musicbtn" id="musicAndroid" href="https://music.youtube.com/">Android player</a>
-        </div>
       </div>
       <div id="planEditFields" style="display:none">
         <div class="row">
@@ -2309,12 +2325,6 @@ function logRecipe(r){
   if(mealCookReturn){ mealCookReturn=false; cookView="list"; cookOpenId=null; libSection="home"; go("meals"); }
   else render();
 }
-$("musicAndroid").addEventListener("click", e=>{
-  if(!/Android/i.test(navigator.userAgent||"")) return;
-  e.preventDefault();
-  const web = "https://music.youtube.com/";
-  window.location.href = "intent://#Intent;action=android.intent.action.MUSIC_PLAYER;S.browser_fallback_url="+encodeURIComponent(web)+";end";
-});
 $("openExercises").onclick = () => { returnView="home"; libSection="exercises"; render(); window.scrollTo(0,0); };
 $("openCookbook").onclick = () => { mealCookReturn=false; cookView="list"; libSection="cookbook"; render(); window.scrollTo(0,0); };
 $("mealsCook").onclick = () => { mealCookReturn=true; cookView="list"; libSection="cookbook"; go("library"); };
