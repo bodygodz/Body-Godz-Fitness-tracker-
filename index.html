@@ -368,6 +368,26 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 .subbar[hidden]{display:none !important}
 .subbar button{flex:1;background:rgba(255,255,255,.16);border:none;border-radius:999px;padding:8px 6px;color:#fff;font-size:13px}
 .subbar button.sel{background:#fff;color:#7c3aed}
+.csteps{display:flex;gap:8px;overflow:auto;margin:0 0 12px;padding-bottom:2px}
+.csteps button{flex:none;background:rgba(255,255,255,.16);border:none;border-radius:999px;color:#fff;font-size:12px;font-weight:700;padding:8px 12px}
+.csteps button.sel{background:#fff;color:#7c3aed}
+.qcard{background:#fff;color:#1c1430;border-radius:16px;padding:12px 14px;margin:0 0 10px;box-shadow:0 1px 2px rgba(40,0,60,.08)}
+.qcard .ql{font-weight:700;font-size:15px;line-height:1.35;color:#1c1430}
+.qcard .qn{color:#7c3aed;font-weight:800;margin-right:6px}
+.qcard input,.qcard textarea{margin-top:8px}
+.scalehead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:8px}
+.scalehead b{font-size:22px;color:#1c1430}
+.scalehead span{color:#6b6280;font-weight:700}
+.scalebar{display:flex;gap:4px;margin-top:6px}
+.scalebar button{flex:1;height:10px;padding:0;border:none;border-radius:99px;background:#efeaf6}
+.scalebar button.on{background:#db2777}
+.starbars{display:flex;gap:4px;align-items:center;margin-top:8px}
+.starbars button{background:transparent;border:none;color:#d9d2e6;font-size:26px;line-height:1;padding:0 2px}
+.starbars button.on{color:#db2777}
+.starbars .of{color:#6b6280;font-weight:700;margin-left:6px}
+.yesno{display:flex;gap:8px;margin-top:8px}
+.yesno button.sel{background:#db2777;color:#fff;border-color:#db2777}
+.cinote{color:#f3e8ff;font-size:13px;margin:0 0 10px}
 .weekdots{display:flex;justify-content:space-between;padding:6px 4px 14px}
 .weekdots button{background:transparent;border:none;color:#f3e8ff;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:700;width:36px}
 .weekdots .dot{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.45);box-sizing:border-box}
@@ -906,6 +926,18 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
   </div>
 </section>
 
+<!-- ============ CHECK-IN ============ -->
+<section class="page" id="page-checkin">
+  <div class="csteps" id="csteps">
+    <button type="button" data-cstep="questions" class="sel">Feedback questions</button>
+    <button type="button" data-cstep="weight">Weight</button>
+    <button type="button" data-cstep="photos">Photos</button>
+    <button type="button" data-cstep="video">Video</button>
+  </div>
+  <p class="cinote" id="checkinNote"></p>
+  <div id="checkinBody"></div>
+</section>
+
 <!-- ============ WEIGHT ============ -->
 <section class="page" id="page-weight">
   <div class="grid2">
@@ -1222,6 +1254,7 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
     <button type="button" class="navitem sub" data-tab="library" data-lib="exercises">Exercises</button>
     <button type="button" class="navitem sub" data-tab="library" data-lib="cookbook">Cookbook</button>
   </div>
+  <button type="button" class="navitem" data-tab="checkin">Check-in</button>
   <button type="button" class="navitem" data-tab="weight">Weight</button>
   <button type="button" class="navitem" data-tab="coach">Coach</button>
   <button type="button" class="navitem" data-tab="videos">Videos</button>
@@ -1649,7 +1682,7 @@ function normalizeCustomRecipes(list){
 }
 function blankState(){
   return {version:2, settings:{calTarget:null, proteinTarget:null, carbTarget:null, fatTarget:null, goalWeight:null},
-    presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], mealPlans:{}, weights:[], steps:{}, water:{}, dayNotes:{}, workouts:{},
+    presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], mealPlans:{}, weights:[], steps:{}, water:{}, dayNotes:{}, workouts:{}, checkins:[],
     plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[], events:[]};
 }
 function load(){
@@ -1709,6 +1742,56 @@ function normalizeEvents(list){
     };
   }).filter(Boolean);
 }
+const CHECKIN_QS = [
+  {n:1, id:"q1", kind:"weight", label:"Weight"},
+  {n:2, id:"q2", kind:"yesno", label:"Have you completed all training so far for the week?"},
+  {n:3, id:"q3", kind:"text", label:"Are there any exercises that you are struggling with? If so, which one?"},
+  {n:4, id:"q4", kind:"text", label:"Have you hit all your daily steps and/or cardio sessions? If not, how many missed?"},
+  {n:5, id:"q5", kind:"scale", label:"How many hours of sleep per night?"},
+  {n:9, id:"q9", kind:"scale", label:"Recovery"},
+  {n:10, id:"q10", kind:"scale", label:"Hunger"},
+  {n:11, id:"q11", kind:"scale", label:"Fatigue"},
+  {n:12, id:"q12", kind:"scale", label:"Stress"},
+  {n:13, id:"q13", kind:"text", label:"Bowel movements?"},
+  {n:14, id:"q14", kind:"scale", label:"Muscle soreness"},
+  {n:15, id:"q15", kind:"stars", label:"Training intensity"},
+  {n:16, id:"q16", kind:"text", label:"Steps / day"},
+  {n:17, id:"q17", kind:"yesno", label:"Did you stick to the diet?"},
+  {n:18, id:"q18", kind:"text", label:"Water intake (liters or gallons)"},
+  {n:19, id:"q19", kind:"text", label:"Sodium / day"},
+  {n:21, id:"q21", kind:"long", label:"Any additional comments or feedback you'd like to add?"}
+];
+function normalizeCheckins(list){
+  if(!Array.isArray(list)) return [];
+  const nid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+  return list.map(c=>{
+    if(!c || typeof c!=="object") return null;
+    const date = String(c.date||"");
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+    const src = c.answers && typeof c.answers==="object" ? c.answers : {};
+    const answers = {};
+    CHECKIN_QS.forEach(q=>{
+      if(src[q.id]==null) return;
+      const raw = String(src[q.id]).trim();
+      if(!raw) return;
+      const cap = q.kind==="long" ? 1000 : 80;
+      answers[q.id] = raw.slice(0, cap);
+    });
+    const photos = Array.isArray(c.photos) ? c.photos.slice(0,3).map(p=>{
+      if(!p || typeof p.url!=="string" || !p.url) return null;
+      const angle = p.angle==="side" || p.angle==="back" ? p.angle : "front";
+      return {id:String(p.id||nid()), angle:angle, url:p.url.slice(0, 400000)};
+    }).filter(Boolean) : [];
+    return {
+      id:String(c.id||nid()),
+      date:date,
+      answers:answers,
+      photos:photos,
+      videoNote:String(c.videoNote||"").slice(0,280),
+      createdAt:Number(c.createdAt)||Date.now()
+    };
+  }).filter(Boolean);
+}
 function normalize(d){
   const b = blankState();
   if(!d || typeof d!=="object") return b;
@@ -1728,7 +1811,8 @@ function normalize(d){
     customExercises:normalizeCustomExercises(d.customExercises),
     customLogs:normalizeCustomLogs(d.customLogs),
     customRecipes:normalizeCustomRecipes(d.customRecipes),
-    events:normalizeEvents(d.events)
+    events:normalizeEvents(d.events),
+    checkins:normalizeCheckins(d.checkins)
   };
 }
 let S = load();
@@ -1805,12 +1889,12 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos"};
+const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos"};
 let currentTab = "today";
 let diaryDate = todayStr();
 function tabGroup(tab){
   if(tab==="workout"||tab==="events"||tab==="calendar") return "plan";
-  if(tab==="weight"||tab==="photos") return "progress";
+  if(tab==="weight"||tab==="photos"||tab==="checkin") return "progress";
   if(tab==="coach") return "coach";
   if(tab==="today") return "today";
   return "";
@@ -1843,7 +1927,7 @@ function paintSubbar(){
   const bar = $("subbar");
   const sets = {
     plan:[["workout","Workout"],["events","Events"],["calendar","Calendar"]],
-    progress:[["weight","Weight"],["photos","Photos"]]
+    progress:[["checkin","Check-in"],["weight","Weight"],["photos","Photos"]]
   };
   if(!sets[g]){ bar.hidden=true; bar.innerHTML=""; return; }
   bar.hidden=false;
@@ -2138,7 +2222,7 @@ document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>b.onclick=()=>{
   const g=b.dataset.tabgo;
   if(g==="today") go("today");
   else if(g==="plan") go(tabGroup(currentTab)==="plan"?currentTab:"workout");
-  else if(g==="progress") go(tabGroup(currentTab)==="progress"?currentTab:"weight");
+  else if(g==="progress") go(tabGroup(currentTab)==="progress"?currentTab:"checkin");
   else if(g==="coach") go("coach");
 });
 $("tabPlus").onclick = e => { e.stopPropagation(); openTool("add"); };
@@ -3285,7 +3369,18 @@ const SETUP_SQL = [
 "  created_at timestamptz default now()",
 ");",
 "alter table public.accounts enable row level security;",
-"grant select, insert, update, delete on public.pairs, public.weigh_ins, public.messages, public.photos, public.videos, public.accounts to anon;",
+"create table if not exists public.checkins (",
+"  id text primary key,",
+"  pair_id text not null references public.pairs(id) on delete cascade,",
+"  logged_on date not null,",
+"  answers jsonb not null default '{}'::jsonb,",
+"  video_note text default '',",
+"  created_at timestamptz default now()",
+");",
+"alter table public.checkins enable row level security;",
+"grant select, insert, update, delete on public.pairs, public.weigh_ins, public.messages, public.photos, public.videos, public.accounts, public.checkins to anon;",
+"drop policy if exists \"cgf checkins\" on public.checkins;",
+"create policy \"cgf checkins\" on public.checkins for all to anon using (true) with check (true);",
 "drop policy if exists \"cgf pairs\" on public.pairs;",
 "create policy \"cgf pairs\" on public.pairs for all to anon using (true) with check (true);",
 "drop policy if exists \"cgf weigh\" on public.weigh_ins;",
@@ -3420,6 +3515,7 @@ function demoLoad(){
     if(!Array.isArray(p.photos)) p.photos = [];
     if(!Array.isArray(p.messages)) p.messages = [];
     if(!Array.isArray(p.videos)) p.videos = [];
+    if(!Array.isArray(p.checkins)) p.checkins = [];
     if(!p.call) p.call = {active:false, startedAt:0, by:""};
   });
   return d;
@@ -3493,6 +3589,7 @@ function mapPairRow(row, extras){
     photos: extra.photos || [],
     messages: extra.messages || [],
     videos: extra.videos || [],
+    checkins: extra.checkins || row.checkins || [],
     call: null,
     createdAt: Date.parse(row.created_at)||Date.now()
   };
@@ -3640,7 +3737,7 @@ const Link = {
       const bus = demoLoad();
       const pair = {
         id:makeId(), inviteCode:makeCode(), clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
-        dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[],
+        dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[], checkins:[],
         call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
       };
       bus.pairs.unshift(pair);
@@ -3695,12 +3792,40 @@ const Link = {
     let videoRows = [];
     try { videoRows = await sbFetch("videos?pair_id=eq."+q+"&select=*") || []; }
     catch(e){ videoRows = []; }
+    let checkinRows = [];
+    try { checkinRows = await sbFetch("checkins?pair_id=eq."+q+"&select=*") || []; }
+    catch(e){ checkinRows = []; }
     return mapPairRow(row, {
       weighIns:(weigh||[]).map(w=>({id:w.id, weight:Number(w.weight), date:w.logged_on, note:w.note||"", createdAt:Date.parse(w.created_at)||0})),
       messages:(msgs||[]).map(m=>({id:m.id, sender:m.sender, body:m.body, createdAt:Date.parse(m.created_at)||0})),
       photos:(photos||[]).map(p=>({id:p.id, angle:p.angle, url:photoPublicUrl(p.storage_path), createdAt:Date.parse(p.created_at)||0})),
-      videos:videoRows.map(mapVideoRow)
+      videos:videoRows.map(mapVideoRow),
+      checkins:checkinRows.map(c=>({id:c.id, date:c.logged_on, answers:c.answers||{}, photos:[], videoNote:c.video_note||"", createdAt:Date.parse(c.created_at)||0}))
     });
+  },
+  async saveCheckin(pairId, entry){
+    const clean = normalizeCheckins([entry])[0];
+    if(!clean) return;
+    if(linkMode()==="demo"){
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.id===pairId);
+      if(!pair) return;
+      if(!Array.isArray(pair.checkins)) pair.checkins = [];
+      const at = pair.checkins.findIndex(c=>c.date===clean.date);
+      if(at>=0) pair.checkins[at] = clean;
+      else pair.checkins.push(clean);
+      demoSave(bus);
+      return;
+    }
+    try {
+      const existing = await sbFetch("checkins?pair_id=eq."+encodeURIComponent(pairId)+"&logged_on=eq."+clean.date+"&select=id");
+      const body = {answers:clean.answers, video_note:clean.videoNote||""};
+      if(existing && existing[0]){
+        await sbFetch("checkins?id=eq."+encodeURIComponent(existing[0].id), {method:"PATCH", body:body});
+      } else {
+        await sbFetch("checkins", {method:"POST", body:Object.assign({id:clean.id, pair_id:pairId, logged_on:clean.date}, body)});
+      }
+    } catch(e){}
   },
   async saveWeighIn(pairId, entry){
     if(linkMode()==="demo"){
@@ -3971,6 +4096,7 @@ function scheduleRefresh(){
     refreshQueued = false;
     const callOpen = $("callLayer") && !$("callLayer").hidden;
     if(currentTab==="videos") refreshVideos().catch(()=>{});
+    if(currentTab==="checkin") renderCheckin();
     if(currentTab==="coach" || callOpen) refreshCoachData().catch(()=>{});
   }, 150);
 }
@@ -4719,10 +4845,174 @@ $("videoJoinCoach").onclick = () => go("coach");
 function renderPhotos(){
   $("hdrSub").textContent = "Progress photos";
 }
+let checkinStep = "questions";
+let checkinDate = todayStr();
+let checkinPairId = "";
+let checkinSyncTimer = null;
+function ensureCheckins(){ if(!Array.isArray(S.checkins)) S.checkins = []; }
+function checkinFor(date){
+  ensureCheckins();
+  let row = S.checkins.find(c=>c.date===date);
+  if(!row){
+    row = {id:uid(), date:date, answers:{}, photos:[], videoNote:"", createdAt:Date.now()};
+    S.checkins.push(row);
+  }
+  return row;
+}
+function checkinAnswer(row, id){ return row && row.answers && row.answers[id] != null ? String(row.answers[id]) : ""; }
+function queueCheckinSync(row){
+  save();
+  const lbs = num(checkinAnswer(row, "q1"));
+  if(lbs!=null && lbs>0){
+    const ex = S.weights.find(w=>w.date===row.date);
+    if(ex) ex.lbs = r1(lbs);
+    else S.weights.push({id:uid(), date:row.date, lbs:r1(lbs)});
+    save();
+  }
+  clearTimeout(checkinSyncTimer);
+  checkinSyncTimer = setTimeout(()=>{
+    if(ID.role==="client" && ID.activePairId) Link.saveCheckin(ID.activePairId, row).catch(()=>{});
+  }, 350);
+}
+function qBlock(q, row, readOnly){
+  const v = checkinAnswer(row, q.id);
+  let control = "";
+  if(readOnly){
+    const shown = v==="" ? "—" : (q.kind==="scale" ? v+"/10" : q.kind==="stars" ? v+" of 5" : q.kind==="weight" ? v+" lb" : v);
+    control = '<p style="margin:8px 0 0;font-weight:700">'+esc(shown)+'</p>';
+  } else if(q.kind==="weight"){
+    control = '<input data-field="'+q.id+'" type="number" inputmode="decimal" step="0.1" min="0" placeholder="lb" value="'+esc(v)+'">';
+  } else if(q.kind==="text"){
+    control = '<input data-field="'+q.id+'" type="text" maxlength="80" value="'+esc(v)+'">';
+  } else if(q.kind==="long"){
+    control = '<textarea data-field="'+q.id+'" maxlength="1000" placeholder="Add a note">'+esc(v)+'</textarea>';
+  } else if(q.kind==="yesno"){
+    control = '<div class="yesno">'+["Yes","No"].map(opt=>'<button type="button" data-set="'+q.id+'" data-v="'+opt+'" class="'+(v===opt?"sel":"")+ '">'+opt+'</button>').join("")+'</div>';
+  } else if(q.kind==="scale"){
+    const n = Math.max(0, Math.min(10, Math.round(+v||0)));
+    const bits = [];
+    for(let i=1;i<=10;i++) bits.push('<button type="button" data-set="'+q.id+'" data-n="'+i+'" class="'+(n>=i?"on":"")+'" aria-label="'+i+' out of 10"></button>');
+    control = '<div class="scalehead"><b>'+(n?String(n):"—")+'</b><span>/ 10</span></div><div class="scalebar">'+bits.join("")+'</div>';
+  } else if(q.kind==="stars"){
+    const n = Math.max(0, Math.min(5, Math.round(+v||0)));
+    const bits = [];
+    for(let i=1;i<=5;i++) bits.push('<button type="button" data-set="'+q.id+'" data-n="'+i+'" class="'+(n>=i?"on":"")+'" aria-label="'+i+' of 5">★</button>');
+    control = '<div class="starbars">'+bits.join("")+'<span class="of">'+(n?n+" of 5":"of 5")+'</span></div>';
+  }
+  return '<div class="qcard"><div class="ql"><span class="qn">'+q.n+'</span>'+esc(q.label)+'</div>'+control+'</div>';
+}
+function paintClientCheckin(){
+  const row = checkinFor(checkinDate);
+  const joined = ID.role==="client" && ID.activePairId;
+  $("checkinNote").textContent = joined
+    ? "Your trainer can see this check-in."
+    : "Saved on this phone. Join your trainer with an invite code so they can see it.";
+  const dateField = '<div class="qcard"><div class="ql">Date</div><input type="date" id="checkinDate" value="'+esc(checkinDate)+'"></div>';
+  let body = "";
+  if(checkinStep==="weight"){
+    body = dateField + qBlock(CHECKIN_QS[0], row, false);
+  } else if(checkinStep==="photos"){
+    const thumbs = (row.photos||[]).map(p=>'<figure style="margin:0"><img alt="'+esc(p.angle)+' progress photo" src="'+esc(safePhotoSrc(p.url))+'" style="width:100%;height:96px;object-fit:cover;border-radius:10px"><figcaption>'+esc(p.angle)+'</figcaption></figure>').join("");
+    body = dateField + '<div class="qcard"><div class="ql">Progress photos</div><p class="note">Front, side, or back. Saved with this check-in.</p>'
+      + '<label class="f" for="cinPhoto">Add a photo</label><input id="cinPhoto" type="file" accept="image/*">'
+      + '<div class="chips" id="cinAngles" style="margin-top:8px"><button type="button" class="chip sel" data-angle="front">Front</button><button type="button" class="chip" data-angle="side">Side</button><button type="button" class="chip" data-angle="back">Back</button></div>'
+      + (thumbs ? '<div class="photogrid" style="margin-top:10px">'+thumbs+'</div>' : '')
+      + '</div>';
+  } else if(checkinStep==="video"){
+    body = dateField + '<div class="qcard"><div class="ql">Video note</div><p class="note">A short note if you want your trainer to watch something with this check-in.</p><textarea id="cinVideo" maxlength="280" placeholder="Short note">'+esc(row.videoNote||"")+'</textarea></div>';
+  } else {
+    body = dateField + CHECKIN_QS.map(q=>qBlock(q, row, false)).join("");
+  }
+  $("checkinBody").innerHTML = body;
+  const dateEl = $("checkinDate");
+  if(dateEl) dateEl.onchange = ()=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(dateEl.value)){ checkinDate = dateEl.value; paintClientCheckin(); } };
+  $("checkinBody").querySelectorAll("[data-field]").forEach(el=>{
+    el.oninput = ()=>{
+      const cur = checkinFor(checkinDate);
+      if(!cur.answers) cur.answers = {};
+      cur.answers[el.dataset.field] = el.value;
+      queueCheckinSync(cur);
+    };
+  });
+  $("checkinBody").querySelectorAll("[data-set]").forEach(btn=>{
+    btn.onclick = ()=>{
+      const cur = checkinFor(checkinDate);
+      if(!cur.answers) cur.answers = {};
+      cur.answers[btn.dataset.set] = btn.dataset.v || btn.dataset.n;
+      queueCheckinSync(cur);
+      paintClientCheckin();
+    };
+  });
+  document.querySelectorAll("#cinAngles [data-angle]").forEach(btn=>{
+    btn.onclick = ()=>{ document.querySelectorAll("#cinAngles [data-angle]").forEach(b=>b.classList.toggle("sel", b===btn)); };
+  });
+  const video = $("cinVideo");
+  if(video) video.oninput = ()=>{ const cur = checkinFor(checkinDate); cur.videoNote = video.value.slice(0,280); queueCheckinSync(cur); };
+  const file = $("cinPhoto");
+  if(file) file.onchange = ()=>{
+    const f = file.files && file.files[0];
+    const angleBtn = document.querySelector("#cinAngles .chip.sel");
+    const angle = angleBtn ? angleBtn.dataset.angle : "front";
+    if(!f) return;
+    compressImage(f, 900, 0.72).then(blob=>blobToDataUrl(blob)).then(url=>{
+      const cur = checkinFor(checkinDate);
+      cur.photos = (cur.photos||[]).filter(p=>p.angle!==angle);
+      cur.photos.push({id:uid(), angle:angle, url:url});
+      queueCheckinSync(cur);
+      if(ID.role==="client" && ID.activePairId) Link.sendPhoto(ID.activePairId, angle, f).catch(()=>{});
+      paintClientCheckin();
+    }).catch(e=>toast(e.message||"Could not read that photo"));
+  };
+}
+async function paintTrainerCheckins(){
+  const pairs = await Link.pairsForTrainer();
+  if(!pairs.length){
+    $("checkinNote").textContent = "Client answers show up here.";
+    $("checkinBody").innerHTML = '<div class="card"><p>No clients yet. Create an invite code in Coach. A client who opens the shared link can fill in this check-in.</p></div>';
+    return;
+  }
+  if(!checkinPairId || !pairs.some(p=>p.id===checkinPairId)) checkinPairId = pairs[0].id;
+  const full = await Link.loadPair(checkinPairId);
+  const list = normalizeCheckins(full && full.checkins);
+  list.sort((a,b)=>a.date<b.date?1:-1);
+  const chosen = list.find(c=>c.date===checkinDate) || list[0] || null;
+  if(chosen) checkinDate = chosen.date;
+  $("checkinNote").textContent = (full && full.clientName ? full.clientName+" · " : "") + "Answers from their phone.";
+  const opts = pairs.map(p=>'<option value="'+esc(p.id)+'"'+(p.id===checkinPairId?" selected":"")+'>'+esc(p.clientName||"Client")+'</option>').join("");
+  const dates = list.map(c=>'<option value="'+esc(c.date)+'"'+(c.date===checkinDate?" selected":"")+'>'+esc(fmtDate(c.date))+'</option>').join("");
+  const row = chosen || {answers:{}, photos:[], videoNote:""};
+  let inner = "";
+  if(!chosen) inner = '<div class="card"><p>No check-in yet from this client.</p></div>';
+  else if(checkinStep==="weight") inner = qBlock(CHECKIN_QS[0], row, true);
+  else if(checkinStep==="photos"){
+    const thumbs = (row.photos||[]).map(p=>{
+      const src = safePhotoSrc(p.url);
+      if(!src) return "";
+      return '<figure style="margin:0"><img alt="'+esc(p.angle)+' progress photo" src="'+src+'" style="width:100%;height:96px;object-fit:cover;border-radius:10px"><figcaption>'+esc(p.angle)+'</figcaption></figure>';
+    }).join("");
+    inner = '<div class="qcard"><div class="ql">Progress photos</div>'+(thumbs?'<div class="photogrid" style="margin-top:8px">'+thumbs+'</div>':'<p class="note">No photos on this check-in.</p>')+'</div>';
+  } else if(checkinStep==="video"){
+    inner = '<div class="qcard"><div class="ql">Video note</div><p style="margin:8px 0 0">'+(row.videoNote?esc(row.videoNote):"—")+'</p></div>';
+  } else inner = CHECKIN_QS.map(q=>qBlock(q, row, true)).join("");
+  $("checkinBody").innerHTML = '<div class="card"><label class="f" for="cinClient">Client</label><select id="cinClient">'+opts+'</select>'
+    + (dates ? '<label class="f" for="cinWhen" style="margin-top:8px">Date</label><select id="cinWhen">'+dates+'</select>' : '')
+    + '</div>' + inner;
+  $("cinClient").onchange = ()=>{ checkinPairId = $("cinClient").value; checkinDate = ""; paintTrainerCheckins().catch(()=>{}); };
+  if($("cinWhen")) $("cinWhen").onchange = ()=>{ checkinDate = $("cinWhen").value; paintTrainerCheckins().catch(()=>{}); };
+}
+function renderCheckin(){
+  $("hdrSub").textContent = "";
+  document.querySelectorAll("#csteps [data-cstep]").forEach(b=>{
+    b.classList.toggle("sel", b.dataset.cstep===checkinStep);
+    b.onclick = ()=>{ checkinStep = b.dataset.cstep; renderCheckin(); };
+  });
+  if(ID.role==="trainer") paintTrainerCheckins().catch(()=>{});
+  else paintClientCheckin();
+}
 function render(){
   paintHeader();
   paintSubbar();
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
