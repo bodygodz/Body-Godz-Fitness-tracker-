@@ -124,16 +124,49 @@ body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welc
 body:not(.welcome-on) .welcome-only{display:none !important}
 .welcome{max-width:560px;margin:0 auto;padding:6px 18px 8px}
 .welcome-intro p{color:#fff;font-size:18px;line-height:1.45;margin:6px 0 16px}
-.welcomeslide{overflow:hidden;margin:16px -18px 6px}
-.welcomeslide-track{display:flex;width:max-content;animation:welcome-slide 46s linear infinite}
-.welcomeslide-set{display:flex}
-.welcomeslide img{width:250px;height:176px;object-fit:cover;object-position:center center;border-radius:18px;flex:none;margin-right:12px;background:#4c1d95}
-.welcomeslide img.face{object-position:center 22%}
-.welcomeslide img.pool{object-position:center 70%}
-@keyframes welcome-slide{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
-@media (prefers-reduced-motion: reduce){
-  .welcomeslide-track{animation:none}
+.bubbles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.picbubble{position:absolute;left:0;top:0;border-radius:50%;object-fit:cover;object-position:center center;pointer-events:none;opacity:.5;background:#4c1d95;box-shadow:0 10px 28px rgba(40,0,60,.28);animation:orbit-out 56s linear infinite}
+.picbubble.face{object-position:center 22%}
+.picbubble.pool{object-position:center 72%}
+.b1{width:132px;height:132px;animation-delay:0s}
+.b2{width:168px;height:168px;animation-delay:-14s}
+.b3{width:96px;height:96px;animation-delay:-28s}
+.b4{width:124px;height:124px;animation-delay:-42s}
+.b5{width:88px;height:88px;animation-name:orbit-in;animation-duration:48s;animation-delay:-6s}
+.b6{width:150px;height:150px;animation-name:orbit-in;animation-duration:48s;animation-delay:-18s}
+.b7{width:108px;height:108px;animation-name:orbit-in;animation-duration:48s;animation-delay:-30s}
+.b8{width:116px;height:116px;animation-name:orbit-in;animation-duration:48s;animation-delay:-42s}
+@keyframes orbit-out{
+  0%{transform:translate3d(6vw,14vh,0)}
+  12.5%{transform:translate3d(58vw,8vh,0)}
+  25%{transform:translate3d(74vw,30vh,0)}
+  37.5%{transform:translate3d(62vw,58vh,0)}
+  50%{transform:translate3d(40vw,74vh,0)}
+  62.5%{transform:translate3d(6vw,66vh,0)}
+  75%{transform:translate3d(-4vw,42vh,0)}
+  87.5%{transform:translate3d(0vw,24vh,0)}
+  100%{transform:translate3d(6vw,14vh,0)}
 }
+@keyframes orbit-in{
+  0%{transform:translate3d(22vw,28vh,0)}
+  25%{transform:translate3d(14vw,52vh,0)}
+  50%{transform:translate3d(42vw,48vh,0)}
+  75%{transform:translate3d(48vw,22vh,0)}
+  100%{transform:translate3d(22vw,28vh,0)}
+}
+@media (prefers-reduced-motion: reduce){
+  .picbubble{animation:none}
+  .b1{transform:translate3d(6vw,18vh,0)}
+  .b2{transform:translate3d(62vw,12vh,0)}
+  .b3{transform:translate3d(8vw,62vh,0)}
+  .b4{transform:translate3d(58vw,68vh,0)}
+  .b5{transform:translate3d(24vw,36vh,0)}
+  .b6{transform:translate3d(46vw,28vh,0)}
+  .b7{transform:translate3d(18vw,54vh,0)}
+  .b8{transform:translate3d(48vw,50vh,0)}
+}
+body.welcome-on .welcome-intro,body.welcome-on #welcomeMore{position:relative;z-index:2}
+body.welcome-on .welcome-intro p,body.welcome-on .welcome h2.hero,body.welcome-on .welcome .hero-sub,body.welcome-on button.learnmore{text-shadow:0 1px 10px #4c1d95,0 0 2px #4c1d95}
 button.learnmore{background:transparent;border:none;color:#fff;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:0;text-decoration:underline;text-underline-offset:4px;border-radius:0}
 .welcome h2.hero{color:#fff;font-size:34px;line-height:1.05;font-weight:800;letter-spacing:-.03em;margin:28px 0 8px}
 .welcome .hero-sub{color:#f3e8ff;font-size:16px;line-height:1.4;margin:0}
@@ -317,29 +350,15 @@ img.person{object-position:center 24%}
       <p>Training lives here. Curly Gurl Fitness is where you and your clients keep workouts, meals, and check-ins on the phone you already use.</p>
       <button type="button" class="learnmore" id="learnMore">Learn more</button>
     </div>
-    <div class="welcomeslide" id="welcomeSlide">
-      <div class="welcomeslide-track">
-        <div class="welcomeslide-set">
-          <img class="face" src="images/header-portrait.jpg" alt="Curly Gurl Fitness">
-          <img class="pool" src="images/work/lower-body.jpg" alt="Pool class">
-          <img src="images/library-step.jpg" alt="Step class">
-          <img src="images/work/glute.jpg" alt="Glute workout">
-          <img src="images/food/salad.jpg" alt="Salad">
-          <img src="images/work/boxing.jpg" alt="Boxing workout">
-          <img src="images/food/salmon-plate.jpg" alt="Salmon plate">
-          <img src="images/work/bike.jpg" alt="Bike workout">
-        </div>
-        <div class="welcomeslide-set" aria-hidden="true">
-          <img class="face" src="images/header-portrait.jpg" alt="">
-          <img class="pool" src="images/work/lower-body.jpg" alt="">
-          <img src="images/library-step.jpg" alt="">
-          <img src="images/work/glute.jpg" alt="">
-          <img src="images/food/salad.jpg" alt="">
-          <img src="images/work/boxing.jpg" alt="">
-          <img src="images/food/salmon-plate.jpg" alt="">
-          <img src="images/work/bike.jpg" alt="">
-        </div>
-      </div>
+    <div class="bubbles" id="welcomeBubbles" aria-hidden="true">
+      <img class="picbubble face b1" src="images/header-portrait.jpg" alt="">
+      <img class="picbubble pool b2" src="images/work/lower-body.jpg" alt="">
+      <img class="picbubble b3" src="images/library-step.jpg" alt="">
+      <img class="picbubble b4" src="images/work/glute.jpg" alt="">
+      <img class="picbubble b5" src="images/food/salad.jpg" alt="">
+      <img class="picbubble b6" src="images/work/boxing.jpg" alt="">
+      <img class="picbubble b7" src="images/food/salmon-plate.jpg" alt="">
+      <img class="picbubble b8" src="images/work/bike.jpg" alt="">
     </div>
     <div id="welcomeMore">
       <h2 class="hero">Grow a coaching business without the extra admin</h2>
