@@ -108,6 +108,9 @@ button:active{transform:scale(.98)}
 .menuaction{margin-top:28px;background:#fff;color:#4c1d95;border:none;border-radius:4px;padding:14px 22px;font-weight:800;font-size:15px;letter-spacing:0;text-transform:none;min-width:210px;text-align:center}
 .menulogout{flex:none;align-self:stretch;background:#4c1d95;border:none;border-top:1px solid rgba(255,255,255,.35);color:#fff;margin-top:12px;padding:16px 0 2px;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:right}
 .menubrand{margin:0 0 18px;font-size:22px;font-weight:600;letter-spacing:.01em;text-align:right;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+.rolepick{display:flex;gap:8px;justify-content:flex-end;margin:0 0 18px;width:100%}
+.rolepick button{background:transparent;border:1px solid rgba(255,255,255,.6);color:#fff;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.rolepick button.sel{background:#fff;color:#4c1d95;border-color:#fff}
 .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#1c1430;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:40;font-size:13px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{color:var(--muted);text-align:center;padding:14px 0;font-size:13px}
@@ -1073,11 +1076,12 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
       <div class="card">
         <h2>New client</h2>
         <div class="field"><label class="f">Client name</label><input id="trName" maxlength="40" placeholder="e.g. Alex" autocomplete="name"></div>
-        <button class="primary full" id="trCreate" type="button">Create invite code</button>
+        <button class="primary full" id="trCreate" type="button">Add client</button>
         <p class="note" id="clientLinkNote" style="margin-top:10px"></p>
       </div>
       <div class="card">
         <h2>Clients</h2>
+        <p class="note" style="margin-bottom:8px">Delete removes a client from this phone.</p>
         <div id="trList"></div>
       </div>
     </div>
@@ -1315,6 +1319,10 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 <nav class="navmenu" id="navMenu" hidden>
   <div class="navscroll">
   <p class="menubrand">Curly Gurl Fitness</p>
+  <div class="rolepick" id="menuRoles" role="group" aria-label="Trainer or client">
+    <button type="button" data-menurole="trainer" aria-pressed="false">Trainer</button>
+    <button type="button" data-menurole="client" aria-pressed="false">Client</button>
+  </div>
   <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
   <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
   <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
@@ -2018,8 +2026,11 @@ function tabGroup(tab){
   if(tab==="today") return "today";
   return "";
 }
+function clientView(){ return ID.role==="client"; }
+function clientAllows(tab){ return tab==="today" || tab==="checkin" || tab==="photos" || tab==="coach"; }
 function go(tab){
   if(!TITLES[tab]) tab="today";
+  if(clientView() && !clientAllows(tab)) tab="today";
   currentTab = tab;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+tab));
   $("hdrTitle").textContent = TITLES[tab];
@@ -2046,7 +2057,9 @@ function paintSubbar(){
   const bar = $("subbar");
   const sets = {
     plan:[["workout","Workout"],["events","Events"],["calendar","Calendar"]],
-    progress:[["checkin","Check-in"],["bmi","BMI"],["weight","Weight"],["photos","Photos"]]
+    progress: clientView()
+      ? [["checkin","Check-in"],["photos","Photos"]]
+      : [["checkin","Check-in"],["bmi","BMI"],["weight","Weight"],["photos","Photos"]]
   };
   if(!sets[g]){ bar.hidden=true; bar.innerHTML=""; return; }
   bar.hidden=false;
@@ -2079,7 +2092,26 @@ function syncMenu(){
     b.classList.toggle("active", on);
   });
   const action = $("menuAction");
-  if(action) action.textContent = ID.role==="trainer" ? "Create invite code" : "Start today's workout";
+  if(action) action.textContent = trainerHere() ? "Add client" : "Start today's workout";
+  const client = clientView();
+  document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
+    if(!client){ b.hidden = false; return; }
+    b.hidden = !clientAllows(b.dataset.tab) || !!b.dataset.lib;
+  });
+  const split = document.querySelector("#navMenu .navsplit");
+  if(split) split.hidden = client;
+  if(client) $("libSub").hidden = true;
+  $("menuCheck").hidden = client;
+  $("menuBell").hidden = client;
+  $("menuAction").hidden = client;
+  const planBtn = document.querySelector('#tabbar [data-tabgo="plan"]');
+  if(planBtn) planBtn.hidden = client;
+  $("tabPlus").hidden = client;
+  document.querySelectorAll("#menuRoles [data-menurole]").forEach(b=>{
+    const on = b.dataset.menurole===ID.role;
+    b.classList.toggle("sel", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
   const g = tabGroup(currentTab);
   document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>{
     b.classList.toggle("sel", b.dataset.tabgo===g);
@@ -2116,7 +2148,7 @@ document.querySelectorAll("#navMenu [data-tab]").forEach(b=>b.addEventListener("
 $("menuLogout").onclick = () => logOut();
 $("menuAction").onclick = () => {
   closeMenu();
-  if(ID.role==="trainer"){
+  if(trainerHere()){
     pairOpen = false;
     go("coach");
     const name = $("trName");
@@ -2341,9 +2373,32 @@ document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>b.onclick=()=>{
   const g=b.dataset.tabgo;
   if(g==="today") go("today");
   else if(g==="plan") go(tabGroup(currentTab)==="plan"?currentTab:"workout");
-  else if(g==="progress") go(tabGroup(currentTab)==="progress"?currentTab:"checkin");
+  else if(g==="progress"){
+    const stay = tabGroup(currentTab)==="progress" && clientAllows(currentTab);
+    go(stay ? currentTab : "checkin");
+  }
   else if(g==="coach") go("coach");
 });
+document.querySelectorAll("#menuRoles [data-menurole]").forEach(b=>{
+  b.onclick = () => chooseMenuRole(b.dataset.menurole);
+});
+function chooseMenuRole(role){
+  if(role!=="trainer" && role!=="client") return;
+  localStorage.setItem(MENU_ROLE_KEY, role);
+  const onWelcome = document.body.classList.contains("welcome-on");
+  if(ID.role!==role){ ID.activePairId = ""; pairOpen = false; }
+  ID.role = role;
+  persistIdentity();
+  closeMenu();
+  if(onWelcome && role==="trainer"){
+    showApp();
+    go("today");
+    return;
+  }
+  if(onWelcome) return;
+  if(role==="client" && !clientAllows(currentTab)) go("today");
+  else render();
+}
 $("tabPlus").onclick = e => { e.stopPropagation(); openTool("add"); };
 $("menuCheck").onclick = (e) => { e.stopPropagation(); closeMenu(); openTool("check"); };
 $("menuBell").onclick = (e) => { e.stopPropagation(); closeMenu(); openTool("bell"); };
@@ -3568,7 +3623,31 @@ function loadIdentity(){
 let ID = loadIdentity();
 function persistIdentity(){
   sessionStorage.setItem(SESSION_KEY, JSON.stringify({role:ID.role, deviceId:ID.deviceId, activePairId:ID.activePairId||""}));
-  localStorage.setItem(PROFILE_KEY, JSON.stringify({role:ID.role, deviceId:ID.deviceId, activePairId:ID.activePairId||""}));
+  const profile = readStore(localStorage, PROFILE_KEY) || {};
+  const keepOwner = isClientPhone() && !menuRole() && (profile.role==="trainer" || profile.role==="solo");
+  localStorage.setItem(PROFILE_KEY, JSON.stringify({
+    role: keepOwner ? profile.role : ID.role,
+    deviceId: ID.deviceId,
+    activePairId: keepOwner ? (profile.activePairId||"") : (ID.activePairId||"")
+  }));
+}
+const REMOVED_CLIENTS_KEY = "curlyGirlFitness.removedClients.v1";
+function removedClientIds(){
+  const raw = readStore(localStorage, REMOVED_CLIENTS_KEY);
+  return Array.isArray(raw) ? raw.filter(id => typeof id==="string" && id) : [];
+}
+function removeClientOnThisPhone(id){
+  const ids = removedClientIds();
+  if(ids.indexOf(id)<0) ids.push(String(id));
+  localStorage.setItem(REMOVED_CLIENTS_KEY, JSON.stringify(ids));
+}
+const MENU_ROLE_KEY = "curlyGirlFitness.menuRole.v1";
+function menuRole(){
+  const v = localStorage.getItem(MENU_ROLE_KEY);
+  return v==="trainer" || v==="client" ? v : "";
+}
+function trainerHere(){
+  return ID.role==="trainer";
 }
 function readKeys(){
   const k = readStore(localStorage, KEYS_KEY) || {};
@@ -3845,11 +3924,16 @@ async function dailyCreateOrGet(name){
 
 const Link = {
   async pairsForTrainer(){
+    if(!trainerHere()) return [];
+    const hidden = removedClientIds();
+    let pairs;
     if(linkMode()==="demo"){
-      return demoLoad().pairs.filter(p=>p.trainerDevice===ID.deviceId).map(demoCopy);
+      pairs = demoLoad().pairs.filter(p=>p.trainerDevice===ID.deviceId).map(demoCopy);
+    } else {
+      const rows = await sbFetch("pairs?trainer_device=eq."+encodeURIComponent(ID.deviceId)+"&select=*&order=created_at.desc");
+      pairs = (rows||[]).map(r=>mapPairRow(r));
     }
-    const rows = await sbFetch("pairs?trainer_device=eq."+encodeURIComponent(ID.deviceId)+"&select=*&order=created_at.desc");
-    return (rows||[]).map(r=>mapPairRow(r));
+    return pairs.filter(p=>hidden.indexOf(p.id)<0);
   },
   async createClient(name){
     if(linkMode()==="demo"){
@@ -4173,27 +4257,31 @@ function paintCallStatus(pair){
 async function paintTrainerList(){
   const pairs = await Link.pairsForTrainer();
   if(!pairs.length){
-    $("trList").innerHTML = '<div class="empty">No clients yet. Create one to get an invite code.</div>';
+    $("trList").innerHTML = '<div class="empty">No clients yet. Add a client to get an invite code.</div>';
     return;
   }
-  $("trList").innerHTML = '<ul class="list">'+pairs.map(p=>'<li><div class="grow"><div class="name">'+esc(p.clientName)+'</div><div class="meta">'+esc(p.inviteCode)+(p.clientDevice?' · joined':' · waiting to join')+'</div></div><button class="sm" type="button" data-open="'+esc(p.id)+'">Open</button></li>').join("")+'</ul>';
+  $("trList").innerHTML = '<ul class="list">'+pairs.map(p=>'<li><div class="grow"><div class="name">'+esc(p.clientName)+'</div><div class="meta">'+esc(p.inviteCode)+(p.clientDevice?' · joined':' · waiting to join')+'</div></div><button class="sm" type="button" data-open="'+esc(p.id)+'">Open</button><button class="sm danger" type="button" data-del="'+esc(p.id)+'" data-name="'+esc(p.clientName||"this client")+'">Delete</button></li>').join("")+'</ul>';
 }
 async function paintPair(){
   const pair = await Link.loadPair(ID.activePairId);
   openPair = pair;
-  if(!pair){
-    if(ID.role==="client") ID.activePairId = "";
+  if(!pair || (isClientPhone() && pair.clientDevice!==ID.deviceId)){
+    if(ID.role==="client" || isClientPhone()) ID.activePairId = "";
     pairOpen = false;
+    openPair = null;
     persistIdentity();
     renderCoach();
-    if(ID.role==="trainer") await paintTrainerList();
+    if(trainerHere()) await paintTrainerList();
     return;
   }
   $("pairName").textContent = pair.clientName || "Client";
   $("pairMeta").textContent = ID.role==="trainer"
     ? (pair.clientDevice ? "Joined on their phone" : "Waiting for them to enter the code")
     : "You're checked in with your trainer";
-  $("pairCode").textContent = pair.inviteCode || "";
+  const showCode = trainerHere();
+  $("pairCode").hidden = !showCode;
+  $("pairCopy").hidden = !showCode;
+  $("pairCode").textContent = showCode ? (pair.inviteCode || "") : "";
   paintWeighIns(pair.weighIns);
   paintPhotos(pair.photos);
   paintMessages(pair.messages);
@@ -4205,7 +4293,7 @@ async function paintPair(){
   ensureLiveChannel(pair.id);
 }
 async function refreshCoachData(){
-  if(ID.role==="trainer" && !showingPair()){ await paintTrainerList(); return; }
+  if(trainerHere() && !showingPair()){ await paintTrainerList(); return; }
   if(showingPair()) await paintPair();
 }
 function scheduleRefresh(){
@@ -4232,10 +4320,11 @@ function renderCoach(){
   $("hdrSub").textContent = ID.role==="trainer" ? "Clients, check-ins, and calls" : ID.role==="client" ? "Weigh-ins, photos, and your trainer" : "Personal tracker";
   $("coachDemoCard").hidden = !(coaching && !dataReady() && !showingPair());
   $("coachSolo").style.display = (ID.role==="solo" || !ID.role) ? "" : "none";
-  $("coachTrainer").style.display = (ID.role==="trainer" && !showingPair()) ? "" : "none";
+  $("coachTrainer").style.display = (trainerHere() && !showingPair()) ? "" : "none";
   $("coachClient").style.display = (ID.role==="client" && !ID.activePairId) ? "" : "none";
   $("pairPanel").style.display = showingPair() ? "" : "none";
-  $("pairBack").style.display = ID.role==="trainer" ? "" : "none";
+  $("pairBack").style.display = trainerHere() ? "" : "none";
+  $("demoAsTrainer").hidden = !trainerHere();
   $("pairWeighForm").style.display = ID.role==="client" ? "" : "none";
   $("pairPhotoForm").style.display = ID.role==="client" ? "" : "none";
   if(ID.role==="client" && $("cwDate") && !$("cwDate").value) $("cwDate").value = todayStr();
@@ -4265,6 +4354,7 @@ function fillConnectionSettings(){
 }
 function setRole(role){
   if(role!=="trainer" && role!=="client" && role!=="solo") return;
+  if(role==="trainer" || role==="client") localStorage.setItem(MENU_ROLE_KEY, role);
   if(ID.role!==role){ ID.activePairId = ""; pairOpen = false; }
   ID.role = role;
   persistIdentity();
@@ -4447,8 +4537,22 @@ $("pairMsg").addEventListener("keydown", (e)=>{
   if(e.key==="Enter"){ e.preventDefault(); $("pairSend").click(); }
 });
 $("page-coach").addEventListener("click", (e)=>{
+  const del = e.target.closest("[data-del]");
+  if(del){
+    if(!trainerHere()) return;
+    const id = del.dataset.del;
+    const name = del.dataset.name || "this client";
+    if(!confirm("Remove "+name+" from your client list on this phone?")) return;
+    removeClientOnThisPhone(id);
+    if(ID.activePairId===id){ ID.activePairId = ""; pairOpen = false; persistIdentity(); }
+    toast("Removed from this phone");
+    renderCoach();
+    refreshCoachData().catch(()=>{});
+    return;
+  }
   const open = e.target.closest("[data-open]");
   if(open){
+    if(!trainerHere()) return;
     ID.activePairId = open.dataset.open;
     pairOpen = true;
     persistIdentity();
@@ -4751,8 +4855,8 @@ function fmtVideoWhen(ts){
   return d.toLocaleString(undefined, {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
 }
 function paintVideoChrome(){
-  const trainer = ID.role==="trainer";
-  const client = ID.role==="client";
+  const trainer = trainerHere();
+  const client = ID.role==="client" || isClientPhone();
   const coaching = trainer || client;
   $("videoSolo").hidden = coaching;
   $("videoDemoNote").hidden = !(coaching && !dataReady());
@@ -4796,7 +4900,7 @@ async function attachVideoPlay(items){
   }
 }
 async function collectVideos(){
-  if(ID.role==="trainer"){
+  if(trainerHere()){
     const pairs = await Link.pairsForTrainer();
     fillVideoClients(pairs);
     if(!pairs.length) return [];
@@ -5125,7 +5229,7 @@ function renderCheckin(){
     b.classList.toggle("sel", b.dataset.cstep===checkinStep);
     b.onclick = ()=>{ checkinStep = b.dataset.cstep; renderCheckin(); };
   });
-  if(ID.role==="trainer") paintTrainerCheckins().catch(()=>{});
+  if(trainerHere()) paintTrainerCheckins().catch(()=>{});
   else paintClientCheckin();
 }
 let bmiShot = {front:"", side:""};
@@ -5296,6 +5400,7 @@ $("bmiSidePick").onclick = ()=>openBmiPhoto("bmiSideFile");
 });
 $("bmiSave").onclick = saveBmi;
 function render(){
+  applyClientLock();
   paintHeader();
   paintSubbar();
   ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos})[currentTab]();
@@ -5330,6 +5435,7 @@ function paintChrome(){
   if(meta) meta.setAttribute("content", "#4c1d95");
 }
 function showWelcome(view){
+  applyClientLock();
   document.body.classList.add("welcome-on");
   paintChrome(true);
   $("welcome").hidden = false;
@@ -5392,6 +5498,7 @@ function rememberAccount(account){
   saveAccounts(accounts);
 }
 async function signUpAccount(name, email, password, role, invite){
+  if(isClientPhone()) role = "client";
   if(!name) throw new Error("Enter your name");
   if(!emailOk(email)) throw new Error("Enter a valid email");
   if(password.length<6) throw new Error("Use at least 6 characters");
@@ -5446,10 +5553,20 @@ async function logInAccount(email, password){
 }
 let signupRole = "trainer";
 function paintSignupRole(){
+  if(isClientPhone() && menuRole()!=="trainer") signupRole = "client";
   document.querySelectorAll("#signupRoles [data-role]").forEach(btn=>{
     btn.classList.toggle("sel", btn.dataset.role===signupRole);
   });
   $("signupCodeWrap").hidden = signupRole!=="client";
+}
+function applyClientLock(){
+  if(isClientPhone() && menuRole()!=="trainer" && ID.role!=="client"){
+    const profile = readStore(localStorage, PROFILE_KEY) || {};
+    if(profile.role==="trainer" || profile.role==="solo") ID.activePairId = "";
+    ID.role = "client";
+    pairOpen = false;
+    persistIdentity();
+  }
 }
 function scrollFeatures(){
   showWelcome("home");
@@ -5499,20 +5616,31 @@ paintSignupRole();
 
 const initial = (location.hash||"").slice(1);
 const clientPhone = isClientPhone();
-if(!clientPhone) localStorage.setItem(ENTRY_KEY, "owner");
+if(!clientPhone){
+  localStorage.setItem(ENTRY_KEY, "owner");
+  const profile = readStore(localStorage, PROFILE_KEY) || {};
+  if(profile.role==="trainer" || profile.role==="solo" || profile.role==="client"){
+    ID.role = profile.role;
+    ID.activePairId = profile.activePairId || "";
+    pairOpen = ID.role==="trainer" && !!ID.activePairId;
+  }
+  if(!ID.role) ID.role = "trainer";
+  persistIdentity();
+}
 const linkNote = $("clientLinkNote");
 if(linkNote) linkNote.textContent = "Clients sign up or log in from the shared link: " + location.origin + location.pathname + "?join";
 if(clientPhone && currentAuth() && loadAccounts().some(a => a.email===currentAuth().email)){
   showApp();
   const saved = loadAccounts().find(a => a.email===currentAuth().email);
   if(saved && !ID.role){ ID.role = saved.role; persistIdentity(); }
+  applyClientLock();
   go(TITLES[initial] ? initial : "today");
   maybeGate();
 } else if(clientPhone){
   if(currentAuth()) localStorage.removeItem(AUTH_KEY);
+  applyClientLock();
   showWelcome("home");
 } else {
-  if(!ID.role){ ID.role = "trainer"; persistIdentity(); }
   showApp();
   go(TITLES[initial] ? initial : "today");
   maybeGate();
