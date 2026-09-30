@@ -210,11 +210,11 @@ button.morelink{background:transparent;border:none;color:#db2777;font-weight:800
 .welcome .card{background:rgba(255,255,255,.85)}
 .welcome .card h2{font-size:22px;text-transform:none;letter-spacing:-.02em;line-height:1.2;color:#1c1430;font-weight:800;margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
 .welcome .card p{margin:0;color:#1c1430;font-size:14px;line-height:1.55}
-.welcome-dock{position:relative;z-index:6;display:flex;gap:10px;width:100%;margin:8px 0 0;padding:8px 0 calc(18px + var(--safe-b));background:transparent;box-sizing:border-box}
+.welcome-dock{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;gap:10px;width:100%;max-width:560px;margin:0 auto;padding:12px 22px calc(16px + var(--safe-b));background:#4c1d95;box-sizing:border-box}
 .welcome-dock[hidden]{display:none !important}
 .welcome-dock button{flex:1;font-size:15px;padding:14px 10px;background:#fff;color:#1c1430;border:1.5px solid #fff;border-radius:8px}
 .welcome-dock button.primary{background:#db2777;color:#fff;border-color:#db2777}
-#welcomeHome{padding-bottom:8px}
+#welcomeHome{padding-bottom:92px}
 .welcome .card p.note{color:var(--muted);font-size:11.5px}
 .welcome-back{margin:0 0 12px}
 #welcomeSignup,#welcomeLogin{padding:8px 0 28px}
@@ -474,9 +474,7 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 <body class="welcome-on">
 <script>
 (function(){
-  var client = /[?&]join(?:[=&]|$)/.test(location.search) || location.hash==="#join";
-  try { if(localStorage.getItem("curlyGirlFitness.entry.v1")==="client") client = true; } catch(e){}
-  if(!client) document.body.classList.remove("welcome-on");
+  /* Welcome stays up until someone logs in or signs up. */
 })();
 </script>
 <header>
@@ -2391,12 +2389,11 @@ function chooseMenuRole(role){
   ID.role = role;
   persistIdentity();
   closeMenu();
-  if(onWelcome && role==="trainer"){
-    showApp();
-    go("today");
+  if(onWelcome){
+    signupRole = role;
+    paintSignupRole();
     return;
   }
-  if(onWelcome) return;
   if(role==="client" && !clientAllows(currentTab)) go("today");
   else render();
 }
@@ -5460,6 +5457,7 @@ function enterAccount(account){
   localStorage.setItem(AUTH_KEY, JSON.stringify({email:account.email, id:account.id}));
   showApp();
   setRole(account.role);
+  go("today");
 }
 const ENTRY_KEY = "curlyGirlFitness.entry.v1";
 function clientRequested(){
@@ -5479,18 +5477,7 @@ function logOut(){
   pairOpen = false;
   if(typeof closeTools==="function") closeTools();
   closeMenu();
-  if(isClientPhone()){
-    ID.role = "";
-    persistIdentity();
-    showWelcome("home");
-    toast("Logged out");
-    return;
-  }
-  ID.role = "trainer";
-  persistIdentity();
-  showApp();
-  go("today");
-  maybeGate();
+  showWelcome("home");
   toast("Logged out");
 }
 function rememberAccount(account){
@@ -5499,7 +5486,7 @@ function rememberAccount(account){
   saveAccounts(accounts);
 }
 async function signUpAccount(name, email, password, role, invite){
-  if(isClientPhone()) role = "client";
+  if(isClientPhone() && menuRole()!=="trainer") role = "client";
   if(!name) throw new Error("Enter your name");
   if(!emailOk(email)) throw new Error("Enter a valid email");
   if(password.length<6) throw new Error("Use at least 6 characters");
@@ -5554,7 +5541,8 @@ async function logInAccount(email, password){
 }
 let signupRole = "trainer";
 function paintSignupRole(){
-  if(isClientPhone() && menuRole()!=="trainer") signupRole = "client";
+  if(menuRole()==="trainer") signupRole = "trainer";
+  else if(menuRole()==="client" || isClientPhone()) signupRole = "client";
   document.querySelectorAll("#signupRoles [data-role]").forEach(btn=>{
     btn.classList.toggle("sel", btn.dataset.role===signupRole);
   });
@@ -5630,22 +5618,8 @@ if(!clientPhone){
 }
 const linkNote = $("clientLinkNote");
 if(linkNote) linkNote.textContent = "Clients sign up or log in from the shared link: " + location.origin + location.pathname + "?join";
-if(clientPhone && currentAuth() && loadAccounts().some(a => a.email===currentAuth().email)){
-  showApp();
-  const saved = loadAccounts().find(a => a.email===currentAuth().email);
-  if(saved && !ID.role){ ID.role = saved.role; persistIdentity(); }
-  applyClientLock();
-  go(TITLES[initial] ? initial : "today");
-  maybeGate();
-} else if(clientPhone){
-  if(currentAuth()) localStorage.removeItem(AUTH_KEY);
-  applyClientLock();
-  showWelcome("home");
-} else {
-  showApp();
-  go(TITLES[initial] ? initial : "today");
-  maybeGate();
-}
+applyClientLock();
+showWelcome("home");
 window.__fitness = {get state(){return S;}, KEY};
 })();
 </script>
