@@ -26,7 +26,10 @@ body{padding-bottom:calc(76px + var(--safe-b));min-height:100vh;background-color
   radial-gradient(720px 520px at 86% 112%, rgba(34,211,238,.88), transparent 48%),
   linear-gradient(165deg, #6d28d9 0%, #db2777 48%, #ea580c 100%)}
 header{position:sticky;top:0;z-index:5;background:#4c1d95;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16)}
-header h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.15;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+.brandwrap{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 8px}
+.brandwrap img{width:84px;height:84px;object-fit:cover;object-position:center 22%;border-radius:14px;flex:none;background:#4c1d95}
+header h1{margin:0;flex:1;min-width:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.05;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+header h1 .drop{float:left;font-size:2.25em;line-height:.72;padding:1px 5px 0 0;font-weight:800}
 header .screentitle{font-size:15px;font-weight:700;margin-top:3px;color:#fff}
 header .sub{color:#e4dcf5;font-size:13px}
 main{padding:14px 14px 20px;max-width:560px;margin:0 auto}
@@ -203,7 +206,10 @@ a.musicbtn{display:inline-flex;align-items:center;justify-content:center;text-de
 </head>
 <body>
 <header>
-  <h1 class="brandline">Curly Gurl Fitness</h1>
+  <div class="brandwrap">
+    <h1 class="brandline"><span class="drop">C</span>urly Gurl Fitness</h1>
+    <img src="images/header-portrait.jpg" alt="">
+  </div>
   <div class="screentitle" id="hdrTitle">Today</div>
   <div class="sub" id="hdrSub"></div>
   <p class="demobanner" id="demoBanner" hidden>Demo mode · two tabs on this browser. Add Supabase and Daily keys in Settings to connect two phones.</p>
@@ -2153,7 +2159,7 @@ function renderLibraryPage(){
   if(libSection==="home"){
     $("hdrTitle").textContent = "Library";
     $("hdrSub").textContent = "Exercises and cookbook";
-    mountHubPhoto($("openExercises"), "images/work/weights.jpg", "Dumbbells and kettlebells on a rack");
+    mountHubPhoto($("openExercises"), "images/library-step.jpg", "Black women in a step class on green turf");
     renderNewsColumn();
     mountHubPhoto($("openCookbook"), foodSrc("chicken-rice"), "Chicken with rice and salad");
   } else if(libSection==="exercises") renderLibrary();
