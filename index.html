@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#4c1d95">
+<meta name="theme-color" content="#111111">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,9 +18,11 @@
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:14px;line-height:1.45;background-color:#4c1d95}
-html{background-color:#4c1d95}
+html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:14px;line-height:1.45}
+html{background-color:#fff}
+html:has(body:not(.welcome-on)){background-color:#4c1d95}
 body{padding-bottom:calc(108px + var(--safe-b));min-height:100vh;background-color:#4c1d95;color:#f8f5ff;background-image:none}
+body.welcome-on{background-color:#fff;color:#111;padding-bottom:0}
 header{position:sticky;top:0;z-index:28;background:#4c1d95;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 6px;border-bottom:1px solid rgba(255,255,255,.16)}
 .brandwrap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
 .menubtn{flex:none;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#fff;border-radius:10px}
@@ -121,10 +123,9 @@ body.welcome-on main,body.welcome-on .screentitle,body.welcome-on #hdrSub,body.w
 body.welcome-on #roleGate{display:none !important}
 body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welcome-on #navMenu .navsub,body.welcome-on #menuAction,body.welcome-on #menuLogout,body.welcome-on #menuCheck,body.welcome-on #menuBell{display:none !important}
 body:not(.welcome-on) .welcome-only{display:none !important}
-.welcome{max-width:560px;margin:0 auto;padding:6px 18px 8px}
-.welcome-intro p{color:#fff;font-size:16px;line-height:1.55;margin:6px 0 16px}
+.welcome{max-width:560px;margin:0 auto;padding:6px 22px 8px;position:relative}
 .bubbles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-.picbubble{position:absolute;left:0;top:0;border-radius:50%;object-fit:cover;object-position:center center;pointer-events:none;opacity:.5;background:#4c1d95;box-shadow:0 10px 28px rgba(40,0,60,.28);animation:orbit-out 56s linear infinite}
+.picbubble{position:absolute;left:0;top:0;border-radius:50%;object-fit:cover;object-position:center center;pointer-events:none;opacity:.5;background:#eee;box-shadow:0 10px 28px rgba(0,0,0,.16);animation:orbit-out 56s linear infinite}
 .picbubble.face{object-position:center 22%}
 .picbubble.pool{object-position:center 72%}
 .b1{width:132px;height:132px;animation-delay:0s}
@@ -164,20 +165,57 @@ body:not(.welcome-on) .welcome-only{display:none !important}
   .b7{transform:translate3d(18vw,54vh,0)}
   .b8{transform:translate3d(48vw,50vh,0)}
 }
-body.welcome-on .welcome-intro,body.welcome-on #welcomeMore{position:relative;z-index:2}
-body.welcome-on .welcome-intro p,body.welcome-on .welcome h2.hero,body.welcome-on .welcome .hero-sub,body.welcome-on button.learnmore{text-shadow:0 1px 10px #4c1d95,0 0 2px #4c1d95}
-button.learnmore{background:transparent;border:none;color:#fff;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:0;text-decoration:underline;text-underline-offset:4px;border-radius:0;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
-.welcome h2.hero{color:#fff;font-size:32px;line-height:1.22;font-weight:500;letter-spacing:.015em;margin:28px 0 8px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
-.welcome .hero-sub{color:#f3e8ff;font-size:15px;line-height:1.55;margin:0}
-#welcomeMore{scroll-margin-top:130px}
-.welcome .card h2{font-size:24px;text-transform:none;letter-spacing:.01em;line-height:1.25;color:#1c1430;font-weight:500;margin:0 0 8px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+body.welcome-on header{background:#111;border-bottom:none;color:#fff}
+body.welcome-on header h1{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-weight:800;font-size:16px;letter-spacing:.03em;color:#fff}
+body.welcome-on header h1 .drop{float:none;font-size:1em;line-height:inherit;padding:0;font-weight:inherit}
+body.welcome-on .profilebtn{width:44px;height:44px;border-radius:8px;overflow:visible}
+body.welcome-on .profilebtn img{display:none}
+body.welcome-on .profilebtn .ham{display:block}
+body.welcome-on .navmenu{background:#111}
+body.welcome-on .menubrand{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-weight:800}
+body.welcome-on #welcomeHome>section,body.welcome-on #welcomeSignup,body.welcome-on #welcomeLogin{position:relative;z-index:2}
+body.welcome-on .mhero h2,body.welcome-on .mhero p,body.welcome-on .mfeat h2,body.welcome-on .mfeat p{text-shadow:0 0 10px #fff,0 0 6px #fff,0 1px 0 #fff}
+body.welcome-on .mdark h2,body.welcome-on .mdark p{text-shadow:0 0 10px #111,0 1px 0 #111}
+button.learnmore{background:transparent;border:none;color:#111;font-weight:700;letter-spacing:.02em;text-transform:none;padding:0;text-decoration:none;border-radius:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.mhero{padding:22px 2px 8px}
+.mhero h2{margin:0 0 14px;color:#111;font-size:40px;line-height:1.02;font-weight:800;letter-spacing:-.035em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.mhero p{margin:0 0 18px;color:#222;font-size:16px;line-height:1.45;max-width:34em}
+button.outline{display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#111;border:1.5px solid #111;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
+.shot{position:relative;margin:28px -22px 12px 0;min-height:400px}
+.shot .heroimg{width:88%;margin-left:auto;height:400px;object-fit:cover;border-radius:18px 0 0 18px;display:block;background:#eee}
+.shot .heroimg.pool{object-position:center 72%}
+.shot .heroimg.face{object-position:center 42%}
+.fcard{position:absolute;background:#fff;color:#111;border-radius:16px;box-shadow:0 12px 28px rgba(0,0,0,.14);padding:12px;text-align:left;text-shadow:none}
+.fcard b{display:block;font-size:14px;font-weight:800;letter-spacing:-.02em;color:#111;text-shadow:none}
+.fcard small{display:block;color:#555;font-size:12px;font-weight:600;margin-top:1px;text-shadow:none}
+.fcard.a{left:0;top:16px;width:64%}
+.fcard.b{left:0;top:200px;width:58%}
+.fcard.c{left:8px;bottom:18px;width:52%}
+.mini{display:flex;gap:8px;align-items:center;margin-top:8px}
+.mini img{width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none;background:#eee}
+.mini.pool img{object-position:center 72%}
+.mfeat{text-align:center;padding:42px 12px 12px}
+.mfeat .ico{width:112px;height:112px;margin:0 auto 6px;display:block}
+.mfeat .ico svg{width:112px;height:112px;display:block}
+.mfeat h2{margin:8px 0 10px;color:#111;font-size:26px;line-height:1.15;font-weight:800;letter-spacing:-.03em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.mfeat p{margin:0 auto 12px;max-width:34em;color:#222;font-size:15px;line-height:1.5}
+button.featlink{background:transparent;border:none;color:#111;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px;padding:8px 4px;border-radius:0}
+button.featlink span{font-weight:800}
+#welcomeMore{scroll-margin-top:88px}
+.mdark{background:#111;color:#fff;margin:36px -22px 0;padding:36px 28px 12px}
+.mdark h2{margin:0 0 10px;color:#fff;font-size:28px;line-height:1.1;font-weight:800;letter-spacing:-.03em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.mdark p{margin:0 0 8px;color:#ececec;font-size:15px;line-height:1.5}
+button.morelink{background:transparent;border:none;color:#fff;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:6px 0 28px;border-radius:0;text-decoration:underline;text-underline-offset:5px;font-size:13px}
+.welcome .card h2{font-size:22px;text-transform:none;letter-spacing:-.02em;line-height:1.2;color:#111;font-weight:800;margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
 .welcome .card p{margin:0;color:#1c1430;font-size:14px;line-height:1.55}
-.welcome-dock{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);z-index:6;display:flex;gap:10px;padding:12px 18px calc(12px + var(--safe-b));background:linear-gradient(to top,#4c1d95 72%,rgba(76,29,149,0));box-sizing:border-box}
+.welcome-dock{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(560px,100%);z-index:6;display:flex;gap:10px;padding:12px 18px calc(12px + var(--safe-b));background:linear-gradient(to top,#fff 68%,rgba(255,255,255,0));box-sizing:border-box}
 .welcome-dock[hidden]{display:none !important}
-.welcome-dock button{flex:1;font-size:15px;padding:14px 10px}
-#welcomeHome{padding-bottom:96px}
+.welcome-dock button{flex:1;font-size:15px;padding:14px 10px;background:#fff;color:#111;border:1.5px solid #111;border-radius:8px}
+.welcome-dock button.primary{background:#111;color:#fff;border-color:#111}
+#welcomeHome{padding-bottom:108px}
 .welcome .card p.note{color:var(--muted);font-size:11.5px}
 .welcome-back{margin:0 0 12px}
+#welcomeSignup,#welcomeLogin{padding:8px 0 28px}
 .hl{color:var(--accent)}
 details summary{cursor:pointer;color:var(--muted);font-size:12px;padding:4px 0}
 .presetedit{display:grid;grid-template-columns:1fr 70px 60px 34px;gap:6px;margin-bottom:6px;align-items:center}
@@ -322,6 +360,7 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 .streak{display:flex;align-items:center;gap:4px;color:#fff;font-size:18px;font-weight:700}
 .streak svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .profilebtn{width:36px;height:36px;padding:0;border:none;border-radius:50%;background:transparent;overflow:hidden}
+.profilebtn .ham{display:none;width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
 .daymenu{background:#fff;border-radius:14px;padding:8px;margin:4px 0 8px;display:flex;flex-direction:column;gap:6px;color:#1c1430}
 .daymenu[hidden]{display:none !important}
 .daymenu button{text-align:left;background:transparent;border:none;color:#1c1430}
@@ -404,7 +443,7 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
     <div class="screentitle" id="hdrTitle" hidden>Today</div>
     <div class="topgap"></div>
     <div class="streak" id="streak" aria-label="Streak"><span id="streakCount">0</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
-    <button type="button" class="profilebtn menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><img src="images/header-portrait.jpg" alt=""></button>
+    <button type="button" class="profilebtn menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><img src="images/header-portrait.jpg" alt=""><svg class="ham" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </div>
   <div class="daymenu" id="dayMenu" hidden>
     <button type="button" data-shift="0">Today</button>
@@ -437,10 +476,6 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 </header>
 <div id="welcome" class="welcome">
   <div id="welcomeHome">
-    <div class="welcome-intro">
-      <p>Training lives here. Curly Gurl Fitness is where you and your clients keep workouts, meals, and check-ins on the phone you already use.</p>
-      <button type="button" class="learnmore" id="learnMore">Learn more</button>
-    </div>
     <div class="bubbles" id="welcomeBubbles" aria-hidden="true">
       <img class="picbubble face b1" src="images/header-portrait.jpg" alt="">
       <img class="picbubble pool b2" src="images/work/lower-body.jpg" alt="">
@@ -451,30 +486,108 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
       <img class="picbubble b7" src="images/food/salmon-plate.jpg" alt="">
       <img class="picbubble b8" src="images/work/bike.jpg" alt="">
     </div>
-    <div id="welcomeMore">
-      <h2 class="hero">Grow a coaching business without the extra admin</h2>
-      <p class="hero-sub">Invite a client, send a video, post a class, and keep check-ins in the same tracker. No second stack of tools.</p>
-      <h2 class="hero">Keep clients coming back</h2>
-      <p class="hero-sub">A plan for today, a day on the calendar, and a video from their trainer give people a reason to open the app again.</p>
-      <div class="card">
-        <h2>Independent trainers</h2>
-        <p>For a coach who trains on their own. Open a client spot, share an invite code, and follow weigh-ins, photos, and messages.</p>
-      </div>
-      <div class="card">
-        <h2>Studios and gyms</h2>
-        <p>For a room that runs classes. List a group, a one-on-one, or an open booking, and keep those days on the calendar.</p>
-      </div>
-      <div class="card">
-        <h2>Track meals and macros</h2>
-        <p>The meal planner and the cookbook are already in the app. Plan a day of meals, then cook from the recipes you saved.</p>
-        <div class="row" style="margin-top:12px">
-          <button type="button" class="full" id="welcomeMeals">Meal planner</button>
-          <button type="button" class="full" id="welcomeCook">Cookbook</button>
+    <section class="mhero">
+      <h2>Put the workout on their phone in minutes</h2>
+      <p>Write the session, set the meals, and send a video. Clients open Curly Gurl Fitness and the plan is already waiting.</p>
+      <button type="button" class="outline" id="learnMore">View features</button>
+      <div class="shot">
+        <img class="heroimg pool" src="images/work/lower-body.jpg" alt="Class training by the pool">
+        <div class="fcard a">
+          <small>Today's class</small>
+          <b>Lower Body</b>
+          <div class="mini pool">
+            <img src="images/work/glute.jpg" alt="">
+            <div><b>Glute strength</b><small>On the workout</small></div>
+          </div>
+          <div class="mini">
+            <img src="images/library-step.jpg" alt="">
+            <div><b>Step class</b><small>From the library</small></div>
+          </div>
+        </div>
+        <div class="fcard b">
+          <b>Hit today's meals</b>
+          <small>Calories, carbs, fat, and protein</small>
+        </div>
+        <div class="fcard c">
+          <b>Log water with the day</b>
+          <small>Cups stay on Today</small>
         </div>
       </div>
-      <h2 class="hero">The app is yours</h2>
-      <p class="hero-sub">Curly Gurl Fitness carries your coaching. Clients see the plan, the meals, and the videos you chose for them.</p>
-    </div>
+    </section>
+    <section class="mhero">
+      <h2>Give clients a reason to come back for more</h2>
+      <p>A workout for today, a video from their coach, and the next class on the calendar. That is a reason to open the app again.</p>
+      <button type="button" class="outline" id="learnMoreB">View features</button>
+      <div class="shot">
+        <img class="heroimg face" src="images/work/glute.jpg" alt="Glute workout">
+        <div class="fcard a">
+          <small>On the calendar</small>
+          <b>Next class</b>
+          <div class="mini">
+            <img src="images/work/bike.jpg" alt="">
+            <div><b>Group session</b><small>Posted for the room</small></div>
+          </div>
+          <div class="mini">
+            <img src="images/work/squat.jpg" alt="">
+            <div><b>One on one</b><small>Booked with you</small></div>
+          </div>
+        </div>
+        <div class="fcard b">
+          <b>Video from coach</b>
+          <small>Sent to this client</small>
+        </div>
+        <div class="fcard c">
+          <b>Invite code</b>
+          <small>How a new client joins</small>
+        </div>
+      </div>
+    </section>
+    <section class="mfeat" id="welcomeMore">
+      <div class="ico" aria-hidden="true">
+        <svg viewBox="0 0 120 140" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="36" y="16" width="48" height="96" rx="8"/>
+          <path d="M52 28h16"/>
+          <path d="M48 52h24M48 64h24M48 76h16"/>
+          <circle cx="78" cy="96" r="16" fill="#fff"/>
+          <path d="M78 88v16M70 96h16"/>
+        </svg>
+      </div>
+      <h2>Track meals and macros</h2>
+      <p>Plan breakfast through snacks, keep the cookbook close, and watch calories, carbs, fat, and protein for the day.</p>
+      <button type="button" class="featlink" id="welcomeMeals">Meal planner <span aria-hidden="true">›</span></button>
+    </section>
+    <section class="mfeat">
+      <div class="ico" aria-hidden="true">
+        <svg viewBox="0 0 120 140" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M44 48h32a8 8 0 0 1 8 8v6H36v-6a8 8 0 0 1 8-8z"/>
+          <path d="M40 62h40v26a20 20 0 0 1-40 0V62z"/>
+          <path d="M52 48V38a8 8 0 0 1 16 0v10"/>
+        </svg>
+      </div>
+      <h2>Send the workout and the video</h2>
+      <p>Build the session, then send a video the client can play. The workout and the clip stay with that person.</p>
+      <button type="button" class="featlink" id="welcomeWork">Workouts and videos <span aria-hidden="true">›</span></button>
+    </section>
+    <section class="mdark">
+      <h2>Independent trainers</h2>
+      <p>For a coach who trains on their own. Share an invite code, then follow weigh-ins, photos, and messages from one place.</p>
+      <button type="button" class="morelink" id="welcomeTrainer">Learn more</button>
+      <h2>Studios and gyms</h2>
+      <p>For a room that runs classes. Put a group, a one-on-one, or an open booking on the calendar so people know when to show up.</p>
+      <button type="button" class="morelink" id="welcomeStudio">Learn more</button>
+    </section>
+    <section class="mfeat">
+      <div class="ico" aria-hidden="true">
+        <svg viewBox="0 0 120 140" fill="none" stroke="#111" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="28" y="36" width="64" height="64" rx="8"/>
+          <path d="M28 52h64M44 36v16M76 36v16"/>
+          <path d="M44 70h8M60 70h8M76 70h8M44 84h8M60 84h8"/>
+        </svg>
+      </div>
+      <h2>The week lives here</h2>
+      <p>Classes sit on the calendar. Videos stay with the client you sent them to. An invite code is how a new client joins you.</p>
+      <button type="button" class="featlink" id="welcomeWeek">Calendar and videos <span aria-hidden="true">›</span></button>
+    </section>
   </div>
   <div id="welcomeSignup" hidden>
     <button type="button" class="learnmore welcome-back" id="signupBack">Back</button>
@@ -4624,8 +4737,14 @@ async function passHash(pw){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
   return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2,"0")).join("");
 }
+function paintChrome(welcome){
+  document.documentElement.style.backgroundColor = welcome ? "#ffffff" : "#4c1d95";
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content", welcome ? "#111111" : "#4c1d95");
+}
 function showWelcome(view){
   document.body.classList.add("welcome-on");
+  paintChrome(true);
   $("welcome").hidden = false;
   $("welcomeHome").hidden = view!=="home";
   $("welcomeSignup").hidden = view!=="signup";
@@ -4640,6 +4759,7 @@ function showWelcome(view){
 }
 function showApp(){
   document.body.classList.remove("welcome-on");
+  paintChrome(false);
   $("welcome").hidden = true;
 }
 function enterAccount(account){
@@ -4722,10 +4842,12 @@ function paintSignupRole(){
   });
   $("signupCodeWrap").hidden = signupRole!=="client";
 }
-$("learnMore").onclick = () => {
+function scrollFeatures(){
   showWelcome("home");
   $("welcomeMore").scrollIntoView({behavior:"smooth", block:"start"});
-};
+}
+$("learnMore").onclick = scrollFeatures;
+$("learnMoreB").onclick = scrollFeatures;
 $("menuLearn").onclick = () => $("learnMore").click();
 $("welcomeLoginBtn").onclick = () => showWelcome("login");
 $("welcomeSignupBtn").onclick = () => showWelcome("signup");
@@ -4736,7 +4858,10 @@ $("loginBack").onclick = () => showWelcome("home");
 $("signupToLogin").onclick = () => showWelcome("login");
 $("loginToSignup").onclick = () => showWelcome("signup");
 $("welcomeMeals").onclick = () => { showWelcome("login"); toast("Log in to open the meal planner"); };
-$("welcomeCook").onclick = () => { showWelcome("login"); toast("Log in to open the cookbook"); };
+$("welcomeWork").onclick = () => { showWelcome("login"); toast("Log in to open workouts and videos"); };
+$("welcomeWeek").onclick = () => { showWelcome("login"); toast("Log in to open the calendar"); };
+$("welcomeTrainer").onclick = () => showWelcome("signup");
+$("welcomeStudio").onclick = () => showWelcome("signup");
 document.querySelectorAll("#signupRoles [data-role]").forEach(btn=>{
   btn.onclick = () => { signupRole = btn.dataset.role; paintSignupRole(); };
 });
