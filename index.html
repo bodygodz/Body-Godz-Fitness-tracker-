@@ -111,6 +111,13 @@ button:active{transform:scale(.98)}
 .toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#1c1430;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:40;font-size:14px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{color:var(--muted);text-align:center;padding:14px 0;font-size:14px}
+.vitem{padding:12px 0;border-top:1px solid var(--line)}
+.vitem:first-child{border-top:0;padding-top:0}
+.vitem .name{font-weight:700}
+.vitem .meta{color:var(--muted);font-size:13px;margin-top:2px}
+.vplayer{margin-top:8px}
+.vplayer iframe,.vplayer video{width:100%;height:200px;border:0;border-radius:12px;background:#1c1430;display:block}
+a.vopen{display:inline-block;margin-top:8px;color:#4c1d95;font-weight:700;font-size:14px}
 .hl{color:var(--accent)}
 details summary{cursor:pointer;color:var(--muted);font-size:13px;padding:4px 0}
 .presetedit{display:grid;grid-template-columns:1fr 70px 60px 34px;gap:6px;margin-bottom:6px;align-items:center}
@@ -664,7 +671,7 @@ img.person{object-position:center 24%}
     <p class="note" style="margin-top:8px">Keys stay in this browser only. They are never built into the page.</p>
     <details style="margin-top:8px">
       <summary>Supabase setup SQL</summary>
-      <p class="note">Run this once in the Supabase SQL editor. It creates invite codes, weigh-ins, realtime chat, and the progress photo bucket.</p>
+      <p class="note">Run this once in the Supabase SQL editor. It creates invite codes, weigh-ins, realtime chat, progress photos, and trainer videos.</p>
       <textarea id="setupSql" readonly style="min-height:140px;font-size:11px"></textarea>
       <button class="sm" id="copySql" type="button" style="margin-top:6px">Copy SQL</button>
     </details>
@@ -756,6 +763,50 @@ img.person{object-position:center 24%}
     <div id="calDayBody"></div>
   </div>
 </section>
+
+<!-- ============ VIDEOS ============ -->
+<section class="page" id="page-videos">
+  <div class="card" id="videoSolo" hidden>
+    <h2>Videos</h2>
+    <p>Videos are sent from a trainer account.</p>
+  </div>
+  <div class="card" id="videoDemoNote" hidden>
+    <h2>Demo mode</h2>
+    <p class="note">Demo mode · two tabs on this browser. Videos sync here the same way chat does. Add Supabase in Settings to reach another phone.</p>
+  </div>
+  <div id="videoCoach" hidden>
+    <div class="card" id="videoSend">
+      <h2>Send a video</h2>
+      <div class="field">
+        <label class="f" for="videoClient">Client</label>
+        <select id="videoClient"></select>
+      </div>
+      <p class="note" id="videoClientNote" hidden>Create a client in Coach, then pick them here.</p>
+      <div class="field">
+        <label class="f" for="videoUrl">Video link</label>
+        <input id="videoUrl" type="url" inputmode="url" placeholder="YouTube or a video URL" autocomplete="off">
+      </div>
+      <div class="field">
+        <label class="f" for="videoFile">Or a video file</label>
+        <input id="videoFile" type="file" accept="video/*">
+      </div>
+      <div class="field">
+        <label class="f" for="videoNote">Note (optional)</label>
+        <input id="videoNote" maxlength="280" placeholder="Short note">
+      </div>
+      <button class="primary full" id="videoSendBtn" type="button">Send video</button>
+    </div>
+  </div>
+  <div class="card" id="videoClientWait" hidden>
+    <h2>Videos</h2>
+    <p class="note">Enter the invite code from your trainer. In demo mode, create that code in another tab of this browser.</p>
+    <button class="full" id="videoJoinCoach" type="button">Open Coach to join</button>
+  </div>
+  <div class="card" id="videoListCard" hidden>
+    <h2 id="videoListTitle">Videos</h2>
+    <div id="videoList"></div>
+  </div>
+</section>
 </main>
 
 <nav class="navmenu" id="navMenu" hidden>
@@ -774,6 +825,7 @@ img.person{object-position:center 24%}
   </div>
   <button type="button" class="navitem" data-tab="weight">Weight</button>
   <button type="button" class="navitem" data-tab="coach">Coach</button>
+  <button type="button" class="navitem" data-tab="videos">Videos</button>
   <button type="button" class="navitem" data-tab="settings">Settings</button>
   <button type="button" class="menuaction" id="menuAction">Start today's workout</button>
 </nav>
@@ -1314,7 +1366,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar"};
+const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos"};
 let currentTab = "today";
 function go(tab){
   currentTab = tab;
@@ -1322,6 +1374,7 @@ function go(tab){
   $("hdrTitle").textContent = TITLES[tab];
   render();
   if(typeof syncCoachTab==="function") syncCoachTab(tab);
+  if(typeof syncVideosTab==="function") syncVideosTab(tab);
   syncMenu();
   window.scrollTo(0,0);
   if(location.hash!=="#"+tab) history.replaceState(null,"","#"+tab);
@@ -2580,11 +2633,22 @@ const SETUP_SQL = [
 "  storage_path text not null,",
 "  created_at timestamptz default now()",
 ");",
+"create table if not exists public.videos (",
+"  id text primary key,",
+"  pair_id text not null references public.pairs(id) on delete cascade,",
+"  kind text not null check (kind in ('link','file')),",
+"  url text default '',",
+"  storage_path text default '',",
+"  note text default '',",
+"  file_name text default '',",
+"  created_at timestamptz default now()",
+");",
 "alter table public.pairs enable row level security;",
 "alter table public.weigh_ins enable row level security;",
 "alter table public.messages enable row level security;",
 "alter table public.photos enable row level security;",
-"grant select, insert, update, delete on public.pairs, public.weigh_ins, public.messages, public.photos to anon;",
+"alter table public.videos enable row level security;",
+"grant select, insert, update, delete on public.pairs, public.weigh_ins, public.messages, public.photos, public.videos to anon;",
 "drop policy if exists \"cgf pairs\" on public.pairs;",
 "create policy \"cgf pairs\" on public.pairs for all to anon using (true) with check (true);",
 "drop policy if exists \"cgf weigh\" on public.weigh_ins;",
@@ -2593,6 +2657,8 @@ const SETUP_SQL = [
 "create policy \"cgf messages\" on public.messages for all to anon using (true) with check (true);",
 "drop policy if exists \"cgf photos\" on public.photos;",
 "create policy \"cgf photos\" on public.photos for all to anon using (true) with check (true);",
+"drop policy if exists \"cgf videos\" on public.videos;",
+"create policy \"cgf videos\" on public.videos for all to anon using (true) with check (true);",
 "insert into storage.buckets (id, name, public)",
 "values ('progress-photos', 'progress-photos', true)",
 "on conflict (id) do update set public = true;",
@@ -2602,10 +2668,20 @@ const SETUP_SQL = [
 "create policy \"cgf photo write\" on storage.objects for insert to anon with check (bucket_id = 'progress-photos');",
 "drop policy if exists \"cgf photo update\" on storage.objects;",
 "create policy \"cgf photo update\" on storage.objects for update to anon using (bucket_id = 'progress-photos');",
+"insert into storage.buckets (id, name, public)",
+"values ('coach-videos', 'coach-videos', true)",
+"on conflict (id) do update set public = true;",
+"drop policy if exists \"cgf coach video read\" on storage.objects;",
+"create policy \"cgf coach video read\" on storage.objects for select to anon using (bucket_id = 'coach-videos');",
+"drop policy if exists \"cgf coach video write\" on storage.objects;",
+"create policy \"cgf coach video write\" on storage.objects for insert to anon with check (bucket_id = 'coach-videos');",
+"drop policy if exists \"cgf coach video update\" on storage.objects;",
+"create policy \"cgf coach video update\" on storage.objects for update to anon using (bucket_id = 'coach-videos');",
 "do $$ begin alter publication supabase_realtime add table public.messages; exception when duplicate_object then null; end $$;",
 "do $$ begin alter publication supabase_realtime add table public.weigh_ins; exception when duplicate_object then null; end $$;",
 "do $$ begin alter publication supabase_realtime add table public.photos; exception when duplicate_object then null; end $$;",
-"do $$ begin alter publication supabase_realtime add table public.pairs; exception when duplicate_object then null; end $$;"
+"do $$ begin alter publication supabase_realtime add table public.pairs; exception when duplicate_object then null; end $$;",
+"do $$ begin alter publication supabase_realtime add table public.videos; exception when duplicate_object then null; end $$;"
 ].join("\n");
 
 function readStore(store, key){
@@ -2704,6 +2780,7 @@ function demoLoad(){
     if(!Array.isArray(p.weighIns)) p.weighIns = [];
     if(!Array.isArray(p.photos)) p.photos = [];
     if(!Array.isArray(p.messages)) p.messages = [];
+    if(!Array.isArray(p.videos)) p.videos = [];
     if(!p.call) p.call = {active:false, startedAt:0, by:""};
   });
   return d;
@@ -2776,6 +2853,7 @@ function mapPairRow(row, extras){
     weighIns: extra.weighIns || [],
     photos: extra.photos || [],
     messages: extra.messages || [],
+    videos: extra.videos || [],
     call: null,
     createdAt: Date.parse(row.created_at)||Date.now()
   };
@@ -2783,6 +2861,97 @@ function mapPairRow(row, extras){
 function photoPublicUrl(path){
   const base = readKeys().supabaseUrl.replace(/\/$/,"");
   return base+"/storage/v1/object/public/progress-photos/"+String(path).split("/").map(encodeURIComponent).join("/");
+}
+function videoPublicUrl(path){
+  const base = readKeys().supabaseUrl.replace(/\/$/,"");
+  return base+"/storage/v1/object/public/coach-videos/"+String(path).split("/").map(encodeURIComponent).join("/");
+}
+function safeVideoUrl(url){
+  if(typeof url!=="string") return "";
+  try {
+    const u = new URL(url.trim());
+    if(u.protocol==="https:" || u.protocol==="http:") return u.href;
+  } catch(e){}
+  return "";
+}
+function youtubeId(url){
+  const safe = safeVideoUrl(url);
+  if(!safe) return "";
+  try {
+    const u = new URL(safe);
+    const host = u.hostname.replace(/^www\./,"");
+    if(host==="youtu.be"){
+      const id = u.pathname.split("/").filter(Boolean)[0] || "";
+      return /^[\w-]{11}$/.test(id) ? id : "";
+    }
+    if(host==="youtube.com" || host==="m.youtube.com" || host==="youtube-nocookie.com"){
+      if(u.pathname==="/watch"){
+        const id = u.searchParams.get("v") || "";
+        return /^[\w-]{11}$/.test(id) ? id : "";
+      }
+      const parts = u.pathname.split("/").filter(Boolean);
+      if((parts[0]==="embed" || parts[0]==="shorts" || parts[0]==="live") && /^[\w-]{11}$/.test(parts[1]||"")) return parts[1];
+    }
+  } catch(e){}
+  return "";
+}
+function mapVideoRow(v){
+  const kind = v.kind==="file" ? "file" : "link";
+  const storagePath = v.storage_path || v.storagePath || "";
+  const url = v.url || "";
+  return {
+    id: v.id,
+    pairId: v.pair_id || v.pairId || "",
+    kind: kind,
+    url: url,
+    storagePath: storagePath,
+    note: v.note || "",
+    fileName: v.file_name || v.fileName || "",
+    mime: v.mime || "",
+    createdAt: v.createdAt || Date.parse(v.created_at) || 0,
+    playUrl: kind==="file" && storagePath ? videoPublicUrl(storagePath) : url
+  };
+}
+function assertVideoFile(file){
+  if(!file) throw new Error("Choose a video file");
+  if(file.size > 50*1024*1024) throw new Error("That video is over 50 MB. Paste a link instead.");
+  if(file.type && file.type.indexOf("video/")!==0) throw new Error("Choose a video file");
+}
+const VIDEO_DB = "curlyGirlFitness.videos";
+function openVideoDb(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(VIDEO_DB, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if(!db.objectStoreNames.contains("blobs")) db.createObjectStore("blobs");
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(new Error("Could not store that video on this phone"));
+  });
+}
+function idbPutVideo(id, blob){
+  return openVideoDb().then(db => new Promise((resolve, reject)=>{
+    const tx = db.transaction("blobs", "readwrite");
+    tx.objectStore("blobs").put(blob, id);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(new Error("Could not store that video on this phone")); };
+  }));
+}
+function idbGetVideo(id){
+  return openVideoDb().then(db => new Promise((resolve, reject)=>{
+    const tx = db.transaction("blobs", "readonly");
+    const req = tx.objectStore("blobs").get(id);
+    req.onsuccess = () => { const value = req.result || null; db.close(); resolve(value); };
+    req.onerror = () => { db.close(); reject(new Error("Could not open that video")); };
+  }));
+}
+const videoBlobUrls = {};
+async function blobUrlForVideo(id){
+  if(videoBlobUrls[id]) return videoBlobUrls[id];
+  const blob = await idbGetVideo(id);
+  if(!blob) return "";
+  videoBlobUrls[id] = URL.createObjectURL(blob);
+  return videoBlobUrls[id];
 }
 async function ensureLiveChannel(pairId){
   if(!dataReady() || !pairId) return;
@@ -2795,6 +2964,7 @@ async function ensureLiveChannel(pairId){
       .on("postgres_changes", {event:"*", schema:"public", table:"messages", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
       .on("postgres_changes", {event:"*", schema:"public", table:"weigh_ins", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
       .on("postgres_changes", {event:"*", schema:"public", table:"photos", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
+      .on("postgres_changes", {event:"*", schema:"public", table:"videos", filter:"pair_id=eq."+pairId}, () => scheduleRefresh())
       .on("postgres_changes", {event:"*", schema:"public", table:"pairs", filter:"id=eq."+pairId}, () => scheduleRefresh())
       .subscribe();
   } catch(e){ /* polling still updates the screen */ }
@@ -2831,7 +3001,7 @@ const Link = {
       const bus = demoLoad();
       const pair = {
         id:makeId(), inviteCode:makeCode(), clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
-        dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[],
+        dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[],
         call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
       };
       bus.pairs.unshift(pair);
@@ -2883,10 +3053,14 @@ const Link = {
     const weigh = await sbFetch("weigh_ins?pair_id=eq."+q+"&select=*");
     const msgs = await sbFetch("messages?pair_id=eq."+q+"&select=*");
     const photos = await sbFetch("photos?pair_id=eq."+q+"&select=*");
+    let videoRows = [];
+    try { videoRows = await sbFetch("videos?pair_id=eq."+q+"&select=*") || []; }
+    catch(e){ videoRows = []; }
     return mapPairRow(row, {
       weighIns:(weigh||[]).map(w=>({id:w.id, weight:Number(w.weight), date:w.logged_on, note:w.note||"", createdAt:Date.parse(w.created_at)||0})),
       messages:(msgs||[]).map(m=>({id:m.id, sender:m.sender, body:m.body, createdAt:Date.parse(m.created_at)||0})),
-      photos:(photos||[]).map(p=>({id:p.id, angle:p.angle, url:photoPublicUrl(p.storage_path), createdAt:Date.parse(p.created_at)||0}))
+      photos:(photos||[]).map(p=>({id:p.id, angle:p.angle, url:photoPublicUrl(p.storage_path), createdAt:Date.parse(p.created_at)||0})),
+      videos:videoRows.map(mapVideoRow)
     });
   },
   async saveWeighIn(pairId, entry){
@@ -2948,6 +3122,67 @@ const Link = {
       throw new Error(msg);
     }
     await sbFetch("photos", {method:"POST", body:{id:id, pair_id:pairId, angle:angle, storage_path:path}});
+  },
+  async listVideos(pairId){
+    if(linkMode()==="demo"){
+      const pair = demoLoad().pairs.find(p=>p.id===pairId);
+      return pair && Array.isArray(pair.videos) ? pair.videos.map(v=>Object.assign({}, v)) : [];
+    }
+    const rows = await sbFetch("videos?pair_id=eq."+encodeURIComponent(pairId)+"&select=*&order=created_at.desc");
+    return (rows||[]).map(mapVideoRow);
+  },
+  async sendVideo(pairId, payload){
+    if(ID.role!=="trainer") throw new Error("Only the trainer can send a video");
+    const note = String((payload && payload.note) || "").trim().slice(0, 280);
+    const file = payload && payload.file;
+    const rawUrl = String((payload && payload.url) || "").trim();
+    if(linkMode()==="demo"){
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.id===pairId);
+      if(!pair || pair.trainerDevice!==ID.deviceId) throw new Error("That client is not on this trainer phone");
+      if(!Array.isArray(pair.videos)) pair.videos = [];
+      const id = makeId();
+      if(file){
+        assertVideoFile(file);
+        await idbPutVideo(id, file);
+        pair.videos.push({id:id, kind:"file", url:"", note:note, fileName:String(file.name||"video").slice(0,120), mime:file.type||"video/mp4", createdAt:Date.now()});
+      } else {
+        const safe = safeVideoUrl(rawUrl);
+        if(!safe) throw new Error("Paste a video link or choose a file");
+        pair.videos.push({id:id, kind:"link", url:safe, note:note, fileName:"", mime:"", createdAt:Date.now()});
+      }
+      demoSave(bus);
+      return;
+    }
+    const owned = await sbFetch("pairs?id=eq."+encodeURIComponent(pairId)+"&trainer_device=eq."+encodeURIComponent(ID.deviceId)+"&select=id");
+    if(!owned || !owned[0]) throw new Error("That client is not on this trainer phone");
+    const id = makeId();
+    if(file){
+      assertVideoFile(file);
+      const ext = String((file.name||"mp4").split(".").pop()||"mp4").replace(/[^a-zA-Z0-9]/g,"").slice(0,8) || "mp4";
+      const path = pairId+"/"+id+"."+ext;
+      const k = readKeys();
+      const res = await fetch(k.supabaseUrl.replace(/\/$/,"")+"/storage/v1/object/coach-videos/"+path, {
+        method:"POST",
+        headers:{
+          apikey:k.supabaseAnonKey,
+          Authorization:"Bearer "+k.supabaseAnonKey,
+          "Content-Type": file.type || "video/mp4",
+          "x-upsert":"true"
+        },
+        body:file
+      });
+      if(!res.ok){
+        let msg = "Could not upload the video";
+        try { const j = await res.json(); if(j && (j.message||j.error)) msg = j.message||j.error; } catch(e){}
+        throw new Error(msg);
+      }
+      await sbFetch("videos", {method:"POST", body:{id:id, pair_id:pairId, kind:"file", url:"", storage_path:path, note:note, file_name:String(file.name||"video").slice(0,120)}});
+      return;
+    }
+    const safe = safeVideoUrl(rawUrl);
+    if(!safe) throw new Error("Paste a video link or choose a file");
+    await sbFetch("videos", {method:"POST", body:{id:id, pair_id:pairId, kind:"link", url:safe, storage_path:"", note:note, file_name:""}});
   },
   async setDemoCall(pairId, call){
     const bus = demoLoad();
@@ -3096,8 +3331,8 @@ function scheduleRefresh(){
   setTimeout(()=>{
     refreshQueued = false;
     const callOpen = $("callLayer") && !$("callLayer").hidden;
-    if(currentTab!=="coach" && !callOpen) return;
-    refreshCoachData().catch(()=>{});
+    if(currentTab==="videos") refreshVideos().catch(()=>{});
+    if(currentTab==="coach" || callOpen) refreshCoachData().catch(()=>{});
   }, 150);
 }
 function syncCoachTab(tab){
@@ -3128,7 +3363,7 @@ function fillConnectionSettings(){
   if(!live){
     $("keysIntro").textContent = "Demo mode stays on until these are saved. On each phone, fill in Supabase project URL, Supabase anon key, and Daily API key. Run the SQL once in Supabase.";
   } else if(!videoReady()){
-    $("keysIntro").textContent = "Supabase is connected for invite codes, chat, weigh-ins, and photos. Add the Daily API key on the trainer phone to start a live video call.";
+    $("keysIntro").textContent = "Supabase is connected for invite codes, chat, weigh-ins, photos, and videos. Add the Daily API key on the trainer phone to start a live video call.";
   } else {
     $("keysIntro").textContent = "Live mode is on. These keys stay on this phone and are not part of the page.";
   }
@@ -3607,9 +3842,228 @@ document.addEventListener("click", e=>{
   closeTools();
 });
 
+/* ---------- Videos ---------- */
+let videoPaintKey = "";
+let videoPoll = null;
+let videoChannel = null;
+function fmtVideoWhen(ts){
+  const d = new Date(ts);
+  if(!ts || isNaN(d.getTime())) return "";
+  return d.toLocaleString(undefined, {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+}
+function paintVideoChrome(){
+  const trainer = ID.role==="trainer";
+  const client = ID.role==="client";
+  const coaching = trainer || client;
+  $("videoSolo").hidden = coaching;
+  $("videoDemoNote").hidden = !(coaching && !dataReady());
+  $("videoCoach").hidden = !trainer;
+  $("videoClientWait").hidden = !(client && !ID.activePairId);
+  $("videoListCard").hidden = !coaching || (client && !ID.activePairId);
+  $("videoListTitle").textContent = trainer ? "Videos sent" : "From your trainer";
+  $("hdrSub").textContent = trainer ? "Send a video to a client" : client ? "Videos from your trainer" : "Videos are sent from a trainer account";
+}
+function fillVideoClients(pairs){
+  const sel = $("videoClient");
+  const ids = pairs.map(p=>p.id).join(",");
+  $("videoClientNote").hidden = pairs.length>0;
+  if(sel.dataset.ids===ids) return;
+  const prev = sel.value;
+  sel.dataset.ids = ids;
+  sel.replaceChildren();
+  if(!pairs.length){
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "No clients yet";
+    sel.appendChild(opt);
+    return;
+  }
+  pairs.forEach(p=>{
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = p.clientName || "Client";
+    sel.appendChild(opt);
+  });
+  if(prev && pairs.some(p=>p.id===prev)) sel.value = prev;
+}
+async function attachVideoPlay(items){
+  for(const v of items){
+    if(v.kind==="file"){
+      if(linkMode()==="demo") v.playUrl = await blobUrlForVideo(v.id);
+      else if(v.storagePath) v.playUrl = videoPublicUrl(v.storagePath);
+    } else {
+      v.playUrl = safeVideoUrl(v.url);
+    }
+  }
+}
+async function collectVideos(){
+  if(ID.role==="trainer"){
+    const pairs = await Link.pairsForTrainer();
+    fillVideoClients(pairs);
+    if(!pairs.length) return [];
+    let items = [];
+    if(linkMode()==="demo"){
+      pairs.forEach(p=>{
+        (p.videos||[]).forEach(v=>{
+          items.push(Object.assign({}, v, {clientName:p.clientName||"Client", pairId:p.id}));
+        });
+      });
+    } else {
+      const q = "("+pairs.map(p=>encodeURIComponent(p.id)).join(",")+")";
+      const rows = await sbFetch("videos?pair_id=in."+q+"&select=*&order=created_at.desc");
+      const names = {};
+      pairs.forEach(p=>{ names[p.id] = p.clientName || "Client"; });
+      items = (rows||[]).map(mapVideoRow).map(v=>Object.assign(v, {clientName:names[v.pairId]||"Client"}));
+    }
+    items.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    await attachVideoPlay(items);
+    return items;
+  }
+  if(ID.role==="client"){
+    if(!ID.activePairId) return [];
+    const pair = await Link.loadPair(ID.activePairId);
+    if(!pair || pair.clientDevice!==ID.deviceId) return [];
+    const videos = linkMode()==="demo" ? (pair.videos||[]) : await Link.listVideos(pair.id);
+    const items = videos.map(v=>Object.assign({}, v, {clientName:pair.clientName||"Client", pairId:pair.id}));
+    items.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    await attachVideoPlay(items);
+    return items;
+  }
+  return [];
+}
+function videoSignature(items){
+  return items.map(v=>[v.id, v.kind, v.playUrl||"", v.note||"", v.fileName||"", v.clientName||"", v.createdAt||0].join("|")).join("\n");
+}
+function paintVideoList(items){
+  const box = $("videoList");
+  box.replaceChildren();
+  if(!items.length){
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = ID.role==="trainer" ? "No videos sent yet." : "No videos from your trainer yet.";
+    box.appendChild(empty);
+    return;
+  }
+  items.forEach(v=>{
+    const item = document.createElement("div");
+    item.className = "vitem";
+    const name = document.createElement("div");
+    name.className = "name";
+    const yt = youtubeId(v.playUrl || v.url);
+    if(ID.role==="trainer") name.textContent = v.clientName || "Client";
+    else if(v.fileName) name.textContent = v.fileName;
+    else if(yt) name.textContent = "YouTube video";
+    else name.textContent = "Video";
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    meta.textContent = fmtVideoWhen(v.createdAt);
+    item.appendChild(name);
+    item.appendChild(meta);
+    if(v.note){
+      const note = document.createElement("div");
+      note.className = "note";
+      note.textContent = v.note;
+      item.appendChild(note);
+    }
+    const play = v.playUrl || "";
+    if(yt){
+      const wrap = document.createElement("div");
+      wrap.className = "vplayer";
+      const frame = document.createElement("iframe");
+      frame.src = "https://www.youtube-nocookie.com/embed/"+yt;
+      frame.title = "Video from your trainer";
+      frame.allowFullscreen = true;
+      frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      wrap.appendChild(frame);
+      item.appendChild(wrap);
+    } else if(play && (v.kind==="file" || safeVideoUrl(play))){
+      const wrap = document.createElement("div");
+      wrap.className = "vplayer";
+      const video = document.createElement("video");
+      video.controls = true;
+      video.playsInline = true;
+      video.setAttribute("playsinline", "");
+      video.src = play;
+      wrap.appendChild(video);
+      item.appendChild(wrap);
+    } else if(v.kind==="file"){
+      const missing = document.createElement("div");
+      missing.className = "note";
+      missing.textContent = "This video file is not on this phone.";
+      item.appendChild(missing);
+    }
+    const openHref = v.kind==="link" ? safeVideoUrl(v.url) : play;
+    if(openHref && (openHref.indexOf("blob:")===0 || safeVideoUrl(openHref))){
+      const link = document.createElement("a");
+      link.className = "vopen";
+      link.href = openHref;
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.textContent = "Open video";
+      item.appendChild(link);
+    }
+    box.appendChild(item);
+  });
+}
+let videoGen = 0;
+async function refreshVideos(){
+  const gen = ++videoGen;
+  paintVideoChrome();
+  if(ID.role!=="trainer" && ID.role!=="client"){
+    videoPaintKey = "";
+    return;
+  }
+  if(ID.role==="client" && !ID.activePairId){
+    videoPaintKey = "";
+    return;
+  }
+  const items = await collectVideos();
+  if(gen!==videoGen) return;
+  const key = videoSignature(items);
+  if(key===videoPaintKey) return;
+  videoPaintKey = key;
+  paintVideoList(items);
+}
+async function ensureVideoChannel(){
+  if(!dataReady() || videoChannel) return;
+  try {
+    const client = await getSb();
+    videoChannel = client.channel("cgf-videos")
+      .on("postgres_changes", {event:"*", schema:"public", table:"videos"}, () => scheduleRefresh())
+      .subscribe();
+  } catch(e){}
+}
+function syncVideosTab(tab){
+  if(videoPoll){ clearInterval(videoPoll); videoPoll = null; }
+  if(tab!=="videos") return;
+  refreshVideos().catch(e => toast(e && e.message ? e.message : "Could not load videos"));
+  if(dataReady()) ensureVideoChannel();
+  videoPoll = setInterval(()=>{
+    if(!document.hidden && currentTab==="videos") refreshVideos().catch(()=>{});
+  }, 3000);
+}
+function renderVideos(){
+  paintVideoChrome();
+}
+$("videoSendBtn").onclick = () => run(async ()=>{
+  const pairId = $("videoClient").value;
+  if(!pairId) throw new Error("Create a client in Coach first");
+  const file = $("videoFile").files && $("videoFile").files[0];
+  const url = $("videoUrl").value.trim();
+  if(!file && !url) throw new Error("Paste a video link or choose a file");
+  await Link.sendVideo(pairId, {url:file ? "" : url, file:file || null, note:$("videoNote").value});
+  $("videoUrl").value = "";
+  $("videoNote").value = "";
+  $("videoFile").value = "";
+  videoPaintKey = "";
+  toast("Video sent");
+  await refreshVideos();
+});
+$("videoJoinCoach").onclick = () => go("coach");
+
 /* ---------- Render ---------- */
 function render(){
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
