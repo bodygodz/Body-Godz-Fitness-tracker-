@@ -1323,8 +1323,9 @@ function musicEmbed(raw, autoplay){
       return {error:"That Apple Music link needs a song, album, or playlist."};
     }
     const playlist = /\/playlist\//i.test(path);
-    const song = /\/song\//i.test(path) || /[?&]i=/.test(url.search);
-    return {service:"Apple Music", src:"https://embed.music.apple.com"+path+url.search, height:playlist?450:(song?175:175), apple:true};
+    const single = /\/song\//i.test(path) || /[?&]i=/.test(url.search);
+    const height = playlist || !single ? 450 : 175;
+    return {service:"Apple Music", src:"https://embed.music.apple.com"+path+url.search, height:height, apple:true};
   }
   if(host==="youtu.be" || host==="youtube.com" || host==="m.youtube.com" || host==="music.youtube.com" || host==="youtube-nocookie.com"){
     let video = url.searchParams.get("v");
