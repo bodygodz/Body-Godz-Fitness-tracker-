@@ -54,3 +54,4 @@ Training — Pexels. These show Black women and Black men working out.
 - images/work/boxing.jpg — woman boxing with a trainer — https://www.pexels.com/photo/6456308/
 - images/work/dumbbell.jpg — man lifting dumbbells — https://www.pexels.com/photo/6455960/
 - images/work/tire.jpg — man flipping a tire — https://www.pexels.com/photo/4720841/
+- images/work/weights.jpg — dumbbells and kettlebells on a rack, no people — https://www.pexels.com/photo/949126/

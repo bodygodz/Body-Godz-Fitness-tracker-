@@ -190,6 +190,14 @@ img.person{object-position:center 24%}
 .pickhit .thumb{width:56px;height:56px}
 .hubshot{display:block;margin:-14px -14px 10px}
 .hubshot .shot{margin:0;height:132px;border-radius:15px 15px 0 0}
+.brief h3{margin:0 0 6px;font-size:18px;color:#1c1430}
+.brief .tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#4c1d95;background:#f3e8ff;border-radius:99px;padding:3px 8px;margin-bottom:8px}
+.brief p{margin:0 0 8px;color:#1c1430}
+.briefmore{margin:8px 0 0;padding:0;list-style:none}
+.briefmore button{width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--line);border-radius:0;padding:8px 0;font-weight:600;color:#1c1430}
+.musicslot{margin:10px 0 4px;padding-top:8px;border-top:1px solid var(--line)}
+.musicbtns{display:flex;flex-wrap:wrap;gap:8px}
+a.musicbtn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#fff;border:1px solid #e4dced;border-radius:12px;padding:8px 12px;font-weight:700;color:#1c1430;font-size:13px}
 
 </style>
 </head>
@@ -329,6 +337,14 @@ img.person{object-position:center 24%}
         </div>
         <span class="pill" id="woStatus"></span>
       </div>
+      <div class="musicslot">
+        <div class="note">Your music stays in your music app. These buttons only open it. Nothing plays inside this tracker.</div>
+        <div class="musicbtns">
+          <a class="musicbtn" id="musicApple" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Apple Music</a>
+          <a class="musicbtn" id="musicSpotify" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">Spotify</a>
+          <a class="musicbtn" id="musicAndroid" href="https://music.youtube.com/">Android player</a>
+        </div>
+      </div>
       <div id="planEditFields" style="display:none">
         <div class="row">
           <div class="field"><label class="f">Day name</label><input id="planTitle" maxlength="40"></div>
@@ -375,6 +391,11 @@ img.person{object-position:center 24%}
   <div id="libHome">
     <button class="card hub" id="openExercises" type="button"><b>Exercise library</b><span class="note">Search moves by muscle group, with a short cue and a how-to video.</span></button>
     <button class="card hub" id="openCookbook" type="button"><b>Cookbook</b><span class="note">Keto, bulking, and lean recipes. Log one serving to today.</span></button>
+    <div class="card brief" id="newsColumn">
+      <h2>Fitness brief</h2>
+      <p class="note">Short briefs written for this app. A different one is featured each day. This is not a live news wire.</p>
+      <div id="newsFeature"></div>
+    </div>
   </div>
   <div id="woLibrary" style="display:none">
     <div class="toolbar">
@@ -2099,6 +2120,32 @@ function allRecipes(){
     .concat((S.customRecipes||[]).map(r=>Object.assign({custom:true}, r)));
 }
 function findRecipe(id){ return allRecipes().find(r=>r.id===id)||null; }
+const FITNESS_BRIEFS = [
+  {tag:"Training", title:"Add a little weight before you add a lot of sets", body:"When a lift feels solid for every set, add the smallest plate or the next dumbbell, not a whole new workout. Keep the same reps for a week or two. If form breaks, stay at the old weight. Progress is the load you can repeat, not the load you can grind once."},
+  {tag:"Nutrition", title:"Put protein on the plate you already eat", body:"You do not need a new diet to eat more protein. Add eggs at breakfast, chicken or beans at lunch, and yogurt or fish at dinner. A rough target is a palm-sized portion at each meal. The tracker’s protein number is there so you can see the day add up."},
+  {tag:"Recovery", title:"Sleep is the rest day you take every night", body:"Muscle is rebuilt while you sleep, not while you scroll. Aim for a regular bedtime and a dark room. If a hard workout left you flat, keep the session short instead of skipping food and sleep to “make up” for it. Soreness fades faster when you eat and rest."},
+  {tag:"Training", title:"Warm up the move you are about to do", body:"Five easy minutes on a bike is fine, then do the first exercise with a lighter set. Squats get bodyweight or an empty bar. Presses get a light dumbbell. The warm-up set is practice, not a test. Stop it while it still feels easy."},
+  {tag:"Nutrition", title:"Drink before you feel wiped out", body:"Training in a dry mouth makes every set feel harder. Drink water with meals and bring a bottle to the session. If the workout is long and sweaty, a salty snack or a sports drink is enough. You do not need a special mix for a normal gym hour."},
+  {tag:"Recovery", title:"A rest day can still include a walk", body:"Rest does not mean the couch for twenty-four hours. An easy walk keeps you from stiffening up and does not steal from tomorrow’s lifting. Skip the heavy sets. If a joint is sharp, not just sore, leave that exercise out instead of pushing through it."},
+  {tag:"Training", title:"Write the set down before you forget it", body:"The number you remember later is usually nicer than the number you lifted. Log the weight and reps in the workout list while you rest. Next week, start from that note. A short log beats a perfect plan you never look at."}
+];
+let newsPick = null;
+function briefIndexFor(dateStr){
+  const p = String(dateStr||"").split("-").map(Number);
+  if(p.length<3 || !p[0]) return 0;
+  const n = Math.floor(Date.UTC(p[0], p[1]-1, p[2]) / 86400000);
+  return ((n % FITNESS_BRIEFS.length) + FITNESS_BRIEFS.length) % FITNESS_BRIEFS.length;
+}
+function renderNewsColumn(){
+  const box = $("newsFeature");
+  if(!box) return;
+  const featured = briefIndexFor(todayStr());
+  const shown = newsPick==null ? featured : newsPick;
+  const item = FITNESS_BRIEFS[shown];
+  const others = FITNESS_BRIEFS.map((b,i)=>i).filter(i=>i!==shown);
+  box.innerHTML = `<div class="tag">${esc(item.tag)}</div><h3>${esc(item.title)}</h3><p>${esc(item.body)}</p><p class="note">${shown===featured?"Featured today":"From this week’s briefs"} · ${FITNESS_BRIEFS.length} short briefs, one featured each day.</p><ul class="briefmore">${others.map(i=>`<li><button type="button" data-brief="${i}">${esc(FITNESS_BRIEFS[i].tag)} · ${esc(FITNESS_BRIEFS[i].title)}</button></li>`).join("")}</ul>`;
+  box.querySelectorAll("[data-brief]").forEach(b=>b.onclick=()=>{ newsPick = +b.dataset.brief; renderNewsColumn(); });
+}
 function renderLibraryPage(){
   $("libHome").style.display = libSection==="home"?"":"none";
   $("woLibrary").style.display = libSection==="exercises"?"":"none";
@@ -2106,7 +2153,8 @@ function renderLibraryPage(){
   if(libSection==="home"){
     $("hdrTitle").textContent = "Library";
     $("hdrSub").textContent = "Exercises and cookbook";
-    mountHubPhoto($("openExercises"), workSrc("squat"), "Black woman squatting in a gym");
+    mountHubPhoto($("openExercises"), "images/work/weights.jpg", "Dumbbells and kettlebells on a rack");
+    renderNewsColumn();
     mountHubPhoto($("openCookbook"), foodSrc("chicken-rice"), "Chicken with rice and salad");
   } else if(libSection==="exercises") renderLibrary();
   else renderCookbook();
@@ -2255,6 +2303,12 @@ function logRecipe(r){
   if(mealCookReturn){ mealCookReturn=false; cookView="list"; cookOpenId=null; libSection="home"; go("meals"); }
   else render();
 }
+$("musicAndroid").addEventListener("click", e=>{
+  if(!/Android/i.test(navigator.userAgent||"")) return;
+  e.preventDefault();
+  const web = "https://music.youtube.com/";
+  window.location.href = "intent://#Intent;action=android.intent.action.MUSIC_PLAYER;S.browser_fallback_url="+encodeURIComponent(web)+";end";
+});
 $("openExercises").onclick = () => { returnView="home"; libSection="exercises"; render(); window.scrollTo(0,0); };
 $("openCookbook").onclick = () => { mealCookReturn=false; cookView="list"; libSection="cookbook"; render(); window.scrollTo(0,0); };
 $("mealsCook").onclick = () => { mealCookReturn=true; cookView="list"; libSection="cookbook"; go("library"); };
