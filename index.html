@@ -198,16 +198,6 @@ img.person{object-position:center 24%}
 .brief p{margin:0 0 8px;color:#1c1430}
 .briefmore{margin:8px 0 0;padding:0;list-style:none}
 .briefmore button{width:100%;text-align:left;background:transparent;border:none;border-top:1px solid var(--line);border-radius:0;padding:8px 0;font-weight:600;color:#1c1430}
-.musiccard{margin-bottom:12px}
-.musiccard h2{font-size:18px;text-transform:none;letter-spacing:0;color:#1c1430;margin-bottom:6px}
-.musiccard .note{margin:0 0 10px}
-.musicbtns{display:flex;flex-direction:column;gap:8px}
-a.musicbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:48px;text-decoration:none;background:#4c1d95;border:none;border-radius:12px;padding:10px 14px;font-weight:800;color:#fff;font-size:16px;line-height:1.2;text-align:center}
-a.musicbtn small{display:block;font-size:12px;font-weight:700;letter-spacing:0;opacity:.92}
-.inplayer{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.inplayer .row button{flex:none}
-#musicFrame{margin-top:10px}
-#musicFrame iframe{display:block;width:100%;border:0;border-radius:12px;background:#1c1430}
 
 </style>
 </head>
@@ -225,26 +215,6 @@ a.musicbtn small{display:block;font-size:12px;font-weight:700;letter-spacing:0;o
 <main>
 <!-- ============ TODAY ============ -->
 <section class="page active" id="page-today">
-  <div class="card musiccard">
-    <h2>Music</h2>
-    <div class="note">Paste a Spotify, Apple Music, or YouTube link to play it here. Amazon Music and Pandora cannot play inside the app.</div>
-    <div class="musicbtns">
-      <a class="musicbtn" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Apple Music</a>
-      <a class="musicbtn" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">Spotify</a>
-      <a class="musicbtn" href="https://music.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube Music</a>
-      <a class="musicbtn" href="https://music.amazon.com/" target="_blank" rel="noopener noreferrer">Amazon Music<small>Can’t play inside the app · opens Amazon</small></a>
-      <a class="musicbtn" href="https://www.pandora.com/" target="_blank" rel="noopener noreferrer">Pandora<small>Can’t play inside the app · opens Pandora</small></a>
-    </div>
-    <div class="inplayer">
-      <label class="f" for="musicPaste">Play a playlist or song in the app</label>
-      <div class="row">
-        <input id="musicPaste" type="url" inputmode="url" placeholder="Spotify, Apple Music, or YouTube link" autocomplete="off">
-        <button class="primary" id="musicPlay" type="button">Play</button>
-      </div>
-      <div class="note" id="musicStatus" style="margin-top:8px"></div>
-      <div id="musicFrame"></div>
-    </div>
-  </div>
   <div id="targetBanner"></div>
   <div class="grid2">
     <div class="stat">
@@ -353,17 +323,6 @@ a.musicbtn small{display:block;font-size:12px;font-weight:700;letter-spacing:0;o
 <!-- ============ WORKOUT ============ -->
 <section class="page" id="page-workout">
   <div id="woHome">
-    <div class="card musiccard">
-      <h2>Music</h2>
-      <div class="note">Apple Music, Spotify, and YouTube Music play on Today. Amazon Music and Pandora open outside the app.</div>
-      <div class="musicbtns">
-        <a class="musicbtn" href="https://music.apple.com/" target="_blank" rel="noopener noreferrer">Apple Music</a>
-        <a class="musicbtn" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">Spotify</a>
-        <a class="musicbtn" href="https://music.youtube.com/" target="_blank" rel="noopener noreferrer">YouTube Music</a>
-        <a class="musicbtn" href="https://music.amazon.com/" target="_blank" rel="noopener noreferrer">Amazon Music<small>Can’t play inside the app · opens Amazon</small></a>
-        <a class="musicbtn" href="https://www.pandora.com/" target="_blank" rel="noopener noreferrer">Pandora<small>Can’t play inside the app · opens Pandora</small></a>
-      </div>
-    </div>
     <div class="toolbar">
       <button class="sm" id="btnLibrary">Exercise library</button>
       <button class="sm" id="btnNewWo">+ Custom workout</button>
@@ -1067,7 +1026,7 @@ function normalizeCustomRecipes(list){
 function blankState(){
   return {version:2, settings:{calTarget:null, proteinTarget:null, goalWeight:null},
     presets: DEFAULT_PRESETS.map(p=>({...p})), meals:[], mealPlans:{}, weights:[], steps:{}, workouts:{},
-    plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[], musicLink:""};
+    plan:null, customWorkouts:[], customExercises:[], customLogs:{}, customRecipes:[]};
 }
 function load(){
   try{
@@ -1113,8 +1072,7 @@ function normalize(d){
     customWorkouts:normalizeCustomWorkouts(d.customWorkouts),
     customExercises:normalizeCustomExercises(d.customExercises),
     customLogs:normalizeCustomLogs(d.customLogs),
-    customRecipes:normalizeCustomRecipes(d.customRecipes),
-    musicLink: typeof d.musicLink==="string" ? d.musicLink.trim().slice(0,500) : ""
+    customRecipes:normalizeCustomRecipes(d.customRecipes)
   };
 }
 let S = load();
@@ -1293,102 +1251,6 @@ $("stepsSave").onclick = () => {
   if(v==null||v<0){ toast("Enter a step count"); return; }
   S.steps[todayStr()] = Math.round(v); save(); $("stepsInput").blur(); render(); toast("Steps saved");
 };
-
-function musicEmbed(raw, autoplay){
-  const text = String(raw||"").trim();
-  if(!text) return {error:"Paste a Spotify, Apple Music, or YouTube playlist or song link."};
-  const spotifyUri = text.match(/^spotify:(track|album|playlist|episode|show|artist):([A-Za-z0-9]+)/i);
-  if(spotifyUri){
-    const kind = spotifyUri[1].toLowerCase();
-    return {service:"Spotify", src:"https://open.spotify.com/embed/"+kind+"/"+spotifyUri[2]+"?utm_source=generator", height:(kind==="track"||kind==="episode")?152:352};
-  }
-  let url;
-  try{ url = new URL(text); }
-  catch(e){ return {error:"Paste a full Spotify, Apple Music, or YouTube link."}; }
-  const host = url.hostname.replace(/^www\./,"").toLowerCase();
-  if(host==="open.spotify.com" || host.endsWith(".spotify.com")){
-    const parts = url.pathname.split("/").filter(Boolean);
-    const kinds = ["track","album","playlist","episode","show","artist"];
-    const i = parts.findIndex(p=>kinds.includes(p));
-    if(i>=0 && parts[i+1]){
-      const kind = parts[i];
-      return {service:"Spotify", src:"https://open.spotify.com/embed/"+kind+"/"+encodeURIComponent(parts[i+1])+"?utm_source=generator", height:(kind==="track"||kind==="episode")?152:352};
-    }
-    return {error:"That Spotify link needs a song, album, or playlist."};
-  }
-  if(host==="music.apple.com" || host==="embed.music.apple.com" || host==="itunes.apple.com" || host==="geo.itunes.apple.com" || host.endsWith(".music.apple.com")){
-    let path = url.pathname;
-    if(!/^\/[a-z]{2}\//i.test(path)) path = "/us"+path;
-    if(!/^\/[a-z]{2}\/(song|album|playlist|station|music-video|artist)\//i.test(path)){
-      return {error:"That Apple Music link needs a song, album, or playlist."};
-    }
-    const playlist = /\/playlist\//i.test(path);
-    const single = /\/song\//i.test(path) || /[?&]i=/.test(url.search);
-    const height = playlist || !single ? 450 : 175;
-    return {service:"Apple Music", src:"https://embed.music.apple.com"+path+url.search, height:height, apple:true};
-  }
-  if(host==="youtu.be" || host==="youtube.com" || host==="m.youtube.com" || host==="music.youtube.com" || host==="youtube-nocookie.com"){
-    let video = url.searchParams.get("v");
-    const list = url.searchParams.get("list");
-    if(host==="youtu.be") video = url.pathname.replace(/^\//,"").split("/")[0];
-    const shorts = url.pathname.match(/\/shorts\/([^/?]+)/);
-    const embedded = url.pathname.match(/\/embed\/([^/?]+)/);
-    if(shorts) video = shorts[1];
-    if(embedded && embedded[1]!=="videoseries") video = embedded[1];
-    const play = autoplay ? "&autoplay=1" : "";
-    if(video){
-      return {service:"YouTube", src:"https://www.youtube.com/embed/"+encodeURIComponent(video)+"?playsinline=1"+play, height:210};
-    }
-    if(list){
-      return {service:"YouTube", src:"https://www.youtube.com/embed/videoseries?list="+encodeURIComponent(list)+"&playsinline=1"+play, height:210};
-    }
-    return {error:"That YouTube link needs a song or playlist."};
-  }
-  if(host.indexOf("amazon.")>=0 || host.indexOf("music.amazon")>=0){
-    return {external:"Amazon Music", href:url.href, reason:"Amazon Music can’t play inside the app. It opens in Amazon instead."};
-  }
-  if(host.indexOf("pandora.com")>=0){
-    return {external:"Pandora", href:url.href, reason:"Pandora can’t play inside the app. It opens in Pandora instead."};
-  }
-  return {error:"Paste a Spotify, Apple Music, or YouTube link. Amazon Music and Pandora open in their own apps."};
-}
-function setMusicStatus(text, link){
-  const msg = $("musicStatus");
-  msg.textContent = text || "";
-  if(!link) return;
-  msg.appendChild(document.createTextNode(" "));
-  const a = document.createElement("a");
-  a.href = link.href;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  a.textContent = link.label;
-  msg.appendChild(a);
-}
-function mountMusicPlayer(autoplay){
-  const raw = $("musicPaste").value.trim();
-  const result = musicEmbed(raw, autoplay);
-  const box = $("musicFrame");
-  if(result.error){
-    setMusicStatus(result.error);
-    return;
-  }
-  if(result.external){
-    box.innerHTML = "";
-    setMusicStatus(result.reason, {href:result.href, label:"Open "+result.external});
-    return;
-  }
-  S.musicLink = raw.slice(0,500);
-  save();
-  const sandbox = result.apple ? ' sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation"' : "";
-  box.innerHTML = '<iframe src="'+esc(result.src)+'" title="'+esc(result.service)+' player" height="'+result.height+'" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" allowfullscreen'+sandbox+'></iframe>';
-  setMusicStatus(result.service+" is ready in this page. Press play in the player if it does not start on its own.");
-}
-$("musicPlay").onclick = () => mountMusicPlayer(true);
-$("musicPaste").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); mountMusicPlayer(true); } });
-if(S.musicLink){
-  $("musicPaste").value = S.musicLink;
-  mountMusicPlayer(false);
-}
 
 /* ---------- Meals ---------- */
 let mealDate = todayStr();
