@@ -1,0 +1,56 @@
+Photographs shipped with Curly Gurl Fitness.
+
+Each file is a real photograph, downloaded into this repo so the site does not hotlink.
+None of these are AI-generated faces. Licenses below allow use on a public website, including GitHub Pages.
+
+Unsplash License (https://unsplash.com/license): free to use for commercial and non-commercial purposes, including a public website. Attribution is not required.
+
+Pexels License (https://www.pexels.com/license): free to use for commercial and non-commercial purposes, including a public website. Attribution is not required.
+
+Food — Unsplash
+- images/food/eggs.jpg — https://images.unsplash.com/photo-1525351484163-7529414344d8
+- images/food/avocado.jpg — https://images.unsplash.com/photo-1482049016688-2d3e1b311543
+- images/food/fried-rice.jpg — https://images.unsplash.com/photo-1512058564366-18510be2db19
+- images/food/burrito.jpg — https://images.unsplash.com/photo-1543339308-43e59d6b73a6
+- images/food/bowl.jpg — https://images.unsplash.com/photo-1512621776951-a57141f2eefd
+- images/food/chicken.jpg — https://images.unsplash.com/photo-1532550907401-a500c9a57435
+- images/food/plate.jpg — https://images.unsplash.com/photo-1504674900247-0877df9cc836
+- images/food/wrap.jpg — https://images.unsplash.com/photo-1529042410759-befb1204b468
+- images/food/salmon.jpg — https://images.unsplash.com/photo-1467003909585-2f8a72700288
+- images/food/salmon-plate.jpg — https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2
+- images/food/steak.jpg — https://images.unsplash.com/photo-1600891964092-4316c288032e
+- images/food/shrimp.jpg — https://images.unsplash.com/photo-1559847844-5315695dadae
+- images/food/chili.jpg — https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd
+- images/food/pasta.jpg — https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9
+- images/food/lasagna.jpg — https://images.unsplash.com/photo-1574894709920-11b28e7367e3
+- images/food/burger.jpg — https://images.unsplash.com/photo-1568901346375-23c9450c58cd
+- images/food/soup.jpg — https://images.unsplash.com/photo-1547592166-23ac45744acd
+- images/food/salad.jpg — https://images.unsplash.com/photo-1546069901-ba9599a7e63c
+- images/food/yogurt.jpg — https://images.unsplash.com/photo-1488477181946-6428a0291777
+- images/food/oatmeal.jpg — https://images.unsplash.com/photo-1494597564530-871f2b93ac55
+- images/food/shake.jpg — https://images.unsplash.com/photo-1572490122747-3968b75cc699
+- images/food/apple.jpg — https://images.unsplash.com/photo-1568702846914-96b305d2aaeb
+- images/food/jerky.jpg — https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec
+
+Food — Pexels
+- images/food/bacon-eggs.jpg — https://www.pexels.com/photo/25440111/
+- images/food/omelet.jpg — https://www.pexels.com/photo/10681224/
+- images/food/chicken-rice.jpg — https://www.pexels.com/photo/34134207/
+- images/food/cottage.jpg — https://www.pexels.com/photo/32065590/
+
+Training — Pexels. These show Black women and Black men working out.
+- images/work/bench.jpg — man bench pressing — https://www.pexels.com/photo/34043577/
+- images/work/row.jpg — man on a cable machine — https://www.pexels.com/photo/6388356/
+- images/work/pullup.jpg — man doing a pull-up — https://www.pexels.com/photo/6720627/
+- images/work/press.jpg — woman pressing a dumbbell — https://www.pexels.com/photo/6455904/
+- images/work/curl.jpg — man curling dumbbells — https://www.pexels.com/photo/13951199/
+- images/work/squat.jpg — woman squatting — https://www.pexels.com/photo/6311686/
+- images/work/lunge.jpg — woman lunging — https://www.pexels.com/photo/6311675/
+- images/work/glute.jpg — woman lunging with a trainer — https://www.pexels.com/photo/6455764/
+- images/work/plank.jpg — woman holding a plank — https://www.pexels.com/photo/6303481/
+- images/work/sideplank.jpg — woman in a side plank — https://www.pexels.com/photo/6303452/
+- images/work/treadmill.jpg — woman on a treadmill — https://www.pexels.com/photo/6455955/
+- images/work/bike.jpg — woman on an exercise bike — https://www.pexels.com/photo/6388987/
+- images/work/boxing.jpg — woman boxing with a trainer — https://www.pexels.com/photo/6456308/
+- images/work/dumbbell.jpg — man lifting dumbbells — https://www.pexels.com/photo/6455960/
+- images/work/tire.jpg — man flipping a tire — https://www.pexels.com/photo/4720841/

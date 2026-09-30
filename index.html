@@ -172,6 +172,24 @@ textarea:focus{border-color:var(--accent)}
 .modechips{display:flex;gap:8px;margin-bottom:10px}
 .modechips .chip{flex:1;text-align:center}
 .planbadge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--accent2);margin-left:6px}
+.thumb,.mini,.strip,.shot{background:#2a2438;display:block;object-fit:cover}
+.thumb{width:64px;height:64px;border-radius:12px;flex:none}
+.mini{width:36px;height:36px;border-radius:50%;flex:none}
+.shot{width:100%;height:180px;border-radius:14px;margin:0 0 10px}
+img.person{object-position:center 24%}
+.strip{width:100%;height:72px;border-radius:10px 10px 0 0}
+.wohead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.wohead .thumb{width:58px;height:58px}
+.photostrip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 12px}
+.photostrip button{padding:0;overflow:hidden;background:var(--card2);display:flex;flex-direction:column;align-items:stretch}
+.photostrip span{font-size:11px;font-weight:700;padding:6px 2px 7px;text-align:center}
+.photochip{display:inline-flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;text-align:left}
+.recipecard{display:flex;gap:10px;width:100%;text-align:left;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:8px;margin:8px 0;align-items:center}
+.recipecard .thumb{width:86px;height:86px}
+.pickhit{display:flex;align-items:center;gap:10px}
+.pickhit .thumb{width:56px;height:56px}
+.hubshot{display:block;margin:-14px -14px 10px}
+.hubshot .shot{margin:0;height:132px;border-radius:15px 15px 0 0}
 
 </style>
 </head>
@@ -202,8 +220,13 @@ textarea:focus{border-color:var(--accent)}
     </div>
     <div class="stat">
       <div class="label">Workout</div>
-      <div class="big" style="font-size:20px" id="dWo">—</div>
-      <div class="small" id="dWoSub"></div>
+      <div class="wohead">
+        <div style="min-width:0">
+          <div class="big" style="font-size:20px" id="dWo">—</div>
+          <div class="small" id="dWoSub"></div>
+        </div>
+        <div id="dWoPhoto"></div>
+      </div>
     </div>
     <div class="stat">
       <div class="label">Weight</div>
@@ -227,6 +250,7 @@ textarea:focus{border-color:var(--accent)}
   <div class="card">
     <h2>Today's meals</h2>
     <ul class="list" id="dMeals"></ul>
+    <div id="dMealIdeas"></div>
     <button class="full" style="margin-top:10px" data-goto="meals">+ Log a meal</button>
   </div>
 </section>
@@ -239,6 +263,7 @@ textarea:focus{border-color:var(--accent)}
     <button class="sm" id="mNext">Next ›</button>
   </div>
   <div class="note" id="mModeNote" style="margin-bottom:12px;text-align:center"></div>
+  <div class="photostrip" id="mTypeStrip"></div>
 
   <div id="mealPlanSection">
     <div class="card">
@@ -296,6 +321,7 @@ textarea:focus{border-color:var(--accent)}
       <div class="week" id="weekStrip"></div>
     </div>
     <div class="card" id="planCard">
+      <div id="woBanner"></div>
       <div class="row" style="justify-content:space-between;margin-bottom:4px">
         <div style="min-width:0">
           <div style="font-size:18px;font-weight:700" id="woTitle"></div>
@@ -1154,6 +1180,7 @@ function renderToday(){
     const extra = customs.length ? " · "+customs.map(c=>customProgress(t,c)).join(", ") : "";
     $("dWoSub").textContent = `${p.title} · ${checked}/${p.exercises.length}${extra}`;
   }
+  setPhotoBox($("dWoPhoto"), workFileForDay(p), "", "thumb", true);
 
   const ws = sortedWeights();
   if(ws.length){
@@ -1171,7 +1198,7 @@ function renderToday(){
   const dPlanCard = $("dPlanCard");
   if(planItems.length){
     dPlanCard.hidden = false;
-    $("dPlan").innerHTML = planItems.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${cap(m.type)} · ${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="sm primary" data-logplan="${m.id}">Log</button></li>`).join("");
+    $("dPlan").innerHTML = planItems.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${cap(m.type)} · ${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="sm primary" data-logplan="${m.id}">Log</button></li>`).join("");
     document.querySelectorAll("[data-logplan]").forEach(b=>b.onclick=()=>{
       const item = plansOn(t).find(x=>x.id===b.dataset.logplan);
       if(!item) return;
@@ -1184,7 +1211,13 @@ function renderToday(){
   }
 
   const ms = mealsOn(t);
-  $("dMeals").innerHTML = ms.length ? ms.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${cap(m.type)} · ${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div></li>`).join("") : '<li class="empty" style="justify-content:center">Nothing logged yet today</li>';
+  $("dMeals").innerHTML = ms.length ? ms.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${cap(m.type)} · ${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div></li>`).join("") : '<li class="empty" style="justify-content:center">Nothing logged yet today</li>';
+  $("dMealIdeas").innerHTML = ms.length ? "" : `<div class="photostrip">${mealIdeaHtml("data-mealjump")}</div>`;
+  $("dMealIdeas").querySelectorAll("[data-mealjump]").forEach(b=>b.onclick=()=>{
+    mealDate=todayStr();
+    $("fType").value=b.dataset.mealjump;
+    go("meals");
+  });
 }
 function setBar(barId, subId, val, target, unit, lowerIsGood){
   const bar=$(barId), sub=$(subId);
@@ -1245,7 +1278,7 @@ function renderMealPlanList(){
     const g = items.filter(m=>m.type===type); if(!g.length) return "";
     const gc = g.reduce((a,m)=>a+(+m.cal||0),0), gp=g.reduce((a,m)=>a+(+m.protein||0),0);
     return `<div class="mealgroup"><h3>${cap(type)} <span>${Math.round(gc)} kcal · ${r1(gp)}g</span></h3><ul class="list">${
-      g.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delplan="${m.id}" aria-label="Delete">×</button></li>`).join("")
+      g.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delplan="${m.id}" aria-label="Delete">×</button></li>`).join("")
     }</ul></div>`;
   }).join("");
   document.querySelectorAll("[data-delplan]").forEach(b=>b.onclick=()=>{
@@ -1261,7 +1294,7 @@ function renderMealLogList(){
     const g = ms.filter(m=>m.type===type); if(!g.length) return "";
     const gc = g.reduce((a,m)=>a+(+m.cal||0),0), gp=g.reduce((a,m)=>a+(+m.protein||0),0);
     return `<div class="mealgroup"><h3>${cap(type)} <span>${Math.round(gc)} kcal · ${r1(gp)}g</span></h3><ul class="list">${
-      g.map(m=>`<li><div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delmeal="${m.id}" aria-label="Delete">×</button></li>`).join("")
+      g.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delmeal="${m.id}" aria-label="Delete">×</button></li>`).join("")
     }</ul></div>`;
   }).join("");
   document.querySelectorAll("[data-delmeal]").forEach(b=>b.onclick=()=>{
@@ -1289,7 +1322,13 @@ function renderMeals(){
   if(kind==="future") mealAddMode = "plan";
   syncAddModeChips();
 
-  $("presetChips").innerHTML = S.presets.map((p,i)=>`<button class="chip" data-preset="${i}">${esc(p.name)} <small>~${p.cal} · ${p.protein}g</small></button>`).join("");
+  $("mTypeStrip").innerHTML = mealIdeaHtml("data-mealtype");
+  $("mTypeStrip").querySelectorAll("[data-mealtype]").forEach(b=>b.onclick=()=>{
+    $("fType").value=b.dataset.mealtype;
+    const name=$("fName");
+    if(name && name.focus) name.focus();
+  });
+  $("presetChips").innerHTML = S.presets.map((p,i)=>`<button class="chip photochip" data-preset="${i}">${photoTag(foodFileForMeal(p),"","mini")}<span>${esc(p.name)} <small>~${p.cal} · ${p.protein}g</small></span></button>`).join("");
   document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{
     const p=S.presets[+b.dataset.preset];
     $("fName").value=p.name; $("fCal").value=p.cal; $("fPro").value=p.protein;
@@ -1388,8 +1427,141 @@ function howtoLink(name){
 function logPlaceholder(n){
   return /walk/i.test(n) ? "Time / distance / incline (e.g. 35 min, 12% @ 3.0)" : /plank/i.test(n) ? "Hold times (e.g. 30, 30, 25 s)" : "Weight × reps (e.g. 135 lb × 10,10,8)";
 }
+/* Local photos only. Files and licenses are listed in images/SOURCES.txt. */
+const FOOD_FILES = {
+  eggs:"food/eggs.jpg", bacon:"food/bacon-eggs.jpg", avocado:"food/avocado.jpg", omelet:"food/omelet.jpg",
+  "chicken-rice":"food/chicken-rice.jpg", "fried-rice":"food/fried-rice.jpg", burrito:"food/burrito.jpg",
+  bowl:"food/bowl.jpg", chicken:"food/chicken.jpg", plate:"food/plate.jpg", wrap:"food/wrap.jpg",
+  salmon:"food/salmon.jpg", "salmon-plate":"food/salmon-plate.jpg", steak:"food/steak.jpg", shrimp:"food/shrimp.jpg",
+  chili:"food/chili.jpg", pasta:"food/pasta.jpg", lasagna:"food/lasagna.jpg", burger:"food/burger.jpg",
+  soup:"food/soup.jpg", salad:"food/salad.jpg", yogurt:"food/yogurt.jpg", cottage:"food/cottage.jpg",
+  oatmeal:"food/oatmeal.jpg", shake:"food/shake.jpg", apple:"food/apple.jpg", jerky:"food/jerky.jpg"
+};
+const RECIPE_PHOTO = {
+  k1:"bacon", k2:"salmon", k3:"burger", k4:"lasagna", k5:"plate", k6:"wrap", k7:"shrimp", k8:"chili",
+  b1:"chicken-rice", b2:"steak", b3:"oatmeal", b4:"salmon", b5:"burrito", b6:"yogurt", b7:"fried-rice", b8:"shake",
+  l1:"salad", l2:"salmon-plate", l3:"bowl", l4:"omelet", l5:"shrimp", l6:"cottage", l7:"chili", l8:"soup"
+};
+const FOOD_RULES = [
+  [/jerky/, "jerky"],
+  [/apple|peanut/, "apple"],
+  [/shake|smoothie/, "shake"],
+  [/cottage/, "cottage"],
+  [/yogurt|parfait|granola/, "yogurt"],
+  [/oatmeal|\boats?\b/, "oatmeal"],
+  [/omelet|omelette/, "omelet"],
+  [/bacon/, "bacon"],
+  [/avocado/, "avocado"],
+  [/\beggs?\b/, "eggs"],
+  [/lasagna/, "lasagna"],
+  [/chili/, "chili"],
+  [/shrimp/, "shrimp"],
+  [/salmon|\bcod\b|fish/, "salmon"],
+  [/burger/, "burger"],
+  [/burrito|taco/, "burrito"],
+  [/fried rice/, "fried-rice"],
+  [/\brice\b/, "chicken-rice"],
+  [/soup|tofu/, "soup"],
+  [/wrap/, "wrap"],
+  [/salad|lettuce|greens/, "salad"],
+  [/steak|beef|sweet potato/, "steak"],
+  [/broccoli/, "plate"],
+  [/chicken|turkey/, "chicken"],
+  [/pasta|noodle/, "pasta"]
+];
+const TYPE_PHOTO = {breakfast:"bacon", lunch:"chicken-rice", snack:"yogurt", dinner:"salmon"};
+const CAT_PHOTO = {keto:"salmon", bulking:"chicken-rice", lean:"salad"};
+const MEAL_IDEAS = [["breakfast","Breakfast","bacon"],["lunch","Lunch","chicken-rice"],["snack","Snack","yogurt"],["dinner","Dinner","salmon"]];
+const WORK_FILES = {
+  bench:"work/bench.jpg", row:"work/row.jpg", pullup:"work/pullup.jpg", press:"work/press.jpg",
+  curl:"work/curl.jpg", squat:"work/squat.jpg", lunge:"work/lunge.jpg", glute:"work/glute.jpg",
+  plank:"work/plank.jpg", side:"work/sideplank.jpg", walk:"work/treadmill.jpg", bike:"work/bike.jpg",
+  box:"work/boxing.jpg", dumbbell:"work/dumbbell.jpg", power:"work/tire.jpg"
+};
+const WORK_RULES = [
+  [/(?<!leg )\bcurls?\b|tricep|skull|pushdown/, "curl"],
+  [/shoulder|overhead|lateral|front raise|rear delt|arnold|thruster/, "press"],
+  [/pull-?ups?|pulldown|chin-?ups?/, "pullup"],
+  [/face pulls?|rowing|\brows?\b/, "row"],
+  [/bench|chest fly|\bdips?\b|crossover/, "bench"],
+  [/push-?ups?/, "plank"],
+  [/glute|hip thrust|kickback|donkey|\bbridge/, "glute"],
+  [/lunge|split squat|step-ups?|leg curl/, "lunge"],
+  [/deadlift|romanian|kettlebell|swings?|\bclean\b/, "power"],
+  [/squat|leg press|calf/, "squat"],
+  [/russian|bird dog/, "side"],
+  [/plank|crunch|dead bug|leg raise|bicycle/, "plank"],
+  [/cycling|\bbike\b/, "bike"],
+  [/walk|\brunn?ing\b|\brun\b/, "walk"],
+  [/jump rope|burpee|mountain/, "box"]
+];
+const GROUP_WORK = {chest:"bench", back:"row", shoulders:"press", arms:"curl", legs:"squat", glutes:"glute", core:"plank", cardio:"walk", full:"dumbbell"};
+function foodSrc(key){ return "images/"+(FOOD_FILES[key]||FOOD_FILES.bowl); }
+function foodKeyForName(name){
+  const n=String(name||"").toLowerCase();
+  for(let i=0;i<FOOD_RULES.length;i++){ if(FOOD_RULES[i][0].test(n)) return FOOD_RULES[i][1]; }
+  return "";
+}
+function foodFileForMeal(m){
+  const n=String(m&&m.name||"").trim().toLowerCase();
+  if(n){
+    const built=RECIPES.find(r=>r.name.toLowerCase()===n);
+    if(built && RECIPE_PHOTO[built.id]) return foodSrc(RECIPE_PHOTO[built.id]);
+    const custom=(S.customRecipes||[]).find(r=>String(r.name||"").toLowerCase()===n);
+    if(custom) return foodFileForRecipe(custom);
+  }
+  const key=foodKeyForName(m&&m.name) || TYPE_PHOTO[(m&&m.type)||""] || "bowl";
+  return foodSrc(key);
+}
+function foodFileForRecipe(r){
+  const key=(r&&RECIPE_PHOTO[r.id]) || foodKeyForName(r&&r.name) || CAT_PHOTO[(r&&r.category)||""] || "bowl";
+  return foodSrc(key);
+}
+function workSrc(key){ return "images/"+(WORK_FILES[key]||WORK_FILES.dumbbell); }
+function workKey(name, group){
+  const n=String(name||"").toLowerCase();
+  for(let i=0;i<WORK_RULES.length;i++){ if(WORK_RULES[i][0].test(n)) return WORK_RULES[i][1]; }
+  return GROUP_WORK[group] || "dumbbell";
+}
+function workFileForName(name, group){
+  const hit = group ? null : findExercise(name);
+  return workSrc(workKey(name, group || (hit&&hit.group) || ""));
+}
+function workFileForDay(p){
+  if(!p) return workSrc("dumbbell");
+  const title=String(p.title||"").toLowerCase();
+  if(p.rest || /walk/.test(title)) return workSrc("walk");
+  if(/cardio/.test(title)) return workSrc("walk");
+  if(/lower/.test(title)) return workSrc("squat");
+  if(/upper/.test(title)) return workSrc("bench");
+  if(/circuit|full/.test(title)) return workSrc("dumbbell");
+  if(p.exercises && p.exercises[0]) return workFileForName(p.exercises[0].name);
+  return workSrc("squat");
+}
+function photoTag(src, alt, cls, eager){
+  const load = eager ? "eager" : "lazy";
+  const pri = eager ? "" : " fetchpriority=\"low\"";
+  const w = cls==="thumb" || cls==="mini" ? 320 : 640;
+  const h = cls==="strip" ? 180 : (cls==="thumb" || cls==="mini" ? 320 : 400);
+  const person = String(src).indexOf("/work/")>=0 ? " person" : "";
+  return `<img class="${cls}${person}" src="${esc(src)}" alt="${esc(alt||"")}" width="${w}" height="${h}" loading="${load}" decoding="async"${pri}>`;
+}
+function setPhotoBox(el, src, alt, cls, eager){
+  if(!el) return;
+  if(!src){ el.innerHTML=""; return; }
+  const img=el.querySelector("img");
+  if(img && img.getAttribute("src")===src) return;
+  el.innerHTML=photoTag(src, alt, cls, eager);
+}
+function mountHubPhoto(btn, src, alt){
+  if(!btn || btn.querySelector("img")) return;
+  btn.insertAdjacentHTML("afterbegin", `<span class="hubshot">${photoTag(src, alt, "shot")}</span>`);
+}
+function mealIdeaHtml(attr){
+  return MEAL_IDEAS.map(([type,label,key])=>`<button type="button" ${attr}="${type}">${photoTag(foodSrc(key), "", "strip")}<span>${label}</span></button>`).join("");
+}
 function exerciseLogHtml(ex, state, token){
-  return `<div class="ex ${state.checked?"done":""}"><input type="checkbox" data-chk="${esc(token)}" ${state.checked?"checked":""} aria-label="Done: ${esc(ex.name)}"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div>${howtoLink(ex.name)}</div><div class="target">${esc(ex.target||"")}</div><input type="text" data-log="${esc(token)}" value="${esc(state.log||"")}" placeholder="${esc(logPlaceholder(ex.name))}"></div></div>`;
+  return `<div class="ex ${state.checked?"done":""}">${photoTag(workFileForName(ex.name),"","thumb")}<input type="checkbox" data-chk="${esc(token)}" ${state.checked?"checked":""} aria-label="Done: ${esc(ex.name)}"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div>${howtoLink(ex.name)}</div><div class="target">${esc(ex.target||"")}</div><input type="text" data-log="${esc(token)}" value="${esc(state.log||"")}" placeholder="${esc(logPlaceholder(ex.name))}"></div></div>`;
 }
 function ensurePlan(){
   if(S.plan) return S.plan;
@@ -1435,6 +1607,7 @@ function renderWorkoutHome(){
   document.querySelectorAll("[data-wodate]").forEach(el=>el.onclick=()=>{ woDate=el.dataset.wodate; render(); });
 
   const p=planFor(woDate), w=woEntry(woDate);
+  setPhotoBox($("woBanner"), workFileForDay(p), p.title||"Workout", "shot");
   $("woTitle").textContent = p.title;
   $("woDate").textContent = (woDate===t?"Today · ":"") + fmtDate(woDate,{weekday:"long",month:"short",day:"numeric"}) + (p.note?" · "+p.note:"");
   const done=isWoDone(woDate);
@@ -1454,7 +1627,7 @@ function renderWorkoutHome(){
   } else if(planEditing){
     $("woDoneBtn").style.display="none";
     $("woNotesWrap").style.display="none";
-    $("woList").innerHTML = p.exercises.length ? p.exercises.map(ex=>`<div class="ex"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-planrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-plantarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">No exercises on this day yet.</div>';
+    $("woList").innerHTML = p.exercises.length ? p.exercises.map(ex=>`<div class="ex">${photoTag(workFileForName(ex.name),"","thumb")}<div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-planrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-plantarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">No exercises on this day yet.</div>';
   } else if(!p.exercises.length){
     $("woList").innerHTML = '<div class="empty">No exercises on this day. Edit exercises to add some.</div>';
     $("woDoneBtn").style.display="none";
@@ -1511,7 +1684,7 @@ function renderLibrary(){
       const del=e.custom?`<button class="x" data-dellib="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">×</button>`:"";
       const badge=e.custom?'<span class="badge">Custom</span>':"";
       const cue=e.cue?`<div class="cue">${esc(e.cue)}</div>`:"";
-      return `<div class="libitem" data-libitem="${esc(e.name)}"><div class="grow"><div class="name">${esc(e.name)}${badge}</div>${cue}<div>${howtoLink(e.name)}</div></div>${del}</div>`;
+      return `<div class="libitem" data-libitem="${esc(e.name)}">${photoTag(workFileForName(e.name, e.group),"","thumb")}<div class="grow"><div class="name">${esc(e.name)}${badge}</div>${cue}<div>${howtoLink(e.name)}</div></div>${del}</div>`;
     }).join("")+`</div>`);
   });
   $("libList").innerHTML = parts.join("");
@@ -1539,7 +1712,7 @@ function renderEditor(){
     renderEditor();
   });
   $("edDaysNote").textContent = editorDraft.days.length ? "Shows on "+editorDraft.days.slice().sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b)).map(d=>DAYS[d]).join(", ")+"." : "No day selected — this workout stays unscheduled and can be logged any day.";
-  $("edList").innerHTML = editorDraft.exercises.length ? editorDraft.exercises.map(ex=>`<div class="ex"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-edrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-edtarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">Pick exercises from the library.</div>';
+  $("edList").innerHTML = editorDraft.exercises.length ? editorDraft.exercises.map(ex=>`<div class="ex">${photoTag(workFileForName(ex.name),"","thumb")}<div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-edrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-edtarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">Pick exercises from the library.</div>';
   $("edDelete").style.display = editorDraft.isNew ? "none" : "";
 }
 function openEditor(existing){
@@ -1623,7 +1796,7 @@ function renderPicker(){
   $("pickerGroups").innerHTML = chips.map(([id,label])=>`<button type="button" class="chip ${pickGroup===id?"sel":""}" data-pickgroup="${id}">${label}</button>`).join("");
   $("pickerGroups").querySelectorAll("[data-pickgroup]").forEach(b=>b.onclick=()=>{ pickGroup=b.dataset.pickgroup; renderPicker(); });
   const list=filteredExercises(pickGroup, $("pickerSearch").value);
-  $("pickerResults").innerHTML = list.length ? list.map(e=>`<button type="button" class="pickhit" data-pick="${esc(e.name)}"><div class="name">${esc(e.name)}${e.custom?'<span class="badge">Custom</span>':""}</div><div class="meta">${esc(groupLabel(e.group))}${e.cue?" · "+esc(e.cue):""}</div></button>`).join("") : '<div class="empty">No exercises match.</div>';
+  $("pickerResults").innerHTML = list.length ? list.map(e=>`<button type="button" class="pickhit" data-pick="${esc(e.name)}">${photoTag(workFileForName(e.name, e.group),"","thumb")}<div><div class="name">${esc(e.name)}${e.custom?'<span class="badge">Custom</span>':""}</div><div class="meta">${esc(groupLabel(e.group))}${e.cue?" · "+esc(e.cue):""}</div></div></button>`).join("") : '<div class="empty">No exercises match.</div>';
   $("pickerResults").querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{
     pickedItem=allExercises().find(e=>e.name===b.dataset.pick)||null;
     if(!pickedItem) return;
@@ -1933,6 +2106,8 @@ function renderLibraryPage(){
   if(libSection==="home"){
     $("hdrTitle").textContent = "Library";
     $("hdrSub").textContent = "Exercises and cookbook";
+    mountHubPhoto($("openExercises"), workSrc("squat"), "Black woman squatting in a gym");
+    mountHubPhoto($("openCookbook"), foodSrc("chicken-rice"), "Chicken with rice and salad");
   } else if(libSection==="exercises") renderLibrary();
   else renderCookbook();
 }
@@ -1957,7 +2132,7 @@ function renderCookList(){
     if(!items.length) return "";
     return `<div class="libgroup"><h3>${label}</h3>`+items.map(r=>{
       const badge=r.custom?'<span class="badge">Custom</span>':"";
-      return `<button type="button" class="pickhit" data-recipe="${esc(r.id)}"><div class="name">${esc(r.name)}${badge}</div><div class="meta">Estimates per serving · ${Math.round(r.calories)} kcal · ${r1(r.protein)}g protein</div></button>`;
+      return `<button type="button" class="recipecard" data-recipe="${esc(r.id)}">${photoTag(foodFileForRecipe(r),"","thumb")}<div class="grow"><div class="name">${esc(r.name)}${badge}</div><div class="meta">Estimates per serving · ${Math.round(r.calories)} kcal · ${r1(r.protein)}g protein</div></div></button>`;
     }).join("")+`</div>`;
   }).join("");
 }
@@ -1973,7 +2148,7 @@ function renderCookDetail(){
   const cookNote = cookToPlan
     ? `Adds 1 serving to the plan for ${mealDate===todayStr()?"today":fmtDate(mealDate)} (${Math.round(r.calories)} kcal, ${r1(r.protein)}g protein).`
     : `Adds 1 serving to today's meal log (${Math.round(r.calories)} kcal, ${r1(r.protein)}g protein).`;
-  $("cookDetailView").innerHTML = `<div class="toolbar"><button class="sm" id="cookDetailBack">‹ Recipes</button></div><div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="note">${esc(cookCatLabel(r.category))}${r.custom?" · Custom":""} · Serves ${r.servings}</div></div></div>${macroGrid(r)}<h2>Ingredients</h2><div class="note">Amounts for the whole recipe.</div><ul class="ing">${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join("")||'<li>None listed</li>'}</ul><h2 style="margin-top:12px">Steps</h2><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")||"<li>No steps yet.</li>"}</ol><button class="primary full" id="cookLog" style="margin-top:14px">${cookBtn}</button><div class="note" style="margin-top:6px">${cookNote}</div>${actions}</div>`;
+  $("cookDetailView").innerHTML = `<div class="toolbar"><button class="sm" id="cookDetailBack">‹ Recipes</button></div><div class="card">${photoTag(foodFileForRecipe(r), r.name, "shot", true)}<div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-size:18px;font-weight:700">${esc(r.name)}</div><div class="note">${esc(cookCatLabel(r.category))}${r.custom?" · Custom":""} · Serves ${r.servings}</div></div></div>${macroGrid(r)}<h2>Ingredients</h2><div class="note">Amounts for the whole recipe.</div><ul class="ing">${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join("")||'<li>None listed</li>'}</ul><h2 style="margin-top:12px">Steps</h2><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")||"<li>No steps yet.</li>"}</ol><button class="primary full" id="cookLog" style="margin-top:14px">${cookBtn}</button><div class="note" style="margin-top:6px">${cookNote}</div>${actions}</div>`;
   $("cookDetailBack").onclick=()=>{ cookView="list"; renderCookbook(); window.scrollTo(0,0); };
   $("cookLog").onclick=()=>logRecipe(r);
   if(r.custom){
