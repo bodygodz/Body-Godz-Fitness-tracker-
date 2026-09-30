@@ -1037,8 +1037,10 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
     <h2>Saved on this phone</h2>
     <div id="bmiList"></div>
   </div>
-  <input type="file" id="bmiCam" accept="image/*" capture="environment" hidden>
-  <input type="file" id="bmiPick" accept="image/*" hidden>
+  <input type="file" id="bmiFrontCamFile" accept="image/*" capture="environment" hidden data-angle="front">
+  <input type="file" id="bmiSideCamFile" accept="image/*" capture="environment" hidden data-angle="side">
+  <input type="file" id="bmiFrontFile" accept="image/*" hidden data-angle="front">
+  <input type="file" id="bmiSideFile" accept="image/*" hidden data-angle="side">
 </section>
 
 <!-- ============ COACH ============ -->
@@ -5204,21 +5206,22 @@ function renderBmi(){
   paintBmiSummary();
   paintBmiList();
 }
-function openBmiPhoto(angle, camera){
-  bmiAngle = angle==="side" ? "side" : "front";
-  const input = $(camera ? "bmiCam" : "bmiPick");
+function openBmiPhoto(inputId){
+  const input = $(inputId);
+  bmiAngle = input && input.dataset.angle==="side" ? "side" : "front";
   input.value = "";
   input.click();
 }
-async function onBmiFile(file){
+async function onBmiFile(file, angle){
   if(!file) return;
+  const which = angle==="side" ? "side" : "front";
   try{
     const blob = await compressImage(file, 720, 0.72);
     const url = await blobToDataUrl(blob);
     if(url.indexOf("data:image/")!==0) throw new Error("Could not read that photo");
-    bmiShot[bmiAngle] = url;
+    bmiShot[which] = url;
     paintBmiSummary();
-    toast((bmiAngle==="front"?"Front":"Side")+" photo ready. Save it on this phone.");
+    toast((which==="front"?"Front":"Side")+" photo ready. Save it on this phone.");
   }catch(err){
     toast(err && err.message ? err.message : "Could not read that photo");
   }
@@ -5246,12 +5249,13 @@ function saveBmi(){
   paintBmiSummary();
   paintBmiList();
 }
-$("bmiFrontCam").onclick = ()=>openBmiPhoto("front", true);
-$("bmiSideCam").onclick = ()=>openBmiPhoto("side", true);
-$("bmiFrontPick").onclick = ()=>openBmiPhoto("front", false);
-$("bmiSidePick").onclick = ()=>openBmiPhoto("side", false);
-$("bmiCam").onchange = e=>{ const f=e.target.files&&e.target.files[0]; onBmiFile(f); e.target.value=""; };
-$("bmiPick").onchange = e=>{ const f=e.target.files&&e.target.files[0]; onBmiFile(f); e.target.value=""; };
+$("bmiFrontCam").onclick = ()=>openBmiPhoto("bmiFrontCamFile");
+$("bmiSideCam").onclick = ()=>openBmiPhoto("bmiSideCamFile");
+$("bmiFrontPick").onclick = ()=>openBmiPhoto("bmiFrontFile");
+$("bmiSidePick").onclick = ()=>openBmiPhoto("bmiSideFile");
+["bmiFrontCamFile","bmiSideCamFile","bmiFrontFile","bmiSideFile"].forEach(id=>{
+  $(id).onchange = e=>{ const f=e.target.files&&e.target.files[0]; onBmiFile(f, e.target.dataset.angle); e.target.value=""; };
+});
 $("bmiSave").onclick = saveBmi;
 function render(){
   paintHeader();
