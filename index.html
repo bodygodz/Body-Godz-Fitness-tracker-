@@ -27,23 +27,14 @@ html,body{margin:0;color:var(--text);font-family:-apple-system,BlinkMacSystemFon
   background-attachment:fixed}
 html{background-color:#4c1d95}
 body{padding-bottom:calc(76px + var(--safe-b));min-height:100vh}
-.homebg{position:fixed;inset:0;z-index:0;display:none;pointer-events:none;overflow:hidden}
-body.home .homebg{display:block}
-.homebg img{width:100%;height:100%;object-fit:cover;object-position:52% 8%}
-/* The gradient on html/body uses background-attachment:fixed, which on iPhone paints over a z-index:0 layer. The photo is also the html background so it stays behind the UI. */
-html:has(body.home){
-  background:#1a1028 url("home-bg.jpg") 52% 8% / cover no-repeat;
-  background-attachment:scroll;
-}
-body.home{background:transparent;--card:rgba(22,16,36,.62)}
-body.home header{background:rgba(28,16,48,.48)}
-body.home nav.tabs{background:rgba(28,16,48,.62)}
-body.home #page-today{padding-top:min(38vh, 320px)}
-body.home .stat .label,body.home .stat .big,body.home .stat .small,body.home .card h2{text-shadow:0 1px 2px rgba(0,0,0,.85)}
-@media (min-aspect-ratio: 3/4){
-  html:has(body.home){background-position:58% 0%}
-  .homebg img{object-position:58% 0%}
-}
+.homebg{position:fixed;inset:0;z-index:0;display:none;pointer-events:none;overflow:hidden;justify-content:center;align-items:flex-start}
+body.home .homebg{display:flex}
+.homebg img{width:min(100vw, 560px);height:auto;flex:none}
+/* iPhone paints a fixed gradient over this layer. Scroll attachment keeps the photo behind the UI. */
+html:has(body.home),body.home{background-attachment:scroll}
+body.home{--card:rgba(22,16,36,.78)}
+body.home header{background:rgba(28,16,48,.72)}
+body.home nav.tabs{background:rgba(28,16,48,.84)}
 header{position:sticky;top:0;z-index:5;background:rgba(28,16,48,.86);backdrop-filter:blur(12px);padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16)}
 header h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.15;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
 header .screentitle{font-size:15px;font-weight:700;margin-top:3px;color:#fff}
