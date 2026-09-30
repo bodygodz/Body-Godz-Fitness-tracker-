@@ -20,13 +20,15 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:15px;line-height:1.4;background-color:#4c1d95}
 html{background-color:#4c1d95}
-body{padding-bottom:calc(76px + var(--safe-b));min-height:100vh;background-color:#4c1d95;color:#f8f5ff;background-image:
+body{padding-bottom:calc(20px + var(--safe-b));min-height:100vh;background-color:#4c1d95;color:#f8f5ff;background-image:
   radial-gradient(920px 520px at -8% -12%, rgba(251,191,36,.95), transparent 56%),
   radial-gradient(780px 540px at 112% -8%, rgba(244,114,182,.92), transparent 52%),
   radial-gradient(720px 520px at 86% 112%, rgba(34,211,238,.88), transparent 48%),
   linear-gradient(165deg, #6d28d9 0%, #db2777 48%, #ea580c 100%)}
-header{position:sticky;top:0;z-index:5;background:#4c1d95;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16)}
-.brandwrap{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 8px}
+header{position:sticky;top:0;z-index:28;background:#4c1d95;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 10px;border-bottom:1px solid rgba(255,255,255,.16)}
+.brandwrap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+.menubtn{flex:none;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#fff;border-radius:10px}
+.menubtn svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
 .brandwrap img{width:84px;height:84px;object-fit:cover;object-position:center 22%;border-radius:14px;flex:none;background:#4c1d95}
 header h1{margin:0;flex:1;min-width:0;font-size:22px;font-weight:800;letter-spacing:-.02em;color:#fff;line-height:1.05;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
 header h1 .drop{float:left;font-size:2.25em;line-height:.72;padding:1px 5px 0 0;font-weight:800}
@@ -94,12 +96,19 @@ button:active{transform:scale(.98)}
 .week div.sel{background:rgba(34,197,94,.15)}
 .week div.logged::after{content:"✓";display:block;color:var(--accent);font-weight:700}
 .chartwrap{position:relative;height:240px}
-nav.tabs{position:fixed;bottom:0;left:0;right:0;z-index:10;display:flex;background:#4c1d95;border-top:1px solid rgba(255,255,255,.16);padding:6px 2px calc(6px + var(--safe-b));overflow-x:auto;scrollbar-width:none}
-nav.tabs::-webkit-scrollbar{display:none}
-nav.tabs button{flex:1 0 52px;min-width:0;overflow:hidden;background:none;border:none;color:#d9d0ea;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;font-size:10px;font-weight:600;white-space:nowrap}
-nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-nav.tabs button.active{color:var(--accent)}
-.toast{position:fixed;left:50%;bottom:calc(90px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#1c1430;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:20;font-size:14px}
+.navmenu{position:fixed;left:0;right:0;bottom:0;top:0;z-index:20;background:#4c1d95;color:#fff;display:flex;flex-direction:column;align-items:flex-end;padding:24px 28px calc(28px + var(--safe-b));overflow:auto}
+.navmenu[hidden]{display:none !important}
+.navmenu .navitem{background:transparent;border:none;color:#fff;border-radius:0;padding:12px 0;font-size:20px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:right;line-height:1.2}
+.navmenu .navitem.sub{font-size:16px;font-weight:600;letter-spacing:.06em;color:#e4dcf5;padding:8px 0}
+.navmenu .navitem.active{text-decoration:underline;text-underline-offset:5px;color:#fff}
+.navsplit{display:flex;align-items:center;justify-content:flex-end;gap:8px;width:100%}
+.caretbtn{background:transparent;border:none;color:#fff;width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:8px}
+.caret{width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid #fff;display:block}
+.caretbtn[aria-expanded="true"] .caret{transform:rotate(180deg)}
+.navsub{display:flex;flex-direction:column;align-items:flex-end;width:100%;padding:0 8px 6px 0}
+.navsub[hidden]{display:none !important}
+.menuaction{margin-top:28px;background:#fff;color:#4c1d95;border:none;border-radius:4px;padding:14px 22px;font-weight:800;font-size:16px;letter-spacing:0;text-transform:none;min-width:210px;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translateX(-50%) translateY(20px);background:#1c1430;color:#fff;padding:10px 16px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:40;font-size:14px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .empty{color:var(--muted);text-align:center;padding:14px 0;font-size:14px}
 .hl{color:var(--accent)}
@@ -206,6 +215,7 @@ img.person{object-position:center 24%}
   <div class="brandwrap">
     <h1 class="brandline"><span class="drop">C</span>urly Gurl Fitness</h1>
     <img src="images/header-portrait.jpg" alt="">
+    <button type="button" class="menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
   </div>
   <div class="screentitle" id="hdrTitle">Today</div>
   <div class="sub" id="hdrSub"></div>
@@ -633,14 +643,22 @@ img.person{object-position:center 24%}
 </section>
 </main>
 
-<nav class="tabs" id="tabs">
-  <button data-tab="today" class="active"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Today</button>
-  <button data-tab="meals"><svg viewBox="0 0 24 24"><path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2"/><path d="M17 2c-2 2-3 5-3 8h3v12"/></svg>Meals</button>
-  <button data-tab="workout"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 9v6M21 9v6M6 12h12"/></svg>Workout</button>
-  <button data-tab="library"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</button>
-  <button data-tab="weight"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>Weight</button>
-  <button data-tab="coach"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="3"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Coach</button>
-  <button data-tab="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Settings</button>
+<nav class="navmenu" id="navMenu" hidden>
+  <button type="button" class="navitem" data-tab="today">Today</button>
+  <button type="button" class="navitem" data-tab="meals">Meals</button>
+  <button type="button" class="navitem" data-tab="workout">Workout</button>
+  <div class="navsplit">
+    <button type="button" class="navitem" data-tab="library" data-lib="home">Library</button>
+    <button type="button" class="caretbtn" id="libToggle" aria-expanded="false" aria-controls="libSub" aria-label="Library sections"><span class="caret"></span></button>
+  </div>
+  <div class="navsub" id="libSub" hidden>
+    <button type="button" class="navitem sub" data-tab="library" data-lib="exercises">Exercises</button>
+    <button type="button" class="navitem sub" data-tab="library" data-lib="cookbook">Cookbook</button>
+  </div>
+  <button type="button" class="navitem" data-tab="weight">Weight</button>
+  <button type="button" class="navitem" data-tab="coach">Coach</button>
+  <button type="button" class="navitem" data-tab="settings">Settings</button>
+  <button type="button" class="menuaction" id="menuAction">Start today's workout</button>
 </nav>
 <div class="toast" id="toast"></div>
 <div class="gate" id="roleGate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
@@ -1154,17 +1172,66 @@ let currentTab = "today";
 function go(tab){
   currentTab = tab;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+tab));
-  document.querySelectorAll("#tabs button").forEach(b=>b.classList.toggle("active", b.dataset.tab===tab));
   $("hdrTitle").textContent = TITLES[tab];
   render();
   if(typeof syncCoachTab==="function") syncCoachTab(tab);
+  syncMenu();
   window.scrollTo(0,0);
   if(location.hash!=="#"+tab) history.replaceState(null,"","#"+tab);
 }
-document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{
-  if(b.dataset.tab==="library") libSection="home";
+function syncMenu(){
+  document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
+    const lib = b.dataset.lib;
+    let on = b.dataset.tab===currentTab;
+    if(lib) on = currentTab==="library" && (lib==="home" ? libSection==="home" : lib===libSection);
+    b.classList.toggle("active", on);
+  });
+  const action = $("menuAction");
+  if(action) action.textContent = ID.role==="trainer" ? "Create invite code" : "Start today's workout";
+}
+function setMenuOpen(open){
+  const menu = $("navMenu");
+  const btn = $("menuBtn");
+  menu.hidden = !open;
+  if(open) menu.style.paddingTop = (document.querySelector("header").offsetHeight + 18) + "px";
+  btn.setAttribute("aria-expanded", open ? "true" : "false");
+  btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  document.body.style.overflow = open ? "hidden" : "";
+  syncMenu();
+}
+function closeMenu(){ setMenuOpen(false); }
+$("menuBtn").onclick = () => setMenuOpen($("navMenu").hidden);
+$("libToggle").onclick = () => {
+  const sub = $("libSub");
+  const open = sub.hidden;
+  sub.hidden = !open;
+  $("libToggle").setAttribute("aria-expanded", open ? "true" : "false");
+};
+document.querySelectorAll("#navMenu [data-tab]").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.tab==="library"){
+    const lib = b.dataset.lib || "home";
+    libSection = lib==="cookbook" || lib==="exercises" ? lib : "home";
+    if(lib==="cookbook"){ cookView="list"; cookOpenId=null; mealCookReturn=false; }
+    returnView = "home";
+  }
+  closeMenu();
   go(b.dataset.tab);
 }));
+$("menuAction").onclick = () => {
+  closeMenu();
+  if(ID.role==="trainer"){
+    pairOpen = false;
+    go("coach");
+    const name = $("trName");
+    if(name && name.value.trim()) $("trCreate").click();
+    else if(name) name.focus();
+    return;
+  }
+  woView = "home";
+  woDate = todayStr();
+  go("workout");
+};
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("navMenu").hidden) closeMenu(); });
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
 
 /* ---------- Today ---------- */
@@ -2936,6 +3003,7 @@ function setRole(role){
   if(role==="trainer" || role==="client") go("coach");
   else if(currentTab==="coach" || currentTab==="settings") render();
   else updateDemoBanner();
+  syncMenu();
 }
 function maybeGate(){
   $("roleGate").style.display = ID.role ? "none" : "flex";
