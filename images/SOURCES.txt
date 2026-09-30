@@ -38,6 +38,9 @@ Food — Pexels
 - images/food/chicken-rice.jpg — https://www.pexels.com/photo/34134207/
 - images/food/cottage.jpg — https://www.pexels.com/photo/32065590/
 
+Background — Pexels. A real photo of a Black woman lifting dumbbells in a gym, used full-screen behind the app. Pexels License.
+- images/gym-bg.jpg — https://www.pexels.com/photo/6455915/
+
 Training — Pexels. These show Black women and Black men working out.
 - images/work/bench.jpg — man bench pressing — https://www.pexels.com/photo/34043577/
 - images/work/row.jpg — man on a cable machine — https://www.pexels.com/photo/6388356/
