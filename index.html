@@ -287,6 +287,11 @@ textarea:focus{border-color:var(--accent)}
 .taperead{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .taperead span{background:#f6f3fb;border-radius:99px;padding:4px 8px;font-size:12px;font-weight:700;color:#1c1430}
 .tapelist{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}
+.bmiranges{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.bmiranges span{background:#f6f3fb;border-radius:12px;padding:7px 8px;font-size:11px;font-weight:700;color:#6b6280;line-height:1.3}
+.bmiranges span small{display:block;font-size:12px;font-weight:800;color:#1c1430}
+.bmiranges span.on{background:#f3e8ff;color:#6d28d9}
+.bmiranges span.on small{color:#6d28d9}
 .calllayer{position:fixed;inset:0;z-index:80;background:#1a0f2e;display:flex;flex-direction:column;height:100dvh}
 .calllayer[hidden]{display:none !important}
 .callbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:rgba(0,0,0,.35);color:#fff}
@@ -991,7 +996,7 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
     <div class="bmihead">
       <div class="bminum">
         <div class="big" id="bmiValue">—</div>
-        <div class="small">from height and weight</div>
+        <div class="small" id="bmiBand">from height and weight</div>
       </div>
       <div class="bmishots">
         <figure>
@@ -1004,9 +1009,14 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
         </figure>
       </div>
     </div>
+    <div class="bmiranges" id="bmiRanges"></div>
     <div class="taperead" id="bmiTapeRead"></div>
     <p class="note" id="bmiWhen"></p>
-    <p class="note">Photos stay on this phone. BMI comes from height and weight.</p>
+    <p class="note">BMI does not see muscle or where fat sits.</p>
+  </div>
+  <div class="card">
+    <h2>Last few</h2>
+    <div id="bmiList"></div>
   </div>
   <div class="card">
     <h2>Height and weight</h2>
@@ -1019,12 +1029,12 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
   </div>
   <div class="card">
     <h2>Tape measurements</h2>
-    <p class="note">Inches from a tape measure. The photos do not measure these.</p>
+    <p class="note">Inches from a tape measure. Chest, waist, stomach, hips, thigh, and arm.</p>
     <div class="tapelist" id="bmiTapes"></div>
   </div>
   <div class="card">
     <h2>Front and side photos</h2>
-    <p class="note">Take a photo with the phone camera or choose one already on the phone. It is saved here with the date and is not uploaded.</p>
+    <p class="note">Take a photo with the phone camera or choose one already on the phone. It stays on this phone with the date. These photos are not a body scan.</p>
     <div class="toolbar">
       <button type="button" class="sm" id="bmiFrontCam">Take front</button>
       <button type="button" class="sm" id="bmiSideCam">Take side</button>
@@ -1033,10 +1043,6 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
     </div>
   </div>
   <button class="primary full" type="button" id="bmiSave">Save on this phone</button>
-  <div class="card" style="margin-top:12px">
-    <h2>Saved on this phone</h2>
-    <div id="bmiList"></div>
-  </div>
   <input type="file" id="bmiFrontCamFile" accept="image/*" capture="environment" hidden data-angle="front">
   <input type="file" id="bmiSideCamFile" accept="image/*" capture="environment" hidden data-angle="side">
   <input type="file" id="bmiFrontFile" accept="image/*" hidden data-angle="front">
@@ -1326,8 +1332,8 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
     <button type="button" class="navitem sub" data-tab="library" data-lib="cookbook">Cookbook</button>
   </div>
   <button type="button" class="navitem" data-tab="checkin">Check-in</button>
-  <button type="button" class="navitem" data-tab="weight">Weight</button>
   <button type="button" class="navitem" data-tab="bmi">BMI</button>
+  <button type="button" class="navitem" data-tab="weight">Weight</button>
   <button type="button" class="navitem" data-tab="coach">Coach</button>
   <button type="button" class="navitem" data-tab="videos">Videos</button>
   <button type="button" class="navitem" data-tab="settings">Settings</button>
@@ -1864,7 +1870,7 @@ function normalizeCheckins(list){
     };
   }).filter(Boolean);
 }
-const TAPE_FIELDS = [["neck","Neck"],["chest","Chest"],["waist","Waist"],["hips","Hips"],["bicep","Bicep"],["thigh","Thigh"],["calf","Calf"]];
+const TAPE_FIELDS = [["chest","Chest"],["waist","Waist"],["stomach","Stomach"],["hips","Hips"],["thigh","Thigh"],["arm","Arm"]];
 function bmiMeasure(v, max){
   const n = parseFloat(v);
   if(!isFinite(n) || n<=0 || n>=max) return null;
@@ -1882,6 +1888,10 @@ function normalizeBmi(list){
       const n = bmiMeasure(src[k], 200);
       if(n!=null) tapes[k] = n;
     });
+    if(tapes.arm==null){
+      const arm = bmiMeasure(src.bicep, 200);
+      if(arm!=null) tapes.arm = arm;
+    }
     const photo = v => {
       const s = String(v||"");
       return s.indexOf("data:image/")===0 ? s : "";
@@ -1890,6 +1900,7 @@ function normalizeBmi(list){
       id:date,
       date:date,
       weight:bmiMeasure(row.weight, 1000),
+      heightIn:bmiMeasure(row.heightIn, 120),
       tapes:tapes,
       front:photo(row.front),
       side:photo(row.side)
@@ -2035,7 +2046,7 @@ function paintSubbar(){
   const bar = $("subbar");
   const sets = {
     plan:[["workout","Workout"],["events","Events"],["calendar","Calendar"]],
-    progress:[["checkin","Check-in"],["weight","Weight"],["photos","Photos"],["bmi","BMI"]]
+    progress:[["checkin","Check-in"],["bmi","BMI"],["weight","Weight"],["photos","Photos"]]
   };
   if(!sets[g]){ bar.hidden=true; bar.innerHTML=""; return; }
   bar.hidden=false;
@@ -5130,6 +5141,23 @@ function bmiFrom(lb, inches){
   if(!(lb>0) || !(inches>0)) return null;
   return Math.round((lb / (inches*inches)) * 7030) / 10;
 }
+function bmiBandName(b){
+  if(b==null) return "";
+  if(b<18.5) return "Underweight";
+  if(b<=24.9) return "Healthy";
+  if(b<=29.9) return "Overweight";
+  return "Obesity";
+}
+function paintBmiRanges(b){
+  const bands = [
+    [b!=null && b<18.5, "Under 18.5", "Underweight"],
+    [b!=null && b>=18.5 && b<=24.9, "18.5 to 24.9", "Healthy"],
+    [b!=null && b>=25 && b<=29.9, "25 to 29.9", "Overweight"],
+    [b!=null && b>=30, "30 and over", "Obesity"]
+  ];
+  $("bmiRanges").innerHTML = bands.map(([on, range, name])=>'<span class="'+(on?"on":"")+'"><small>'+name+'</small>'+range+'</span>').join("");
+  $("bmiBand").textContent = b==null ? "from height and weight" : bmiBandName(b)+" · from height and weight";
+}
 function latestWeightLb(){
   const rows = (S.weights||[]).filter(w=>num(w.weight)>0).slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
   return rows.length ? rows[0].weight : "";
@@ -5142,10 +5170,17 @@ function setTapeInputs(tapes){
     el.value = n>0 ? String(n) : "";
   });
 }
+function applyHeight(inches){
+  if(!(inches>0)) return;
+  $("bmiFt").value = Math.floor(inches/12);
+  $("bmiIn").value = r1(inches % 12);
+}
 function loadBmiDate(date){
   const row = (S.bmi||[]).find(r=>r.date===date);
   bmiShot = {front:row&&row.front||"", side:row&&row.side||""};
   setTapeInputs(row?row.tapes:{});
+  if(row && row.heightIn) applyHeight(row.heightIn);
+  else if(num(S.settings.heightIn)>0) applyHeight(num(S.settings.heightIn));
   if(row && row.weight) $("bmiLb").value = row.weight;
   else if(!$("bmiLb").value) $("bmiLb").value = latestWeightLb();
 }
@@ -5154,6 +5189,7 @@ function paintBmiSummary(){
   const lb = num($("bmiLb").value);
   const b = bmiFrom(lb, inches);
   $("bmiValue").textContent = b==null ? "—" : String(b);
+  paintBmiRanges(b);
   [["front","bmiFrontFrame","Front"],["side","bmiSideFrame","Side"]].forEach(([angle,id,label])=>{
     const frame = $(id);
     const src = bmiShot[angle];
@@ -5169,13 +5205,15 @@ function paintBmiSummary(){
   $("bmiWhen").textContent = d ? fmtDate(d) : "";
 }
 function paintBmiList(){
-  const rows = (S.bmi||[]).slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
-  const inches = num(S.settings.heightIn);
+  const rows = (S.bmi||[]).slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0, 6);
+  const fallback = num(S.settings.heightIn);
   if(!rows.length){ $("bmiList").innerHTML = '<div class="empty">Nothing saved on this phone yet.</div>'; return; }
   $("bmiList").innerHTML = "<ul class=\"list\">"+rows.map(r=>{
-    const b = bmiFrom(r.weight, inches);
-    const photos = (r.front?"front":"no front")+" · "+(r.side?"side":"no side");
-    return '<li><button type="button" data-bmidate="'+esc(r.date)+'" style="width:100%;text-align:left;background:transparent;border:none;padding:0"><div class="name">'+esc(fmtDate(r.date))+'</div><div class="meta">'+(b==null?"BMI —":esc(String(b))+" BMI")+" · "+esc(photos)+'</div></button></li>';
+    const b = bmiFrom(r.weight, r.heightIn || fallback);
+    const band = bmiBandName(b);
+    const tapes = TAPE_FIELDS.map(([k,label])=> r.tapes && r.tapes[k] ? label+" "+r.tapes[k] : "").filter(Boolean).join(" · ");
+    const bmiLine = b==null ? "BMI —" : b+" "+band;
+    return '<li><button type="button" data-bmidate="'+esc(r.date)+'" style="width:100%;text-align:left;background:transparent;border:none;padding:0"><div class="name">'+esc(fmtDate(r.date))+'</div><div class="meta">'+esc(bmiLine)+(tapes?" · "+esc(tapes):"")+'</div></button></li>';
   }).join("")+"</ul>";
   $("bmiList").querySelectorAll("[data-bmidate]").forEach(btn=>{
     btn.onclick = ()=>{
@@ -5239,7 +5277,7 @@ function saveBmi(){
     if(n>0) tapes[k] = r1(n);
   });
   S.settings.heightIn = r1(inches);
-  const entry = {id:date, date:date, weight:r1(weight), tapes:tapes, front:bmiShot.front||"", side:bmiShot.side||""};
+  const entry = {id:date, date:date, weight:r1(weight), heightIn:r1(inches), tapes:tapes, front:bmiShot.front||"", side:bmiShot.side||""};
   S.bmi = normalizeBmi((S.bmi||[]).filter(r=>r.date!==date).concat(entry));
   const existing = (S.weights||[]).find(w=>w.date===date);
   if(existing) existing.weight = r1(weight);
