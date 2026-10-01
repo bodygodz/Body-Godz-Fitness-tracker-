@@ -7,31 +7,35 @@
 <title>Curly Gurl Fitness</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;background:#4c1d95;color:#f8f5ff}
+html,body{margin:0;background:#fff;color:#1c1430}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:17px;line-height:1.5}
 a{color:inherit}
 .serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 28px;background:#3b1578;border-bottom:1px solid rgba(255,255,255,.18);position:sticky;top:0;z-index:5}
-.brand{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:22px;font-weight:600;color:#fff;text-decoration:none;letter-spacing:.01em;line-height:1.15}
-.nav{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
-.nav a{color:#fff;text-decoration:none;font-weight:700;font-size:16px}
-.nav a.login{background:#fff;color:#1c1430;border-radius:8px;padding:8px 14px}
-.hero{display:grid;grid-template-columns:1fr 1.15fr;gap:36px;align-items:center;max-width:1100px;margin:0 auto;padding:56px 28px 28px}
-.hero h1{margin:0 0 12px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:64px;font-weight:600;line-height:1.02;letter-spacing:-.02em;color:#fff}
-.hero p{margin:0;max-width:28em;color:#f3e8ff;font-size:18px}
-.hero img{width:100%;height:380px;object-fit:cover;border-radius:18px;display:block;background:#efeaf6}
-.band{max-width:1100px;margin:0 auto;padding:28px 28px 8px}
-.band h2{margin:0 0 8px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:36px;font-weight:600;color:#fff}
-.band .sub{margin:0 0 18px;color:#f3e8ff}
-.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 32px;background:#fff;border-bottom:1px solid #e7e0f0;position:sticky;top:0;z-index:5}
+.brand{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:22px;font-weight:600;color:#4c1d95;text-decoration:none;letter-spacing:.01em;line-height:1.15;white-space:nowrap}
+.nav{display:flex;align-items:center;gap:22px}
+.nav a{color:#1c1430;text-decoration:none;font-weight:700;font-size:16px}
+.nav a.login{background:#4c1d95;color:#fff;border-radius:8px;padding:8px 14px}
+.hero{display:grid;grid-template-columns:1fr 1.15fr;gap:40px;align-items:center;max-width:1100px;margin:0 auto;padding:64px 32px 36px}
+.hero h1{margin:0 0 12px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:64px;font-weight:600;line-height:1.02;letter-spacing:-.02em;color:#4c1d95}
+.hero p{margin:0;max-width:26em;color:#3a3148;font-size:18px}
+.hero img{width:100%;height:420px;object-fit:cover;border-radius:16px;display:block;background:#efeaf6}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1100px;margin:0 auto;padding:12px 32px 36px}
+.feature{background:#4c1d95;color:#fff;border-radius:16px;padding:22px 20px}
+.feature h2{margin:0 0 8px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:26px;font-weight:600}
+.feature p{margin:0;color:#f3e8ff;font-size:16px}
+.classes{max-width:1100px;margin:0 auto;padding:12px 32px 40px}
+.classes h2{margin:0 0 16px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:36px;font-weight:600;color:#4c1d95}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .gallery figure{margin:0}
-.gallery img{width:100%;height:220px;object-fit:cover;border-radius:14px;display:block;background:#efeaf6}
-.gallery figcaption{margin-top:8px;font-weight:700;color:#fff}
-.shop{background:#fff;color:#1c1430;margin-top:36px}
-.shop .inner{max-width:1100px;margin:0 auto;padding:48px 28px}
-.shop h2{margin:0 0 8px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:36px;font-weight:600;color:#1c1430}
-.shop p{margin:0;max-width:36em;font-size:18px}
-.quote{max-width:760px;margin:0 auto;padding:48px 28px 56px}
+.gallery img{width:100%;height:210px;object-fit:cover;border-radius:14px;display:block;background:#efeaf6}
+.gallery figcaption{margin-top:8px;font-weight:700}
+.shop{background:#4c1d95;color:#fff}
+.shop .inner{max-width:1100px;margin:0 auto;padding:48px 32px}
+.shop h2{margin:0 0 8px;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:36px;font-weight:600}
+.shop p{margin:0;max-width:34em;font-size:18px;color:#f3e8ff}
+footer{background:#4c1d95}
+.quote{max-width:760px;margin:0 auto;padding:36px 32px 48px}
 .welcome-close{display:flex;align-items:center;gap:14px;background:transparent}
 .creator-frame{width:112px;height:112px;border-radius:50%;overflow:hidden;flex:none;position:relative;background:#fff}
 .welcome-close img.creator{position:absolute;width:132px;height:180px;max-width:none;left:-34px;top:10px;object-fit:fill;border-radius:0}
@@ -39,16 +43,19 @@ a{color:inherit}
 .welcome-close img.script{width:auto;height:84px;max-width:100%;object-fit:contain;object-position:left center;background:transparent;border-radius:0}
 .welcome-sign{display:block;height:15px;width:auto;margin:0;background:transparent}
 @media (max-width:720px){
-  .topbar{flex-direction:column;align-items:flex-start;gap:10px;padding:14px 16px}
-  .nav{gap:16px}
-  .hero{grid-template-columns:1fr;padding:28px 16px 8px;gap:18px}
-  .hero h1{font-size:42px}
+  .topbar{padding:12px 14px}
+  .brand{font-size:18px}
+  .nav{gap:12px}
+  .nav a{font-size:14px}
+  .hero{grid-template-columns:1fr;gap:18px;padding:28px 16px 12px}
+  .hero h1{font-size:40px}
   .hero img{height:220px}
-  .band{padding:28px 16px 8px}
+  .features{grid-template-columns:1fr;padding:8px 16px 20px}
+  .classes{padding:8px 16px 24px}
   .gallery{grid-template-columns:1fr}
-  .gallery img{height:200px}
+  .gallery img{height:190px}
   .shop .inner{padding:32px 16px}
-  .quote{padding:32px 16px 40px}
+  .quote{padding:28px 16px 36px}
 }
 </style>
 </head>
@@ -64,14 +71,27 @@ a{color:inherit}
   </header>
   <section class="hero" id="home">
     <div>
-      <h1>Curly Gurl Fitness</h1>
-      <p>A place for class, community, and the people who train with us. Members open the tracker from Log in.</p>
+      <h1>Come to class.</h1>
+      <p>The room is the workout. Log in when you need the tracker.</p>
     </div>
     <img src="images/welcome-rooftop.jpg" alt="Curly Gurl class on the roof">
   </section>
-  <section class="band" id="classes">
+  <section class="features">
+    <article class="feature">
+      <h2>Training</h2>
+      <p>The session is written for the people in the room.</p>
+    </article>
+    <article class="feature">
+      <h2>Community</h2>
+      <p>You train with the class, not alone on a screen.</p>
+    </article>
+    <article class="feature">
+      <h2>Shop</h2>
+      <p>Nothing is for sale here yet.</p>
+    </article>
+  </section>
+  <section class="classes" id="classes">
     <h2>Classes</h2>
-    <p class="sub">Training together, from the roof to the floor.</p>
     <div class="gallery">
       <figure>
         <img src="images/welcome-rooftop.jpg" alt="Curly Gurl class on the roof">
@@ -90,19 +110,21 @@ a{color:inherit}
   <section class="shop" id="shop">
     <div class="inner">
       <h2>Shop</h2>
-      <p>The shop is not open. There is nothing for sale here.</p>
+      <p>The shop is not open yet.</p>
     </div>
   </section>
-  <section class="quote">
-    <div class="welcome-close">
-      <div class="creator-frame">
-        <img class="creator" src="images/creator.jpg" alt="Marquita Foster">
-      </div>
-      <div class="welcome-quote">
-        <img class="script" src="images/welcome-script.png" alt="Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.">
-        <img class="welcome-sign" src="images/marquita-foster.png" alt="Marquita Foster">
+  <footer>
+    <div class="quote">
+      <div class="welcome-close">
+        <div class="creator-frame">
+          <img class="creator" src="images/creator.jpg" alt="Marquita Foster">
+        </div>
+        <div class="welcome-quote">
+          <img class="script" src="images/welcome-script.png" alt="Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.">
+          <img class="welcome-sign" src="images/marquita-foster.png" alt="Marquita Foster">
+        </div>
       </div>
     </div>
-  </section>
+  </footer>
 </body>
 </html>
