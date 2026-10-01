@@ -474,6 +474,18 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 .setupcard{background:#fff;color:#1c1430}
 .setupcard input,.setupcard textarea{background:#fff;color:#1c1430;border-color:#e7e0f0}
 .codebig{color:#7c3aed}
+body.member-look:not(.welcome-on),
+body.member-look:not(.welcome-on) header,
+body.member-look:not(.welcome-on) .navmenu,
+body.member-look:not(.welcome-on) .menulogout{background:var(--member-page,#4c1d95);background-color:var(--member-page,#4c1d95)}
+body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(--member-page,#4c1d95) 70%,transparent)}
+.lookpicks{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
+.lookpicks button{display:inline-flex;align-items:center;gap:6px;background:#fff;color:#1c1430;border:1.5px solid #e7e0f0;border-radius:999px;padding:6px 10px;font-size:12px}
+.lookpicks button.sel{border-color:#db2777;color:#9d174d}
+.lookswatch{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.bubbleedit{display:flex;gap:12px;align-items:center}
+.bubbleedit img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center 22%;background:#4c1d95;flex:none}
+.bubbleedit .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 
 </style>
 </head>
@@ -685,6 +697,26 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 <main>
 <!-- ============ TODAY ============ -->
 <section class="page active" id="page-today">
+  <div class="card" id="myPageCard" hidden>
+    <h2>My page</h2>
+    <p class="note">Change the color of your diary and the photo in your bubble. This stays on this phone. It does not change the login page or anyone else's pages.</p>
+    <div class="lookpicks" id="lookPicks">
+      <button type="button" data-look="purple" aria-pressed="true"><span class="lookswatch" style="background:#4c1d95"></span>Purple</button>
+      <button type="button" data-look="plum" aria-pressed="false"><span class="lookswatch" style="background:#3b0764"></span>Plum</button>
+      <button type="button" data-look="rose" aria-pressed="false"><span class="lookswatch" style="background:#9d174d"></span>Rose</button>
+      <button type="button" data-look="night" aria-pressed="false"><span class="lookswatch" style="background:#1e1b4b"></span>Night</button>
+    </div>
+    <div class="bubbleedit">
+      <img id="bubblePreview" src="images/header-portrait.jpg" alt="">
+      <div class="grow">
+        <button type="button" id="bubbleCamBtn">Take photo</button>
+        <button type="button" id="bubbleLibBtn">Choose photo</button>
+        <button type="button" id="bubbleClear">Use the original</button>
+      </div>
+    </div>
+    <input id="bubbleCamFile" type="file" accept="image/*" capture="environment" hidden>
+    <input id="bubbleLibFile" type="file" accept="image/*" hidden>
+  </div>
   <div id="targetBanner" hidden></div>
   <div class="weekdots" id="weekDots"></div>
   <button type="button" class="promptcard" id="weightPrompt">
@@ -2195,6 +2227,7 @@ function openHabit(which){
 }
 function closeHabit(){ $("habitSheet").style.display = "none"; }
 function renderToday(){
+  paintMyPage();
   const t = diaryDate, tot = totals(t), st = S.settings;
   $("hdrSub").textContent = fmtDate(t,{weekday:"long",month:"long",day:"numeric"});
   const calTarget = st.calTarget || 2793;
@@ -4375,9 +4408,10 @@ function setRole(role){
   $("roleGate").style.display = "none";
   updateDemoBanner();
   toast(role==="trainer"?"Trainer mode":role==="client"?"Client mode":"Personal tracker");
+  applyMemberLook();
   if(role==="trainer" || role==="client") go("coach");
   else if(currentTab==="coach" || currentTab==="settings") render();
-  else updateDemoBanner();
+  else { updateDemoBanner(); paintMyPage(); }
   syncMenu();
 }
 function maybeGate(){
@@ -5407,6 +5441,7 @@ function render(){
   applyClientLock();
   paintHeader();
   paintSubbar();
+  applyMemberLook();
   ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
@@ -5433,10 +5468,75 @@ async function passHash(pw){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
   return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2,"0")).join("");
 }
-function paintChrome(){
-  document.documentElement.style.backgroundColor = "#4c1d95";
+const MEMBER_LOOK_KEY = "curlyGirlFitness.memberLook.v1";
+const MEMBER_LOOKS = {purple:"#4c1d95", plum:"#3b0764", rose:"#9d174d", night:"#1e1b4b"};
+const BUBBLE_FALLBACK = "images/header-portrait.jpg";
+function memberCanStyle(){
+  return !document.body.classList.contains("welcome-on") && (ID.role==="client" || ID.role==="solo");
+}
+function memberKey(){
+  const auth = currentAuth();
+  if(auth && auth.id) return "acct:"+auth.id;
+  if(ID && ID.deviceId) return "dev:"+ID.deviceId;
+  return "";
+}
+function readMemberLooks(){
+  const all = readStore(localStorage, MEMBER_LOOK_KEY);
+  return all && typeof all==="object" && !Array.isArray(all) ? all : {};
+}
+function readMyLook(){
+  const key = memberKey();
+  const row = key ? readMemberLooks()[key] : null;
+  const look = row && MEMBER_LOOKS[row.look] ? row.look : "purple";
+  const bubble = row && typeof row.bubble==="string" && row.bubble.indexOf("data:image/")===0 ? row.bubble : "";
+  return {look:look, bubble:bubble};
+}
+function writeMyLook(patch){
+  if(!memberCanStyle()) return;
+  const key = memberKey();
+  if(!key) return;
+  const all = readMemberLooks();
+  const cur = all[key] && typeof all[key]==="object" ? all[key] : {look:"purple", bubble:""};
+  const next = Object.assign({}, cur, patch);
+  if(next.look && !MEMBER_LOOKS[next.look]) next.look = "purple";
+  if(next.bubble && String(next.bubble).indexOf("data:image/")!==0) next.bubble = "";
+  all[key] = next;
+  try { localStorage.setItem(MEMBER_LOOK_KEY, JSON.stringify(all)); }
+  catch(e){ throw new Error("That photo is too large for this phone"); }
+}
+function applyMemberLook(){
+  const styling = memberCanStyle();
+  document.body.classList.toggle("member-look", styling);
+  const mine = readMyLook();
+  const page = styling ? MEMBER_LOOKS[mine.look] : "#4c1d95";
+  if(styling) document.body.style.setProperty("--member-page", page);
+  else document.body.style.removeProperty("--member-page");
+  document.documentElement.style.backgroundColor = page;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute("content", "#4c1d95");
+  if(meta) meta.setAttribute("content", page);
+  const img = document.querySelector("#menuBtn img");
+  if(img){
+    const next = styling && mine.bubble ? mine.bubble : BUBBLE_FALLBACK;
+    if(img.getAttribute("src")!==next) img.src = next;
+  }
+}
+function paintMyPage(){
+  const card = $("myPageCard");
+  if(!card) return;
+  const on = memberCanStyle();
+  card.hidden = !on;
+  if(!on) return;
+  const mine = readMyLook();
+  document.querySelectorAll("#lookPicks [data-look]").forEach(btn=>{
+    const sel = btn.dataset.look===mine.look;
+    btn.classList.toggle("sel", sel);
+    btn.setAttribute("aria-pressed", sel ? "true" : "false");
+  });
+  const prev = $("bubblePreview");
+  if(prev) prev.src = mine.bubble || BUBBLE_FALLBACK;
+}
+function paintChrome(){
+  applyMemberLook();
 }
 function showWelcome(view){
   applyClientLock();
@@ -5607,6 +5707,44 @@ $("loginForm").onsubmit = (e) => {
   });
 };
 $("logOutBtn").onclick = () => logOut();
+$("lookPicks").onclick = (e) => {
+  const btn = e.target.closest("[data-look]");
+  if(!btn || !memberCanStyle()) return;
+  writeMyLook({look:btn.dataset.look});
+  applyMemberLook();
+  paintMyPage();
+};
+async function onBubbleFile(file){
+  if(!file || !memberCanStyle()) return;
+  try {
+    const blob = await compressImage(file, 480, 0.72);
+    const url = await blobToDataUrl(blob);
+    writeMyLook({bubble:url});
+    applyMemberLook();
+    paintMyPage();
+    toast("Photo bubble updated on this phone");
+  } catch(err) {
+    toast(err && err.message ? err.message : "Could not use that photo");
+  }
+}
+$("bubbleCamBtn").onclick = () => $("bubbleCamFile").click();
+$("bubbleLibBtn").onclick = () => $("bubbleLibFile").click();
+$("bubbleCamFile").onchange = () => {
+  const file = $("bubbleCamFile").files && $("bubbleCamFile").files[0];
+  $("bubbleCamFile").value = "";
+  onBubbleFile(file);
+};
+$("bubbleLibFile").onchange = () => {
+  const file = $("bubbleLibFile").files && $("bubbleLibFile").files[0];
+  $("bubbleLibFile").value = "";
+  onBubbleFile(file);
+};
+$("bubbleClear").onclick = () => {
+  if(!memberCanStyle()) return;
+  writeMyLook({bubble:""});
+  applyMemberLook();
+  paintMyPage();
+};
 paintSignupRole();
 
 const initial = (location.hash||"").slice(1);
