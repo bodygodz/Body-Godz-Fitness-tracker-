@@ -57,6 +57,7 @@ Training — Pexels. These show Black women and Black men working out.
 - images/work/weights.jpg — dumbbells and kettlebells on a rack, no people — https://www.pexels.com/photo/949126/
 
 Owner photos — files supplied for this app and stored in the repo.
+- images/welcome-rooftop.jpg — class on a rooftop, used for one welcome bubble. The poster headline was removed before it was saved.
 - images/library-step.jpg — step class on green turf, shown on the exercise library card
 - images/header-portrait.jpg — portrait on the right of the Curly Gurl Fitness title
 - images/work/lower-body.jpg — group class on pink mats by a pool, used for the Lower Body workout
