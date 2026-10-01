@@ -486,6 +486,10 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
 .bubbleedit{display:flex;gap:12px;align-items:center}
 .bubbleedit img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center 22%;background:#4c1d95;flex:none}
 .bubbleedit .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+#scanVideo{width:100%;height:220px;background:#1c1430;border-radius:12px;display:block;object-fit:cover;margin:0 0 8px}
+#scanResult{margin-top:12px}
+#scanFoodName{font-weight:800;color:#1c1430;margin:0 0 4px}
+#scanScaled{font-weight:700;color:#1c1430;margin:8px 0}
 
 </style>
 </head>
@@ -824,6 +828,25 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
     <div class="chips" id="presetChips"></div>
     <div class="note" style="margin-top:8px">Preset macros are <b>rough estimates</b>. Tapping one fills the form below so you can adjust before adding. Edit the defaults in Settings.</div>
     <button class="full" id="mealsCook" style="margin-top:10px">Browse cookbook</button>
+    <button type="button" class="full" id="scanFood" style="margin-top:8px">Scan barcode</button>
+    <p class="note" id="scanNote" hidden></p>
+    <div id="scanBox" hidden>
+      <video id="scanVideo" playsinline muted autoplay></video>
+      <button type="button" class="full" id="scanClose">Close camera</button>
+    </div>
+    <div id="scanResult" hidden>
+      <p id="scanFoodName"></p>
+      <p class="note" id="scanBasis"></p>
+      <ul class="list" id="scanPer"></ul>
+      <div class="row">
+        <div class="field"><label class="f" for="scanAmount">How much</label><input id="scanAmount" type="number" inputmode="decimal" min="0" step="0.1" value="100"></div>
+        <div class="field"><label class="f" for="scanUnit">Unit</label>
+          <select id="scanUnit"><option value="g">Grams</option><option value="oz">Ounces</option><option value="lb">Pounds</option></select>
+        </div>
+      </div>
+      <p id="scanScaled"></p>
+      <button type="button" class="primary full" id="scanAdd">Add this amount</button>
+    </div>
     <div style="margin-top:12px">
       <div class="field"><label class="f">Food</label><input id="fName" placeholder="e.g. Turkey sandwich"></div>
       <div class="row">
@@ -2064,7 +2087,7 @@ function tabGroup(tab){
   return "";
 }
 function clientView(){ return ID.role==="client"; }
-function clientAllows(tab){ return tab==="today" || tab==="checkin" || tab==="photos" || tab==="coach"; }
+function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="checkin" || tab==="photos" || tab==="coach"; }
 function go(tab){
   if(!TITLES[tab]) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
@@ -2072,6 +2095,7 @@ function go(tab){
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+tab));
   $("hdrTitle").textContent = TITLES[tab];
   if(typeof closeTools==="function") closeTools();
+  if(typeof stopFoodScan==="function") stopFoodScan();
   render();
   if(typeof syncCoachTab==="function") syncCoachTab(tab);
   if(typeof syncVideosTab==="function") syncVideosTab(tab);
@@ -2483,7 +2507,7 @@ function renderMealPlanList(){
     const g = items.filter(m=>m.type===type); if(!g.length) return "";
     const gc = g.reduce((a,m)=>a+(+m.cal||0),0), gp=g.reduce((a,m)=>a+(+m.protein||0),0);
     return `<div class="mealgroup"><h3>${cap(type)} <span>${Math.round(gc)} kcal · ${r1(gp)}g</span></h3><ul class="list">${
-      g.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delplan="${m.id}" aria-label="Delete">×</button></li>`).join("")
+      g.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${foodMeta(m)}</div></div><button class="x" data-delplan="${m.id}" aria-label="Delete">×</button></li>`).join("")
     }</ul></div>`;
   }).join("");
   document.querySelectorAll("[data-delplan]").forEach(b=>b.onclick=()=>{
@@ -2499,7 +2523,7 @@ function renderMealLogList(){
     const g = ms.filter(m=>m.type===type); if(!g.length) return "";
     const gc = g.reduce((a,m)=>a+(+m.cal||0),0), gp=g.reduce((a,m)=>a+(+m.protein||0),0);
     return `<div class="mealgroup"><h3>${cap(type)} <span>${Math.round(gc)} kcal · ${r1(gp)}g</span></h3><ul class="list">${
-      g.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${Math.round(m.cal)} kcal · ${r1(m.protein)}g protein</div></div><button class="x" data-delmeal="${m.id}" aria-label="Delete">×</button></li>`).join("")
+      g.map(m=>`<li>${photoTag(foodFileForMeal(m),"","thumb")}<div class="grow"><div class="name">${esc(m.name)}</div><div class="meta">${foodMeta(m)}</div></div><button class="x" data-delmeal="${m.id}" aria-label="Delete">×</button></li>`).join("")
     }</ul></div>`;
   }).join("");
   document.querySelectorAll("[data-delmeal]").forEach(b=>b.onclick=()=>{
@@ -2546,12 +2570,24 @@ function renderMeals(){
   if(!$("mCopyFromDate").value) $("mCopyFromDate").value = t;
   if(!$("mCopyToDate").value) $("mCopyToDate").value = addDays(t,1);
 }
+function foodMeta(m){
+  const bits = [];
+  if(m.cal!=null && m.cal!=="") bits.push(Math.round(+m.cal)+" kcal");
+  if(m.carbs!=null && m.carbs!=="") bits.push(r1(m.carbs)+"g carbs");
+  if(m.fat!=null && m.fat!=="") bits.push(r1(m.fat)+"g fat");
+  if(m.protein!=null && m.protein!=="") bits.push(r1(m.protein)+"g protein");
+  return bits.join(" · ");
+}
+function listedMacro(v){
+  if(v==null || v==="") return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n>=0 ? r1(n) : null;
+}
 function addMealOrPlan(){
-  const name=$("fName").value.trim(), cal=num($("fCal").value), pro=num($("fPro").value);
+  const name=$("fName").value.trim(), cal=num($("fCal").value);
   if(!name){ toast("Enter a food name"); $("fName").focus(); return; }
   if(cal==null||cal<0){ toast("Enter calories"); $("fCal").focus(); return; }
-  const carb=num($("fCarb").value), fat=num($("fFat").value);
-  const item = {id:uid(), name, cal:Math.round(cal), protein:pro!=null&&pro>=0?r1(pro):0, carbs:carb!=null&&carb>=0?r1(carb):0, fat:fat!=null&&fat>=0?r1(fat):0, type:$("fType").value};
+  const item = {id:uid(), name, cal:Math.round(cal), protein:listedMacro($("fPro").value), carbs:listedMacro($("fCarb").value), fat:listedMacro($("fFat").value), type:$("fType").value};
   if(effectiveAddMode()==="plan"){
     const list = plansOn(mealDate).slice();
     list.push(item);
@@ -2563,6 +2599,221 @@ function addMealOrPlan(){
   }
 }
 $("fAdd").onclick = addMealOrPlan;
+
+let scanControls = null;
+let scanHit = null;
+let scanLock = false;
+function showScanNote(msg){
+  const note = $("scanNote");
+  note.hidden = false;
+  note.textContent = msg;
+}
+function stopFoodScan(){
+  if(scanControls && typeof scanControls.stop==="function"){
+    try { scanControls.stop(); } catch(e){}
+  }
+  scanControls = null;
+  const video = $("scanVideo");
+  if(video && video.srcObject){
+    const tracks = video.srcObject.getTracks ? video.srcObject.getTracks() : [];
+    tracks.forEach(t=>{ try { t.stop(); } catch(e){} });
+    video.srcObject = null;
+  }
+  if($("scanBox")) $("scanBox").hidden = true;
+}
+function loadZXing(){
+  if(window.ZXing && window.ZXing.BrowserMultiFormatReader) return Promise.resolve();
+  if(loadZXing.promise) return loadZXing.promise;
+  loadZXing.promise = new Promise((resolve, reject)=>{
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/@zxing/library@0.18.6/umd/index.min.js";
+    s.onload = () => (window.ZXing && window.ZXing.BrowserMultiFormatReader) ? resolve() : reject(new Error("The scanner didn't load. Type the food instead."));
+    s.onerror = () => reject(new Error("The scanner didn't load. Type the food instead."));
+    document.head.appendChild(s);
+  });
+  return loadZXing.promise;
+}
+function nutNumber(bag, key){
+  if(!bag || bag[key]==null || bag[key]==="") return null;
+  const n = Number(bag[key]);
+  return Number.isFinite(n) ? n : null;
+}
+function gramsInServing(text){
+  if(!text) return null;
+  const raw = String(text);
+  const g = raw.match(/(\d+(?:[.,]\d+)?)\s*g\b/i);
+  if(g) return parseFloat(g[1].replace(",","."));
+  const oz = raw.match(/(\d+(?:[.,]\d+)?)\s*oz\b/i);
+  if(oz) return parseFloat(oz[1].replace(",","."))*28.349523125;
+  return null;
+}
+function per100FromProduct(product){
+  const n = product.nutriments || {};
+  let cal = nutNumber(n, "energy-kcal_100g");
+  let carbs = nutNumber(n, "carbohydrates_100g");
+  let fat = nutNumber(n, "fat_100g");
+  let protein = nutNumber(n, "proteins_100g");
+  if(cal==null && carbs==null && fat==null && protein==null){
+    const servingG = gramsInServing(product.serving_size);
+    if(servingG && servingG>0){
+      const lift = (v) => v==null ? null : v * 100 / servingG;
+      cal = lift(nutNumber(n, "energy-kcal_serving"));
+      carbs = lift(nutNumber(n, "carbohydrates_serving"));
+      fat = lift(nutNumber(n, "fat_serving"));
+      protein = lift(nutNumber(n, "proteins_serving"));
+    }
+  }
+  return {cal:cal, carbs:carbs, fat:fat, protein:protein};
+}
+function amountGrams(){
+  const amount = Number($("scanAmount").value);
+  const unit = $("scanUnit").value;
+  if(!Number.isFinite(amount) || amount<=0) return null;
+  if(unit==="oz") return amount * 28.349523125;
+  if(unit==="lb") return amount * 453.59237;
+  return amount;
+}
+function scaleNut(v, grams){
+  if(v==null || grams==null) return null;
+  return v * grams / 100;
+}
+function trimAmount(v){
+  const n = Number(v);
+  if(!Number.isFinite(n)) return "";
+  return String(Math.round(n*1000)/1000);
+}
+function nutBits(n){
+  const show = (label, v, suffix) => label+" "+(v==null ? "not listed" : (label==="Calories" ? Math.round(v) : Math.round(v*10)/10)+suffix);
+  return [show("Calories", n.cal, ""), show("carbs", n.carbs, " g"), show("fat", n.fat, " g"), show("protein", n.protein, " g")].join(" · ");
+}
+function paintScanHit(){
+  if(!scanHit) return;
+  const grams = amountGrams();
+  const per = scanHit.per;
+  const scaled = {cal:scaleNut(per.cal, grams), carbs:scaleNut(per.carbs, grams), fat:scaleNut(per.fat, grams), protein:scaleNut(per.protein, grams)};
+  const unit = $("scanUnit").value;
+  const unitWord = unit==="oz" ? "oz" : unit==="lb" ? "lb" : "g";
+  $("scanFoodName").textContent = scanHit.name;
+  $("scanBasis").textContent = "Per 100 g. These are the numbers from the package listing.";
+  $("scanPer").innerHTML = [
+    ["Calories", per.cal, ""],
+    ["Carbs", per.carbs, " g"],
+    ["Fat", per.fat, " g"],
+    ["Protein", per.protein, " g"]
+  ].map(([label, v, suffix])=>`<li><div class="grow"><div class="name">${label}</div></div><div class="meta">${v==null?"Not listed":(label==="Calories"?Math.round(v):Math.round(v*10)/10)+suffix}</div></li>`).join("");
+  $("scanScaled").textContent = grams==null ? "Enter how much you ate." : "This amount ("+trimAmount($("scanAmount").value)+" "+unitWord+"): "+nutBits(scaled);
+  if(grams!=null){
+    $("fName").value = scanHit.name+" · "+trimAmount($("scanAmount").value)+" "+unitWord;
+    $("fCal").value = scaled.cal==null ? "" : String(Math.round(scaled.cal));
+    $("fCarb").value = scaled.carbs==null ? "" : String(Math.round(scaled.carbs*10)/10);
+    $("fFat").value = scaled.fat==null ? "" : String(Math.round(scaled.fat*10)/10);
+    $("fPro").value = scaled.protein==null ? "" : String(Math.round(scaled.protein*10)/10);
+  }
+}
+async function applyBarcode(code){
+  const clean = String(code||"").replace(/\D/g,"");
+  scanHit = null;
+  $("scanResult").hidden = true;
+  if(!clean){
+    showScanNote("That barcode wasn't readable. Type the food instead.");
+    return;
+  }
+  showScanNote("Looking up barcode "+clean+"…");
+  try {
+    const res = await fetch("https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(clean)+".json?fields=product_name,product_name_en,generic_name,serving_size,nutriments");
+    if(!res.ok) throw new Error("The food lookup didn't answer. Type the food instead.");
+    const data = await res.json();
+    if(!data || data.status!==1 || !data.product){
+      if($("fName").value.indexOf(" · ")>=0) $("fName").value = "";
+      $("fCal").value = $("fCarb").value = $("fFat").value = $("fPro").value = "";
+      showScanNote("No food found for barcode "+clean+". Type the food instead.");
+      return;
+    }
+    const product = data.product;
+    const name = String(product.product_name || product.product_name_en || product.generic_name || "").trim();
+    const per = per100FromProduct(product);
+    const any = per.cal!=null || per.carbs!=null || per.fat!=null || per.protein!=null;
+    if(!any){
+      showScanNote((name || "That barcode")+" has no calories or macros listed. Type the food instead.");
+      if(name) $("fName").value = name;
+      $("fCal").value = $("fCarb").value = $("fFat").value = $("fPro").value = "";
+      return;
+    }
+    scanHit = {name: name || "Scanned food", per: per, code: clean};
+    $("scanAmount").value = "100";
+    $("scanUnit").value = "g";
+    paintScanHit();
+    $("scanNote").hidden = true;
+    $("scanResult").hidden = false;
+  } catch(err) {
+    showScanNote(err && err.message ? err.message : "The food lookup didn't answer. Type the food instead.");
+  } finally {
+    scanLock = false;
+  }
+}
+async function startFoodScan(){
+  stopFoodScan();
+  scanHit = null;
+  $("scanResult").hidden = true;
+  $("scanNote").hidden = true;
+  const video = $("scanVideo");
+  video.setAttribute("playsinline","true");
+  video.playsInline = true;
+  video.muted = true;
+  $("scanBox").hidden = false;
+  try {
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      throw new Error("This phone can't open the camera here. Type the food instead.");
+    }
+    await loadZXing();
+    const hints = new Map();
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+      ZXing.BarcodeFormat.EAN_13,
+      ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.UPC_A,
+      ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.CODE_128
+    ]);
+    const reader = new ZXing.BrowserMultiFormatReader(hints);
+    scanControls = await reader.decodeFromConstraints(
+      {audio:false, video:{facingMode:{ideal:"environment"}}},
+      video,
+      (result) => {
+        if(!result || scanLock) return;
+        const code = String(result.getText ? result.getText() : result.text || "");
+        if(!/^\d{8,14}$/.test(code.replace(/\D/g,""))) return;
+        scanLock = true;
+        stopFoodScan();
+        applyBarcode(code);
+      }
+    );
+  } catch(err) {
+    stopFoodScan();
+    const raw = err && err.message ? err.message : "";
+    const plain = /didn't load|Type the food|can't open the camera/.test(raw) ? raw : "The camera didn't open. Type the food instead.";
+    showScanNote(plain);
+  }
+}
+function addScannedAmount(){
+  if(!scanHit) return;
+  if(amountGrams()==null){ toast("Enter how much you ate"); $("scanAmount").focus(); return; }
+  paintScanHit();
+  if(scanHit.per.cal==null){
+    toast("Calories are not listed for this barcode. Type them instead.");
+    $("fCal").focus();
+    return;
+  }
+  addMealOrPlan();
+  scanHit = null;
+  $("scanResult").hidden = true;
+  $("scanAmount").value = "100";
+  $("scanUnit").value = "g";
+}
+$("scanFood").onclick = () => startFoodScan();
+$("scanClose").onclick = () => stopFoodScan();
+$("scanAdd").onclick = () => addScannedAmount();
+$("scanAmount").addEventListener("input", ()=>{ if(scanHit) paintScanHit(); });
+$("scanUnit").addEventListener("change", ()=>{ if(scanHit) paintScanHit(); });
 function copyPlans(fromDate, toDate){
   if(!fromDate || !toDate){ toast("Pick a date"); return false; }
   if(fromDate===toDate){ toast("Pick a different day"); return false; }
@@ -5764,7 +6015,7 @@ const linkNote = $("clientLinkNote");
 if(linkNote) linkNote.textContent = "Clients sign up or log in from the shared link: " + location.origin + location.pathname + "?join";
 applyClientLock();
 showWelcome("home");
-window.__fitness = {get state(){return S;}, KEY};
+window.__fitness = {get state(){return S;}, KEY, applyBarcode};
 })();
 </script>
 </body>
