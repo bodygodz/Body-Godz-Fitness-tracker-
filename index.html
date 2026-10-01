@@ -227,9 +227,11 @@ button.morelink{background:transparent;border:none;color:#db2777;font-weight:800
 .welcome .card .remember input{width:18px;height:18px;min-width:18px;flex:none;margin:0;padding:0;accent-color:#db2777}
 .welcome-back{margin:0 0 12px}
 #welcomeSignup,#welcomeLogin{padding:8px 0 28px}
-.welcome-close{display:flex;align-items:center;gap:10px;margin:28px 16px 108px;padding:0;background:transparent}
-.welcome-close img.creator{width:128px;height:128px;object-fit:cover;object-position:center 22%;flex:none;border-radius:50%;background:#fff}
-.welcome-close img.script{width:auto;height:92px;max-width:100%;object-fit:contain;object-position:left center;flex:1 1 auto;background:transparent;border-radius:0}
+.welcome-close{display:flex;align-items:center;gap:10px;margin:28px 16px 6px;padding:0;background:transparent}
+.creator-frame{width:112px;height:112px;border-radius:50%;overflow:hidden;flex:none;position:relative;background:#fff}
+.welcome-close img.creator{position:absolute;width:132px;height:180px;max-width:none;left:-34px;top:10px;object-fit:fill;border-radius:0}
+.welcome-close img.script{width:auto;height:84px;max-width:100%;object-fit:contain;object-position:left center;flex:1 1 auto;background:transparent;border-radius:0}
+.welcome-sign{display:block;height:46px;width:auto;margin:0 18px 108px auto;background:transparent}
 .hl{color:var(--accent)}
 details summary{cursor:pointer;color:var(--muted);font-size:12px;padding:4px 0}
 .presetedit{display:grid;grid-template-columns:1fr 70px 60px 34px;gap:6px;margin-bottom:6px;align-items:center}
@@ -713,9 +715,12 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
     </form>
   </div>
   <div class="welcome-close">
-    <img class="creator" src="images/creator.jpg" alt="Curly Gurl Fitness creator">
+    <div class="creator-frame">
+      <img class="creator" src="images/creator.jpg" alt="Curly Gurl Fitness creator">
+    </div>
     <img class="script" src="images/welcome-script.png" alt="Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.">
   </div>
+  <img class="welcome-sign" src="images/marquita-foster.png" alt="Marquita Foster">
   <div class="welcome-dock" id="welcomeDock">
     <button type="button" id="welcomeLoginBtn">Log in</button>
     <button type="button" class="primary" id="welcomeSignupBtn">Sign up</button>
