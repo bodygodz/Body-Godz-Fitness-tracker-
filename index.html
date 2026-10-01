@@ -222,6 +222,8 @@ button.morelink{background:transparent;border:none;color:#f9a8d4;font-weight:800
 .welcome-dock button.primary{background:#db2777;color:#fff;border-color:#db2777}
 #welcomeHome{padding-bottom:92px}
 .welcome .card p.note{color:#e4dcf5;font-size:11.5px}
+.remember{display:flex;align-items:center;gap:8px;margin:2px 0 12px;font-weight:600;font-size:14px;color:#f8f5ff}
+.welcome .card .remember input{width:18px;height:18px;min-width:18px;flex:none;margin:0;padding:0;accent-color:#db2777}
 .welcome-back{margin:0 0 12px}
 #welcomeSignup,#welcomeLogin{padding:8px 0 28px}
 .hl{color:var(--accent)}
@@ -386,6 +388,9 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 .streak svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .profilebtn{width:36px;height:36px;padding:0;border:none;border-radius:50%;background:transparent;overflow:hidden}
 .profilebtn .ham{display:none;width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round}
+.headside{display:flex;align-items:center;gap:2px;flex:none}
+.profilepic{width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:center 22%;flex:none;background:#4c1d95}
+body.welcome-on .profilepic{display:none !important}
 .daymenu{background:#fff;border-radius:14px;padding:8px;margin:4px 0 8px;display:flex;flex-direction:column;gap:6px;color:#1c1430}
 .daymenu[hidden]{display:none !important}
 .daymenu button{text-align:left;background:transparent;border:none;color:#1c1430}
@@ -515,7 +520,10 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
     <div class="screentitle" id="hdrTitle" hidden>Today</div>
     <div class="topgap"></div>
     <div class="streak" id="streak" aria-label="Streak"><span id="streakCount">0</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
-    <button type="button" class="profilebtn menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><img src="images/header-portrait.jpg" alt=""><svg class="ham" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <div class="headside">
+      <img class="profilepic" id="profilePic" src="images/header-portrait.jpg" alt="">
+      <button type="button" class="menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><svg class="ham" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
   </div>
   <div class="daymenu" id="dayMenu" hidden>
     <button type="button" data-shift="0">Today</button>
@@ -695,6 +703,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
       <p class="note" id="loginLocalNote" style="margin-bottom:10px"></p>
       <div class="field"><label class="f" for="loginEmail">Email</label><input id="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
       <div class="field"><label class="f" for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password" placeholder="Password"></div>
+      <label class="remember" for="loginRemember"><input id="loginRemember" type="checkbox"> Remember me</label>
       <button class="primary full" type="submit">Log in</button>
       <button type="button" class="full" id="loginToSignup" style="margin-top:8px">Need an account? Sign up</button>
     </form>
@@ -5721,12 +5730,86 @@ document.addEventListener("visibilitychange",()=>{ if(!document.hidden && todayS
 $("fType").value = defaultMealType();
 const ACCOUNTS_KEY = "curlyGirlFitness.accounts.v1";
 const AUTH_KEY = "curlyGirlFitness.auth.v1";
+const SESSION_AUTH_KEY = "curlyGirlFitness.sessionAuth.v1";
+const AWAY_KEY = "curlyGirlFitness.awayAt.v1";
+const RETURN_LOGIN_KEY = "curlyGirlFitness.returnLogin.v1";
+const AWAY_LIMIT = 10 * 60 * 1000;
 function loadAccounts(){
   const list = readStore(localStorage, ACCOUNTS_KEY);
   return Array.isArray(list) ? list : [];
 }
 function saveAccounts(list){ localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list)); }
-function currentAuth(){ return readStore(localStorage, AUTH_KEY); }
+function currentAuth(){
+  const saved = readStore(localStorage, AUTH_KEY);
+  if(saved && saved.email) return saved;
+  const live = readStore(sessionStorage, SESSION_AUTH_KEY);
+  if(live && live.email) return live;
+  return null;
+}
+function awayTooLong(){
+  const t = parseInt(localStorage.getItem(AWAY_KEY)||"", 10);
+  if(!t) return false;
+  return Date.now() - t > AWAY_LIMIT;
+}
+function clearSessionStores(){
+  localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem(AWAY_KEY);
+  sessionStorage.removeItem(SESSION_AUTH_KEY);
+  sessionStorage.removeItem(RETURN_LOGIN_KEY);
+}
+function endSession(toLogin, message){
+  clearSessionStores();
+  ID.activePairId = "";
+  pairOpen = false;
+  if(typeof closeTools==="function") closeTools();
+  closeMenu();
+  showWelcome(toLogin ? "login" : "home");
+  if(message) toast(message);
+}
+function markAway(){
+  if(document.body.classList.contains("welcome-on")) return;
+  const auth = currentAuth();
+  if(!auth || !auth.email) return;
+  if(auth.remember){
+    if(!localStorage.getItem(AWAY_KEY)) localStorage.setItem(AWAY_KEY, String(Date.now()));
+    return;
+  }
+  sessionStorage.removeItem(SESSION_AUTH_KEY);
+  sessionStorage.setItem(RETURN_LOGIN_KEY, "1");
+}
+function onReturn(){
+  if(document.hidden) return;
+  const auth = readStore(localStorage, AUTH_KEY);
+  if(auth && auth.remember){
+    if(awayTooLong()){
+      endSession(true, "Signed out after 10 minutes away");
+      return;
+    }
+    localStorage.removeItem(AWAY_KEY);
+    return;
+  }
+  if(sessionStorage.getItem(RETURN_LOGIN_KEY)==="1" && !document.body.classList.contains("welcome-on")){
+    endSession(true, "");
+  }
+}
+function restoreRememberedSession(){
+  const auth = readStore(localStorage, AUTH_KEY);
+  if(!auth || !auth.remember || !auth.email) return false;
+  if(awayTooLong()){
+    endSession(true, "Signed out after 10 minutes away");
+    return true;
+  }
+  localStorage.removeItem(AWAY_KEY);
+  const account = loadAccounts().find(a => a.email===auth.email);
+  if(account && account.role && !isClientPhone()){
+    ID.role = account.role;
+    persistIdentity();
+  }
+  showApp();
+  const tab = (location.hash||"").replace("#","");
+  go(TITLES[tab] ? tab : "today");
+  return true;
+}
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 function accountNote(){
   return dataReady()
@@ -5783,7 +5866,7 @@ function applyMemberLook(){
   document.documentElement.style.backgroundColor = page;
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content", page);
-  const img = document.querySelector("#menuBtn img");
+  const img = document.getElementById("profilePic");
   if(img){
     const next = styling && mine.bubble ? mine.bubble : BUBBLE_FALLBACK;
     if(img.getAttribute("src")!==next) img.src = next;
@@ -5824,8 +5907,18 @@ function showApp(){
   paintChrome(false);
   $("welcome").hidden = true;
 }
-function enterAccount(account){
-  localStorage.setItem(AUTH_KEY, JSON.stringify({email:account.email, id:account.id}));
+function enterAccount(account, remember){
+  const row = {email:account.email, id:account.id, remember:!!remember};
+  if(remember){
+    localStorage.setItem(AUTH_KEY, JSON.stringify(row));
+    sessionStorage.removeItem(SESSION_AUTH_KEY);
+    localStorage.removeItem(AWAY_KEY);
+  } else {
+    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(AWAY_KEY);
+    sessionStorage.setItem(SESSION_AUTH_KEY, JSON.stringify(row));
+  }
+  sessionStorage.removeItem(RETURN_LOGIN_KEY);
   showApp();
   setRole(account.role);
   go("today");
@@ -5843,13 +5936,7 @@ function isClientPhone(){
   return localStorage.getItem(ENTRY_KEY)==="client";
 }
 function logOut(){
-  localStorage.removeItem(AUTH_KEY);
-  ID.activePairId = "";
-  pairOpen = false;
-  if(typeof closeTools==="function") closeTools();
-  closeMenu();
-  showWelcome("home");
-  toast("Logged out");
+  endSession(false, "Logged out");
 }
 function rememberAccount(account){
   const accounts = loadAccounts().filter(a => a.email!==account.email);
@@ -5885,7 +5972,7 @@ async function signUpAccount(name, email, password, role, invite){
     }
   }
 }
-async function logInAccount(email, password){
+async function logInAccount(email, password, remember){
   if(!emailOk(email)) throw new Error("Enter a valid email");
   if(!password) throw new Error("Enter your password");
   const hash = await passHash(password);
@@ -5908,7 +5995,7 @@ async function logInAccount(email, password){
       } catch(e){}
     }
   }
-  enterAccount(account);
+  enterAccount(account, !!remember);
 }
 let signupRole = "trainer";
 function paintSignupRole(){
@@ -5966,8 +6053,9 @@ $("loginForm").onsubmit = (e) => {
   e.preventDefault();
   const email = $("loginEmail").value.trim().toLowerCase();
   const password = $("loginPass").value;
+  const remember = $("loginRemember").checked;
   run(async () => {
-    await logInAccount(email, password);
+    await logInAccount(email, password, remember);
     $("loginPass").value = "";
   });
 };
@@ -6028,7 +6116,18 @@ if(!clientPhone){
 const linkNote = $("clientLinkNote");
 if(linkNote) linkNote.textContent = "Clients sign up or log in from the shared link: " + location.origin + location.pathname + "?join";
 applyClientLock();
-showWelcome("home");
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden) markAway();
+  else onReturn();
+});
+window.addEventListener("pagehide", markAway);
+window.addEventListener("pageshow", e => { if(e.persisted) onReturn(); });
+if(sessionStorage.getItem(RETURN_LOGIN_KEY)==="1"){
+  sessionStorage.removeItem(RETURN_LOGIN_KEY);
+  showWelcome("login");
+} else if(!restoreRememberedSession()){
+  showWelcome("home");
+}
 window.__fitness = {get state(){return S;}, KEY, applyBarcode};
 })();
 </script>
