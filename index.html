@@ -134,7 +134,7 @@ body:not(.welcome-on) #welcome{display:none !important}
 .b1{width:132px;height:132px;animation-delay:0s}
 .b2{width:168px;height:168px;animation-delay:-14s}
 .b3{width:96px;height:96px;animation-delay:-28s}
-.b4{width:124px;height:124px;animation-delay:-42s}
+.b4{width:124px;height:124px;animation-delay:-42s;object-fit:contain;object-position:center center;padding:11px;background:transparent}
 .b5{width:88px;height:88px;animation-name:orbit-in;animation-duration:48s;animation-delay:-6s}
 .b6{width:150px;height:150px;animation-name:orbit-in;animation-duration:48s;animation-delay:-18s}
 .b7{width:108px;height:108px;animation-name:orbit-in;animation-duration:48s;animation-delay:-30s}
@@ -187,7 +187,8 @@ button.outline{display:inline-flex;align-items:center;justify-content:center;bac
 .wshot .heroimg{position:absolute;right:0;top:0;bottom:0;width:84%;height:100%;object-fit:cover;border-radius:18px 0 0 18px;display:block;background:#4c1d95}
 .wshot .heroimg.pool{object-position:center 72%}
 .wshot .heroimg.face{object-position:center 42%}
-.wshot .heroimg.roofshot{object-position:center 78%}
+.wshot:has(.heroimg.roofshot){min-height:520px}
+.wshot .heroimg.roofshot{object-fit:contain;object-position:center center;width:220px;max-width:calc(100% - 24px);height:auto;top:auto;bottom:14px;right:12px;left:auto;border-radius:14px;background:transparent}
 .wcards{position:relative;z-index:2;display:flex;flex-direction:column;gap:12px;width:min(250px,72%);padding:16px 0 20px;box-sizing:border-box}
 .fcard{position:relative;background:rgba(255,255,255,.85);color:#1c1430;border-radius:16px;box-shadow:0 12px 28px rgba(40,0,60,.18);padding:12px;text-align:left;text-shadow:none}
 .fcard b{display:block;font-size:14px;line-height:1.25;font-weight:800;letter-spacing:-.02em;color:#1c1430;text-shadow:none}
@@ -196,7 +197,7 @@ button.outline{display:inline-flex;align-items:center;justify-content:center;bac
 .wmini img{width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none;background:#efeaf6}
 .wmini div{min-width:0}
 .wmini.pool img{object-position:center 72%}
-.wmini img.roofshot{object-position:center 72%}
+.wmini img.roofshot{object-fit:contain;object-position:center center;width:78px;height:44px;background:transparent}
 .mfeat{text-align:center;padding:42px 12px 12px}
 .mfeat .ico{width:112px;height:112px;margin:0 auto 6px;display:block;color:#f8f5ff}
 .mfeat .ico svg{width:112px;height:112px;display:block;stroke:currentColor}
