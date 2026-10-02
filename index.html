@@ -626,6 +626,16 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
 .themerow .mark{color:#8A9A86;font-weight:800;visibility:hidden}
 .themerow.sel{color:#8A9A86}
 .themerow.sel .mark{visibility:visible}
+.fastclock{text-align:center}
+.fasttime{margin:6px 0 2px;font-size:42px;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums;color:#2B2A27}
+.fastmark{margin:0 0 6px;font-weight:700;color:#8A9A86}
+.fastclock #fastNote{text-align:left;margin:8px 0}
+.fastactions{display:flex;gap:8px;margin:12px 0 4px}
+.fastactions button{flex:1}
+.fastmarks{list-style:none;margin:10px 0 0;padding:0;text-align:left}
+.fastmarks li{padding:7px 0;border-bottom:1px solid #E4DFD4;color:#6F6C64}
+.fastmarks li.now{color:#2B2A27;font-weight:700}
+.chip.sel{border-color:#8A9A86;color:#8A9A86}
 body.theme-dark:not(.welcome-on){--bg:#1C1B19;--card:#2C2A26;--text:#F4F1EA;--muted:#C8C2B6;--line:#3E3B36;background-color:#1C1B19;color:#F4F1EA}
 body.theme-dark:not(.welcome-on) header,
 body.theme-dark.member-look:not(.welcome-on),
@@ -706,6 +716,11 @@ body.theme-dark:not(.welcome-on) .week div{background:#2C2A26;color:#F4F1EA;bord
 body.theme-dark:not(.welcome-on) .week div b{color:#F4F1EA}
 body.theme-dark:not(.welcome-on) .yourow svg{stroke:#F4F1EA}
 body.theme-dark:not(.welcome-on) .yourow svg [fill]{fill:#F4F1EA}
+body.theme-dark:not(.welcome-on) .fasttime,
+body.theme-dark:not(.welcome-on) .fastmarks li.now{color:#F4F1EA}
+body.theme-dark:not(.welcome-on) .fastclock .fastmark,
+body.theme-dark:not(.welcome-on) .chip.sel{color:#C5D1C0;border-color:#8A9A86}
+body.theme-dark:not(.welcome-on) .fastmarks li{border-color:#3E3B36;color:#C8C2B6}
 #menuEditPanel{gap:8px;padding-bottom:10px}
 #menuEditPanel .note{color:#6F6C64;text-align:right;max-width:260px;margin:0}
 #menuEditPanel .lookpicks{justify-content:flex-end;margin:0}
@@ -7437,7 +7452,8 @@ function lastSaveText(){
 function themeChoice(){
   let v = "";
   try { v = localStorage.getItem(THEME_KEY) || ""; } catch(e){ v = ""; }
-  return v==="light" || v==="dark" ? v : "system";
+  if(v==="light" || v==="dark" || v==="system") return v;
+  return "light";
 }
 function systemPrefersDark(){
   return !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
@@ -7484,6 +7500,7 @@ function loadYou(){
     fastStart: String(row.fastStart||""),
     fastEnd: String(row.fastEnd||""),
     fastNote: String(row.fastNote||""),
+    fastClock: cleanFastClock(row.fastClock),
     sleep: Array.isArray(row.sleep) ? row.sleep : [],
     reminders: Array.isArray(row.reminders) ? row.reminders : [],
     community: String(row.community||""),
@@ -7499,6 +7516,126 @@ function saveYou(patch){
   all[email] = Object.assign({}, cur, patch);
   localStorage.setItem(YOU_KEY, JSON.stringify(all));
   try { localStorage.setItem(LAST_SAVE_KEY, String(Date.now())); } catch(e){}
+}
+const FAST_MARKS = [
+  {h:4, note:"Around 4 hours, digestion of the last meal is winding down."},
+  {h:12, note:"Around 12 hours, the body starts using stored fuel."},
+  {h:16, note:"Around 16 hours is a common intermittent-fasting window."},
+  {h:18, note:"Around 18 hours, the body commonly keeps drawing on stored fuel."},
+  {h:24, note:"Around 24 hours, the body has spent a full day on stored fuel."},
+  {h:36, note:"Around 36 hours, this long fast is still running on stored fuel."}
+];
+let fastTimer = null;
+function cleanFastClock(raw){
+  const src = raw && typeof raw==="object" ? raw : {};
+  const goals = [12,16,18,24];
+  const goalHours = goals.indexOf(+src.goalHours)>=0 ? +src.goalHours : 16;
+  const status = src.status==="running" || src.status==="paused" ? src.status : "idle";
+  const startedAt = hasNum(src.startedAt) && +src.startedAt>0 ? +src.startedAt : 0;
+  const elapsedMs = hasNum(src.elapsedMs) && +src.elapsedMs>0 ? +src.elapsedMs : 0;
+  if(status==="running" && !startedAt) return {goalHours:goalHours, status:"paused", startedAt:0, elapsedMs:elapsedMs};
+  return {goalHours:goalHours, status:status, startedAt:startedAt, elapsedMs:elapsedMs};
+}
+function loadFastClock(){ return cleanFastClock(loadYou().fastClock); }
+function saveFastClock(clock){ saveYou({fastClock:cleanFastClock(clock)}); }
+function fastElapsedMs(clock){
+  if(clock.status==="running" && clock.startedAt) return Math.max(0, clock.elapsedMs + (Date.now() - clock.startedAt));
+  return Math.max(0, clock.elapsedMs||0);
+}
+function formatFastElapsed(ms){
+  const s = Math.max(0, Math.floor(ms/1000));
+  const h = Math.floor(s/3600);
+  const m = Math.floor((s%3600)/60);
+  const sec = s%60;
+  return h+":"+pad(m)+":"+pad(sec);
+}
+function fastMarkLabel(h){ return h===4 ? "About 4 hours" : h+" hours"; }
+function fastStage(ms, active){
+  if(!active && ms<=0) return {h:0, label:"", note:"Press start when the fast begins."};
+  const hours = ms/3600000;
+  let current = null;
+  FAST_MARKS.forEach(mark=>{ if(hours+1e-9>=mark.h) current = mark; });
+  if(!current) return {h:0, label:"Before 4 hours", note:"Before about 4 hours, the last meal is still being digested."};
+  return {h:current.h, label:fastMarkLabel(current.h), note:current.note};
+}
+function fastingClockHtml(y){
+  const clock = cleanFastClock(y.fastClock);
+  const goals = [12,16,18,24].map(h=>'<button type="button" class="chip'+(clock.goalHours===h?" sel":"")+'" data-fastgoal="'+h+'" aria-pressed="'+(clock.goalHours===h?"true":"false")+'">'+h+" hours</button>").join("");
+  const marks = FAST_MARKS.map(m=>'<li data-fasth="'+m.h+'">'+esc(fastMarkLabel(m.h))+"</li>").join("");
+  return '<div class="card fastclock"><p class="note">General information, not medical advice.</p><p class="fasttime" id="fastElapsed" aria-live="polite">0:00:00</p><p class="fastmark" id="fastMark"></p><p id="fastNote"></p><p class="note" id="fastGoalLine"></p><p class="themelabel">Goal length</p><div class="chips">'+goals+'</div><div class="fastactions"><button type="button" class="primary" data-fastact="start" id="fastStart">Start</button><button type="button" data-fastact="pause" id="fastPause">Pause</button><button type="button" data-fastact="reset" id="fastReset">Reset</button></div><ul class="fastmarks">'+marks+"</ul></div>";
+}
+function paintFastClock(){
+  const elapsedEl = $("fastElapsed");
+  if(!elapsedEl) return;
+  const clock = loadFastClock();
+  const ms = fastElapsedMs(clock);
+  const active = clock.status==="running" || clock.status==="paused" || ms>0;
+  const stage = fastStage(ms, active);
+  elapsedEl.textContent = formatFastElapsed(ms);
+  const markEl = $("fastMark");
+  if(markEl) markEl.textContent = stage.label;
+  const noteEl = $("fastNote");
+  if(noteEl) noteEl.textContent = stage.note;
+  const goalEl = $("fastGoalLine");
+  if(goalEl){
+    const reached = active && ms>=clock.goalHours*3600000;
+    goalEl.textContent = reached ? "The "+clock.goalHours+" hour goal length has passed." : "Goal length is "+clock.goalHours+" hours.";
+  }
+  document.querySelectorAll("[data-fastgoal]").forEach(btn=>{
+    const on = +btn.dataset.fastgoal===clock.goalHours;
+    btn.classList.toggle("sel", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  document.querySelectorAll("[data-fasth]").forEach(li=>{
+    li.classList.toggle("now", stage.h===+li.dataset.fasth);
+  });
+  const startBtn = $("fastStart");
+  const pauseBtn = $("fastPause");
+  if(startBtn){
+    startBtn.textContent = clock.status==="paused" ? "Resume" : "Start";
+    startBtn.disabled = clock.status==="running";
+  }
+  if(pauseBtn) pauseBtn.disabled = clock.status!=="running";
+}
+function stopFastTimer(){
+  if(fastTimer){ clearInterval(fastTimer); fastTimer = null; }
+}
+function armFastTimer(){
+  const clock = loadFastClock();
+  if(!(youView==="fasting" && currentTab==="you" && clock.status==="running")){ stopFastTimer(); return; }
+  if(fastTimer) return;
+  fastTimer = setInterval(()=>{
+    if(currentTab!=="you" || youView!=="fasting"){ stopFastTimer(); return; }
+    paintFastClock();
+  }, 1000);
+}
+function runFastAct(act){
+  const clock = loadFastClock();
+  if(act==="start"){
+    if(clock.status==="running") return;
+    if(clock.status!=="paused") clock.elapsedMs = 0;
+    clock.startedAt = Date.now();
+    clock.status = "running";
+  } else if(act==="pause"){
+    if(clock.status!=="running") return;
+    clock.elapsedMs = fastElapsedMs(clock);
+    clock.startedAt = 0;
+    clock.status = "paused";
+  } else if(act==="reset"){
+    clock.elapsedMs = 0;
+    clock.startedAt = 0;
+    clock.status = "idle";
+  } else return;
+  saveFastClock(clock);
+  paintFastClock();
+  armFastTimer();
+}
+function setFastGoal(hours){
+  const clock = loadFastClock();
+  if([12,16,18,24].indexOf(hours)<0 || clock.goalHours===hours) return;
+  clock.goalHours = hours;
+  saveFastClock(clock);
+  paintFastClock();
 }
 function hasNum(v){ return v!=null && v!=="" && isFinite(+v); }
 function macroText(meals, key, unit){
@@ -7549,7 +7686,7 @@ function youHtml(view){
     return '<form class="card" data-youform="profile"><div class="field"><label class="f" for="youName">Name</label><input id="youName" name="name" value="'+esc(account.name||"")+'" autocomplete="name"></div><div class="field"><label class="f" for="youEmailBox">Email</label><input id="youEmailBox" value="'+esc(account.email||"")+'" readonly></div><div class="field"><label class="f" for="youRole">Role</label><input id="youRole" value="'+esc(account.role||"")+'" readonly></div><p class="note">Email and role stay as they were when you signed up. The name is saved on this phone.</p><button class="primary full" type="submit">Save profile</button></form>';
   }
   if(view==="glp1") return '<form class="card" data-youform="glp1"><p>A private note you write yourself. This is not a dose calculator and it does not give medical advice.</p><div class="field"><label class="f" for="youGlp">Note</label><textarea id="youGlp" name="note">'+esc(y.glp1)+'</textarea></div><button class="primary full" type="submit">Save note</button></form>';
-  if(view==="fasting") return '<form class="card" data-youform="fast"><p>Start and end are whatever you type. This screen does not say a fast is safe.</p><div class="field"><label class="f" for="youFastStart">Start</label><input id="youFastStart" name="start" type="time" value="'+esc(y.fastStart)+'"></div><div class="field"><label class="f" for="youFastEnd">End</label><input id="youFastEnd" name="end" type="time" value="'+esc(y.fastEnd)+'"></div><div class="field"><label class="f" for="youFastNote">Note</label><textarea id="youFastNote" name="note">'+esc(y.fastNote)+'</textarea></div><button class="primary full" type="submit">Save</button></form>';
+  if(view==="fasting") return fastingClockHtml(y)+'<form class="card" data-youform="fast"><p>Start and end are whatever you type. This screen does not say a fast is safe.</p><div class="field"><label class="f" for="youFastStart">Start</label><input id="youFastStart" name="start" type="time" value="'+esc(y.fastStart)+'"></div><div class="field"><label class="f" for="youFastEnd">End</label><input id="youFastEnd" name="end" type="time" value="'+esc(y.fastEnd)+'"></div><div class="field"><label class="f" for="youFastNote">Note</label><textarea id="youFastNote" name="note">'+esc(y.fastNote)+'</textarea></div><button class="primary full" type="submit">Save</button></form>';
   if(view==="sleep"){
     const rows = y.sleep.slice().reverse().map(s=>{
       const when = /^\d{4}-\d{2}-\d{2}$/.test(String(s.date||"")) ? fmtDate(s.date) : "Date not set";
@@ -7624,7 +7761,7 @@ function youHtml(view){
   if(view==="appearance"){
     const c = themeChoice();
     const row = (id, label) => '<button type="button" class="themerow'+(c===id?" sel":"")+'" data-theme="'+id+'" aria-pressed="'+(c===id?"true":"false")+'"><span>'+label+'</span><span class="mark" aria-hidden="true">✓</span></button>';
-    return '<p class="themelabel">Select Theme</p>'+row("system","System Default")+row("light","Light Theme")+row("dark","Dark Theme")+'<p class="note">System Default follows this phone’s light or dark setting. Light Theme is the linen look. The login screen stays linen either way.</p>';
+    return '<p class="themelabel">Select Theme</p>'+row("system","System Default")+row("light","Light Theme")+row("dark","Dark Theme")+'<p class="note">Until you pick a theme, this phone uses Light Theme. System Default follows this phone’s light or dark setting. The login screen stays linen either way.</p>';
   }
   if(view==="privacy"){
     const cloud = dataReady() ? "Shared keys are saved, so an account can sign in on another phone." : "Nothing is sent to another phone unless shared keys are saved in Settings.";
@@ -7645,9 +7782,17 @@ function renderYou(){
   if($("hdrSub")) $("hdrSub").textContent = "";
   const body = $("youBody");
   if(!body) return;
-  if(body.dataset.view===youView) return;
+  if(body.dataset.view===youView){
+    if(youView==="fasting") armFastTimer();
+    else stopFastTimer();
+    return;
+  }
   body.dataset.view = youView;
   body.innerHTML = youHtml(youView);
+  if(youView==="fasting"){
+    paintFastClock();
+    armFastTimer();
+  } else stopFastTimer();
 }
 function openMember(id){
   if(!(currentAuth() && currentAuth().email)) return;
@@ -7738,6 +7883,10 @@ function onYouSubmit(e){
 function onYouClick(e){
   const theme = e.target.closest("[data-theme]");
   if(theme){ setTheme(theme.dataset.theme); return; }
+  const fastActBtn = e.target.closest("[data-fastact]");
+  if(fastActBtn){ runFastAct(fastActBtn.dataset.fastact); return; }
+  const fastGoal = e.target.closest("[data-fastgoal]");
+  if(fastGoal){ setFastGoal(+fastGoal.dataset.fastgoal); return; }
   const del = e.target.closest("[data-youdel]");
   if(del){
     const y = loadYou();
