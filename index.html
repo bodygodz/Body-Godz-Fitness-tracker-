@@ -2668,11 +2668,20 @@ function macroBit(label, v){
   if(v==null || !Number.isFinite(Number(v))) return "";
   return label+" "+(Math.round(Number(v)*10)/10)+" g";
 }
+function foodQueryWords(query){
+  return foodKey(query).split(" ").filter(w=>w.length>1);
+}
+function foodWordHit(tokens, word){
+  if(tokens.has(word)) return true;
+  if(word.length>2 && word.endsWith("s") && tokens.has(word.slice(0,-1))) return true;
+  if(word.length>2 && tokens.has(word+"s")) return true;
+  return false;
+}
 function foodQueryMatch(query, label){
-  const hay = foodKey(label);
-  const words = foodKey(query).split(" ").filter(w=>w.length>1);
+  const words = foodQueryWords(query);
   if(!words.length) return false;
-  return words.every(w=>hay.indexOf(w)>=0);
+  const tokens = new Set(foodKey(label).split(" ").filter(Boolean));
+  return words.every(w=>foodWordHit(tokens, w));
 }
 function foodRank(query, name){
   const q = foodKey(query);
@@ -2682,12 +2691,12 @@ function foodRank(query, name){
   if(k.indexOf(q)===0) return 1;
   return 2;
 }
-function packListed(name, brand, cal, protein, carbs, fat, amount){
+function packListed(name, brand, cal, protein, carbs, fat, amount, source){
   const bits = [Math.round(cal)+" cal"];
   if(amount) bits.push(amount);
   if(brand) bits.push(brand);
   const extra = [macroBit("protein", protein), macroBit("carbs", carbs), macroBit("fat", fat)].filter(Boolean).join(", ");
-  return {name:name, detail:bits.join(", ")+(extra?" · "+extra:""), cal:Math.round(cal), protein:protein, carbs:carbs, fat:fat, amount:amount||""};
+  return {name:name, detail:bits.join(", ")+(extra?" · "+extra:"")+(source?" · "+source:""), cal:Math.round(cal), protein:protein, carbs:carbs, fat:fat, amount:amount||"", source:source||""};
 }
 function nutById(list, id){
   const row = (list||[]).find(n=>n && (n.nutrientId===id || Number(n.nutrientNumber)===id));
@@ -2712,7 +2721,8 @@ function listedUsdaFood(food, query){
   } else {
     amount = "100 g";
   }
-  return packListed(name, brand, cal, protein, carbs, fat, amount);
+  const source = food.dataType==="Branded" ? "USDA packaged" : "USDA";
+  return packListed(name, brand, cal, protein, carbs, fat, amount, source);
 }
 function listedFood(product, query){
   const name = String(product.product_name || product.product_name_en || "").trim();
@@ -2744,14 +2754,14 @@ function listedFood(product, query){
     amount = "";
   } else return null;
   if(!Number.isFinite(cal) || cal<0) return null;
-  return packListed(name, brand, cal, protein, carbs, fat, amount);
+  return packListed(name, brand, cal, protein, carbs, fat, amount, "Open Food Facts");
 }
 function takeFoodHits(foods, query){
   const seen = new Set();
   const hits = [];
   foods.forEach(food=>{
     if(!food) return;
-    const key = foodKey(food.name)+"|"+food.cal+"|"+foodKey(food.amount);
+    const key = foodKey(food.name)+"|"+food.cal+"|"+foodKey(food.amount)+"|"+foodKey(food.source);
     if(seen.has(key)) return;
     seen.add(key);
     hits.push(food);
@@ -2762,7 +2772,7 @@ function takeFoodHits(foods, query){
     const raw = (name) => /,\s*raw\b/i.test(name) ? 0 : 1;
     return raw(a.name)-raw(b.name) || a.name.length-b.name.length;
   });
-  return hits.slice(0, 8);
+  return hits;
 }
 function paintFoodRows(foods, source){
   $("foodLogList").innerHTML = foods.map((f,i)=>`<div class="foodrow"><div class="grow"><b>${esc(f.name)}${f.mark?'<span class="mark" aria-label="Checked"> ✓</span>':""}</b><small>${esc(f.detail)}</small></div><button type="button" class="foodplus" data-foodhit="${i}" data-foodsrc="${source}" aria-label="Add ${esc(f.name)}">+</button></div>`).join("");
@@ -2786,43 +2796,80 @@ async function fetchFoodJson(url){
   if(!text || text.charAt(0)!=="{") throw new Error("lookup");
   return JSON.parse(text);
 }
+async function fetchFoodJsonRetry(url, tries){
+  let last;
+  for(let i=0;i<tries;i++){
+    try { return await fetchFoodJson(url); }
+    catch(err){
+      last = err;
+      if(i<tries-1) await new Promise(r=>setTimeout(r, 350));
+    }
+  }
+  throw last;
+}
+async function usdaFoodPages(query, dataType){
+  const found = [];
+  const pageSize = 100;
+  for(let page=1; page<=4; page++){
+    const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/foods/search?query="+encodeURIComponent(query)+"&pageSize="+pageSize+"&pageNumber="+page+"&dataType="+encodeURIComponent(dataType)+"&api_key=DEMO_KEY");
+    const batch = data.foods || [];
+    const matched = batch.map(food=>listedUsdaFood(food, query)).filter(Boolean);
+    found.push.apply(found, matched);
+    const total = Number(data.totalHits) || 0;
+    if(!batch.length || matched.length===0 || batch.length<pageSize || page*pageSize>=total) break;
+  }
+  return found;
+}
+async function openFoodPages(query){
+  const pageSize = 100;
+  const hosts = ["https://world.openfoodfacts.org", "https://us.openfoodfacts.org"];
+  let data = null;
+  let host = hosts[0];
+  for(const base of hosts){
+    try {
+      data = await fetchFoodJsonRetry(base+"/cgi/search.pl?search_terms="+encodeURIComponent(query)+"&search_simple=1&action=process&json=1&page_size="+pageSize+"&page=1", 2);
+      host = base;
+      break;
+    } catch(err){}
+  }
+  if(!data) throw new Error("lookup");
+  const found = (data.products||[]).map(product=>listedFood(product, query)).filter(Boolean);
+  const count = Number(data.count) || 0;
+  const first = data.products || [];
+  if(found.length && first.length>=pageSize && count>pageSize){
+    for(let page=2; page<=4; page++){
+      if((page-1)*pageSize>=count) break;
+      const more = await fetchFoodJsonRetry(host+"/cgi/search.pl?search_terms="+encodeURIComponent(query)+"&search_simple=1&action=process&json=1&page_size="+pageSize+"&page="+page, 2);
+      const batch = more.products || [];
+      const matched = batch.map(product=>listedFood(product, query)).filter(Boolean);
+      found.push.apply(found, matched);
+      if(!batch.length || matched.length===0 || batch.length<pageSize) break;
+    }
+  }
+  return found;
+}
 async function lookupPublicFoods(query, seq){
   const still = () => ($("foodLogSearch").value||"").trim().toLowerCase()===query.toLowerCase() && seq===foodLookupSeq;
   if(!still()) return;
-  let answered = false;
-  const sources = [
-    {title:"FoodData Central", run: async ()=>{
-      const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/foods/search?query="+encodeURIComponent(query)+"&pageSize=20&dataType="+encodeURIComponent("Survey (FNDDS)")+"&api_key=DEMO_KEY");
-      answered = true;
-      return (data.foods||[]).map(food=>listedUsdaFood(food, query));
-    }},
-    {title:"FoodData Central", run: async ()=>{
-      const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/foods/search?query="+encodeURIComponent(query)+"&pageSize=20&dataType="+encodeURIComponent("Branded")+"&api_key=DEMO_KEY");
-      answered = true;
-      return (data.foods||[]).map(food=>listedUsdaFood(food, query));
-    }},
-    {title:"Open Food Facts", run: async ()=>{
-      const data = await fetchFoodJson("https://world.openfoodfacts.org/api/v2/search?q="+encodeURIComponent(query)+"&page_size=20&fields=product_name,product_name_en,brands,serving_size,nutriments");
-      answered = true;
-      return (data.products||[]).map(product=>listedFood(product, query));
-    }}
+  const jobs = [
+    usdaFoodPages(query, "Branded"),
+    usdaFoodPages(query, "SR Legacy"),
+    usdaFoodPages(query, "Survey (FNDDS)"),
+    openFoodPages(query)
   ];
-  for(const source of sources){
-    if(!still()) return;
-    try {
-      const hits = takeFoodHits(await source.run(), query);
-      if(!still()) return;
-      if(hits.length){
-        foodLookupHits = hits;
-        $("foodLogHeading").textContent = source.title;
-        paintFoodRows(foodLookupHits, "lookup");
-        return;
-      }
-    } catch(err){
-      if(!still()) return;
-    }
-  }
+  const settled = await Promise.all(jobs.map(job=>job.then(rows=>({ok:true, rows:rows})).catch(()=>({ok:false, rows:[]}))));
   if(!still()) return;
+  const answered = settled.some(item=>item.ok);
+  const hits = takeFoodHits(settled.reduce((all, item)=>all.concat(item.rows), []), query);
+  if(!still()) return;
+  if(hits.length){
+    foodLookupHits = hits;
+    const hasUsda = hits.some(food=>food.source && food.source.indexOf("USDA")===0);
+    const hasOff = hits.some(food=>food.source==="Open Food Facts");
+    $("foodLogHeading").textContent = hasUsda && hasOff ? "FoodData Central and Open Food Facts" : (hasOff ? "Open Food Facts" : "FoodData Central");
+    paintFoodRows(foodLookupHits, "lookup");
+    return;
+  }
   $("foodLogHeading").textContent = "Search";
   $("foodLogList").innerHTML = answered
     ? '<p class="foodlog-empty">'+esc(query)+' was not found.</p>'
