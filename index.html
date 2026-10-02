@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color:#121212">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f6c5d6">
+<meta name="theme-color" content="#121212">
+<style>html,body{background-color:#121212}</style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,15 +22,15 @@ if ("serviceWorker" in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f6c5d6; --card:#ffffff; --card2:#f6f3fb; --line:#e7e0f0; --text:#1c1430; --muted:#6b6280;
+  --bg:#121212; --card:#ffffff; --card2:#f6f3fb; --line:#e7e0f0; --text:#1c1430; --muted:#6b6280;
   --accent:#db2777; --accent2:#7c3aed; --warn:#b45309; --danger:#e11d48; --radius:16px;
   --safe-b:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:14px;line-height:1.45}
-html{background-color:var(--bg)}
-body{padding-bottom:calc(108px + var(--safe-b));min-height:100vh;background-color:var(--bg);color:#1c1430;background-image:none}
-body.welcome-on{background-color:var(--bg);color:#1c1430;padding-bottom:0}
+html{background-color:#121212}
+body{padding-bottom:calc(108px + var(--safe-b));min-height:100vh;background-color:#121212;color:#f8f5ff;background-image:none}
+body.welcome-on{background-color:#121212;color:#f8f5ff;padding-bottom:0}
 header{position:sticky;top:0;z-index:28;background:#4c1d95;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 6px;border-bottom:1px solid rgba(255,255,255,.16)}
 .brandwrap{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
 .menubtn{flex:none;width:44px;height:44px;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:#fff;border-radius:10px}
@@ -84,8 +85,8 @@ button:active{transform:scale(.98)}
 .mealgroup h3{font-size:14px;margin:10px 0 0;padding:8px 0 4px;color:#1c1430;display:flex;justify-content:space-between;align-items:baseline;text-transform:none;letter-spacing:0;font-weight:800;border-top:1px solid var(--line)}
 .mealgroup:first-child h3{border-top:none;margin-top:0;padding-top:0}
 .mealgroup h3 span{color:#6b6280;font-weight:700;font-size:12px;font-variant-numeric:tabular-nums}
-.datenav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;color:#1c1430}
-.datenav b{font-size:15px;color:#1c1430}
+.datenav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;color:#fff}
+.datenav b{font-size:15px;color:#fff}
 .ex{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
 .ex:last-child{border-bottom:none}
 .ex input[type=checkbox]{width:24px;height:24px;accent-color:var(--accent);margin-top:2px;flex:none}
@@ -184,11 +185,11 @@ body.welcome-on .profilebtn .ham{display:block}
 body.welcome-on #welcomeHome>section,body.welcome-on #welcomeSignup,body.welcome-on #welcomeLogin{position:relative;z-index:2}
 body.welcome-on .mhero h2,body.welcome-on .mhero p,body.welcome-on .mfeat h2,body.welcome-on .mfeat p{text-shadow:none}
 body.welcome-on .mdark h2,body.welcome-on .mdark p{text-shadow:none}
-button.learnmore{background:transparent;border:none;color:#1c1430;font-weight:700;letter-spacing:.02em;text-transform:none;padding:0;text-decoration:none;border-radius:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+button.learnmore{background:transparent;border:none;color:#fff;font-weight:700;letter-spacing:.02em;text-transform:none;padding:0;text-decoration:none;border-radius:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
 .mhero{padding:22px 2px 8px}
-.mhero h2{margin:0 0 14px;color:#1c1430;font-size:40px;line-height:1.12;font-weight:800;letter-spacing:-.035em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
-.mhero p{margin:0 0 18px;color:#1c1430;font-size:16px;line-height:1.5;max-width:34em}
-button.outline{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#1c1430;border:1.5px solid #1c1430;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
+.mhero h2{margin:0 0 14px;color:#fff;font-size:40px;line-height:1.12;font-weight:800;letter-spacing:-.035em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.mhero p{margin:0 0 18px;color:#f3e8ff;font-size:16px;line-height:1.5;max-width:34em}
+button.outline{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#fff;border:1.5px solid #fff;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
 .wshot{position:relative;margin:28px -22px 8px 0;min-height:460px}
 .wshot .heroimg{position:absolute;right:0;top:0;bottom:0;width:84%;height:100%;object-fit:cover;border-radius:var(--radius);display:block;background:#4c1d95}
 .wshot .heroimg.pool{object-position:center 72%}
@@ -203,11 +204,11 @@ button.outline{display:inline-flex;align-items:center;justify-content:center;bac
 .wmini div{min-width:0}
 .wmini.pool img{object-position:center 72%}
 .mfeat{text-align:center;padding:42px 12px 12px}
-.mfeat .ico{width:112px;height:112px;margin:0 auto 6px;display:block;color:#9d174d}
+.mfeat .ico{width:112px;height:112px;margin:0 auto 6px;display:block;color:#f8f5ff}
 .mfeat .ico svg{width:112px;height:112px;display:block;stroke:currentColor}
-.mfeat h2{margin:8px 0 10px;color:#1c1430;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-.03em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
-.mfeat p{margin:0 auto 12px;max-width:34em;color:#1c1430;font-size:15px;line-height:1.5}
-button.featlink{background:transparent;border:none;color:#9d174d;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px;padding:8px 4px;border-radius:0}
+.mfeat h2{margin:8px 0 10px;color:#fff;font-size:26px;line-height:1.2;font-weight:800;letter-spacing:-.03em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
+.mfeat p{margin:0 auto 12px;max-width:34em;color:#f3e8ff;font-size:15px;line-height:1.5}
+button.featlink{background:transparent;border:none;color:#f9a8d4;font-weight:800;letter-spacing:.08em;text-transform:uppercase;font-size:13px;padding:8px 4px;border-radius:0}
 button.featlink span{font-weight:800}
 #welcomeMore{scroll-margin-top:88px}
 .mdark{background:rgba(255,255,255,.85);color:#1c1430;margin:36px 0 0;padding:36px 28px 12px;border-radius:var(--radius);overflow:hidden}
@@ -385,7 +386,7 @@ button.card{border-radius:var(--radius);overflow:hidden}
 .eventfilters{display:flex;background:#fff;border-radius:8px;overflow:hidden;margin:0 0 12px}
 .eventfilters button{flex:1;border:none;border-radius:0;background:#fff;color:#7c3aed;font-size:11px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;padding:10px 4px}
 .eventfilters button.sel{background:#7c3aed;color:#fff}
-.eventhead{color:#1c1430;font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px}
+.eventhead{color:#fff;font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px}
 .eventrow{display:flex;gap:12px;align-items:flex-start}
 .eventrow img{width:112px;height:84px;object-fit:cover;object-position:center 68%;border-radius:var(--radius);flex:none;background:#efeaf6}
 .eventrow b{display:block;font-size:15px;color:#7c3aed}
@@ -420,10 +421,10 @@ body.welcome-on .profilepic{display:none !important}
 .daymenu input{color:#1c1430}
 .subbar{display:flex;gap:8px;padding:4px 0 8px}
 .subbar[hidden]{display:none !important}
-.subbar button{flex:1;background:#fff;border:none;border-radius:999px;padding:8px 6px;color:#1c1430;font-size:13px}
+.subbar button{flex:1;background:rgba(255,255,255,.16);border:none;border-radius:999px;padding:8px 6px;color:#fff;font-size:13px}
 .subbar button.sel{background:#fff;color:#7c3aed}
 .csteps{display:flex;gap:8px;overflow:auto;margin:0 0 12px;padding-bottom:2px}
-.csteps button{flex:none;background:#fff;border:none;border-radius:999px;color:#1c1430;font-size:12px;font-weight:700;padding:8px 12px}
+.csteps button{flex:none;background:rgba(255,255,255,.16);border:none;border-radius:999px;color:#fff;font-size:12px;font-weight:700;padding:8px 12px}
 .csteps button.sel{background:#fff;color:#7c3aed}
 .qcard{background:#fff;color:#1c1430;border-radius:var(--radius);padding:12px 14px;margin:0 0 10px;box-shadow:0 1px 2px rgba(40,0,60,.08);overflow:hidden}
 .qcard .ql{font-weight:700;font-size:15px;line-height:1.35;color:#1c1430}
@@ -441,11 +442,11 @@ body.welcome-on .profilepic{display:none !important}
 .starbars .of{color:#6b6280;font-weight:700;margin-left:6px}
 .yesno{display:flex;gap:8px;margin-top:8px}
 .yesno button.sel{background:#db2777;color:#fff;border-color:#db2777}
-.cinote{color:#6b6280;font-size:13px;margin:0 0 10px}
+.cinote{color:#f3e8ff;font-size:13px;margin:0 0 10px}
 .weekdots{display:flex;justify-content:space-between;padding:6px 4px 14px}
-.weekdots button{background:transparent;border:none;color:#1c1430;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:700;width:36px}
-.weekdots .dot{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(28,20,48,.35);box-sizing:border-box}
-.weekdots button.today .dot{border-style:dashed;border-color:#1c1430}
+.weekdots button{background:transparent;border:none;color:#f3e8ff;padding:0;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;font-weight:700;width:36px}
+.weekdots .dot{width:28px;height:28px;border-radius:50%;border:1.5px solid rgba(255,255,255,.45);box-sizing:border-box}
+.weekdots button.today .dot{border-style:dashed;border-color:#fff}
 .weekdots button.sel .dot{background:#db2777;border-color:#db2777}
 .promptcard{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:#fff;border:none;border-radius:var(--radius);padding:16px;margin:0 0 12px;color:#1c1430;box-shadow:0 1px 2px rgba(40,0,60,.08);overflow:hidden}
 .promptcard b{display:block;font-size:16px;font-weight:700;color:#1c1430}
@@ -463,7 +464,7 @@ body.welcome-on .profilepic{display:none !important}
 .macrosheet b{font-size:16px;color:#1c1430}
 .macrosheet .of{color:#6b6280;font-size:12px;font-weight:600}
 .sechead{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px}
-.sechead h2,.sec{color:#1c1430;font-size:22px;font-weight:700;margin:0;letter-spacing:-.02em}
+.sechead h2,.sec{color:#fff;font-size:22px;font-weight:700;margin:0;letter-spacing:-.02em}
 .sec{margin:18px 2px 10px}
 .linkish{background:transparent;border:none;color:#db2777;padding:0;font-weight:700}
 .mealrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #efeaf6}
@@ -6551,7 +6552,7 @@ function applyMemberLook(){
   const styling = memberCanStyle();
   document.body.classList.toggle("member-look", styling);
   const mine = readMyLook();
-  const page = styling ? MEMBER_LOOKS[mine.look] : "#f6c5d6";
+  const page = styling ? MEMBER_LOOKS[mine.look] : "#121212";
   if(styling) document.body.style.setProperty("--member-page", page);
   else document.body.style.removeProperty("--member-page");
   document.documentElement.style.backgroundColor = page;
