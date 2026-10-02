@@ -135,8 +135,48 @@ body.welcome-on #roleGate{display:none !important}
 body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welcome-on #navMenu .navsub,body.welcome-on #menuAction,body.welcome-on #menuLogout,body.welcome-on #menuCheck,body.welcome-on #menuBell,body.welcome-on #menuEdit,body.welcome-on #menuEditPanel{display:none !important}
 body:not(.welcome-on) .welcome-only{display:none !important}
 body:not(.welcome-on) #welcome{display:none !important}
-.welcome{max-width:560px;margin:0 auto;padding:6px 22px 8px;position:relative}
-body.welcome-on header{background:#F4F1EA;border-bottom:1px solid rgba(43,42,39,.12);color:#2B2A27}
+.welcome{max-width:560px;margin:0 auto;padding:6px 22px 8px;position:relative;z-index:2}
+.bubbles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body:not(.welcome-on) .bubbles{display:none !important}
+.picbubble{position:absolute;left:0;top:0;border-radius:50%;object-fit:cover;pointer-events:none;opacity:.62;background:#F4F1EA;box-shadow:0 10px 28px rgba(43,42,39,.16)}
+.d1{width:86px;height:86px;animation:drift-a 26s ease-in-out infinite}
+.d2{width:108px;height:108px;animation:drift-b 32s ease-in-out infinite}
+.d3{width:74px;height:74px;animation:drift-c 22s ease-in-out infinite}
+.d4{width:96px;height:96px;animation:drift-d 30s ease-in-out infinite}
+@keyframes drift-a{
+  0%{transform:translate3d(-16px,68vh,0)}
+  50%{transform:translate3d(10px,82vh,0)}
+  100%{transform:translate3d(-16px,68vh,0)}
+}
+@keyframes drift-b{
+  0%{transform:translate3d(calc(100vw - 100px),70vh,0)}
+  50%{transform:translate3d(calc(100vw - 72px),84vh,0)}
+  100%{transform:translate3d(calc(100vw - 100px),70vh,0)}
+}
+@keyframes drift-c{
+  0%{transform:translate3d(4vw,86vh,0)}
+  50%{transform:translate3d(-8px,94vh,0)}
+  100%{transform:translate3d(4vw,86vh,0)}
+}
+@keyframes drift-d{
+  0%{transform:translate3d(calc(100vw - 78px),90vh,0)}
+  50%{transform:translate3d(calc(100vw - 124px),74vh,0)}
+  100%{transform:translate3d(calc(100vw - 78px),90vh,0)}
+}
+@media (prefers-reduced-motion: reduce){
+  .picbubble{animation:none}
+  .d1{transform:translate3d(-16px,68vh,0)}
+  .d2{transform:translate3d(calc(100vw - 100px),70vh,0)}
+  .d3{transform:translate3d(4vw,86vh,0)}
+  .d4{transform:translate3d(calc(100vw - 78px),90vh,0)}
+}
+body.welcome-on header{background:#F4F1EA;border-bottom:1px solid rgba(43,42,39,.12);color:#2B2A27;z-index:28}
+body.welcome-on .topbar{position:relative;min-height:96px}
+body.welcome-on .brandline{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+body.welcome-on .loginlogo{display:block;position:absolute;left:50%;top:50%;width:176px;height:auto;transform:translate(-50%,-50%);object-fit:contain;pointer-events:none;background:transparent}
+body:not(.welcome-on) .loginlogo{display:none !important}
+body.welcome-on #welcomeHome,body.welcome-on #welcomeSignup,body.welcome-on #welcomeLogin,body.welcome-on .welcome-close{position:relative;z-index:1}
+body.welcome-on .mhero h2,body.welcome-on .mhero p,body.welcome-on .mfeat h2,body.welcome-on .mfeat p,body.welcome-on .welcome-quote,body.welcome-on button.outline,body.welcome-on button.featlink,body.welcome-on button.learnmore{background:#F4F1EA}
 body.welcome-on .topgap{flex:none;width:0}
 body.welcome-on .profilebtn{width:44px;height:44px;border-radius:8px;overflow:visible}
 body.welcome-on .profilebtn img{display:none}
@@ -572,6 +612,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
 <header>
   <div class="topbar">
     <h1 class="brandline"><span class="drop">C</span>urly Gurl Fitness</h1>
+    <img class="loginlogo" src="images/login-logo.jpg" alt="Curly Gurl Fitness">
     <button type="button" class="todaypick" id="todayPick" aria-expanded="false" aria-controls="dayMenu">
       <span id="todayPickLabel">Today</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -614,6 +655,12 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
   </div>
 </header>
 <div id="welcome" class="welcome">
+  <div class="bubbles" id="welcomeBubbles" aria-hidden="true">
+    <img class="picbubble d1" src="images/work/lower-body.jpg" alt="">
+    <img class="picbubble d2" src="images/food/salad.jpg" alt="">
+    <img class="picbubble d3" src="images/work/boxing.jpg" alt="">
+    <img class="picbubble d4" src="images/work/bike.jpg" alt="">
+  </div>
   <div id="welcomeHome">
     <section class="mhero">
       <div class="phonehero">
