@@ -567,12 +567,34 @@ body.welcome-on .profilepic{display:none !important}
 .noterow{width:100%;display:flex;align-items:center;justify-content:space-between;background:#FAF9F6;border:none;border-radius:var(--radius);padding:16px;color:#6F6C64;text-align:left;box-shadow:0 1px 2px rgba(43,42,39,.08);overflow:hidden}
 .noterow svg{width:18px;height:18px;stroke:#8A9A86;fill:none;stroke-width:1.7}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:24;display:flex;align-items:flex-end;gap:10px;padding:8px 12px calc(10px + var(--safe-b));background:linear-gradient(to top,var(--bg) 70%,transparent);max-width:560px;margin:0 auto}
-.tabpill{flex:1;display:flex;background:#FAF9F6;border-radius:28px;padding:6px 4px 4px;box-shadow:0 8px 20px rgba(43,42,39,.12)}
+.tabpill{flex:1;min-width:0;display:flex;background:#FAF9F6;border-radius:28px;padding:6px 4px 4px;box-shadow:0 8px 20px rgba(43,42,39,.12)}
 .tabpill button{flex:1;background:transparent;border:none;color:#6F6C64;padding:4px 0 2px;font-size:11px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:20px}
 .tabpill button[hidden],.tabplus[hidden]{display:none !important}
 .tabpill button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tabpill button.sel{color:#8A9A86}
 .tabplus{width:58px;height:58px;border-radius:50%;border:none;background:#8A9A86;color:#2B2A27;font-size:34px;line-height:1;padding:0;flex:none;box-shadow:0 8px 18px rgba(138,154,134,.4)}
+body.trainer-bar .tabbar{gap:4px;padding:6px 4px calc(8px + var(--safe-b))}
+body.trainer-bar .tabpill{padding:4px 1px 2px;min-width:0}
+body.trainer-bar .tabpill button{font-size:8px;font-weight:700;gap:1px;padding:2px 0 1px;min-width:0;line-height:1.05;letter-spacing:-.03em}
+body.trainer-bar .tabpill button span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.trainer-bar .tabpill button svg{width:16px;height:16px}
+body.trainer-bar .tabplus{width:42px;height:42px;font-size:24px}
+.asktitle{margin:0 0 6px;font-size:28px;font-weight:600;letter-spacing:.01em;color:#2B2A27;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+.askthread{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.askbubble{max-width:100%;padding:10px 12px;border-radius:16px;background:#FAF9F6;color:#2B2A27;box-shadow:0 1px 2px rgba(43,42,39,.08)}
+.askbubble.me{align-self:flex-end;max-width:88%;background:#E7EBE4}
+.askbubble p{margin:0 0 8px}
+.askbubble p:last-child{margin:0}
+.askchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 0}
+.askchips button{background:#FAF9F6;color:#2B2A27;border:1px solid #E4DFD4;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}
+.askday{background:#F4F1EA;border-radius:12px;padding:8px;margin:8px 0}
+.askday b{display:block;margin:0 0 6px;color:#2B2A27}
+.askrow{display:flex;gap:6px;align-items:center;margin:0 0 6px}
+.askrow select,.askrow input{flex:1;min-width:0;background:#FAF9F6;color:#2B2A27;border:1px solid #E4DFD4;border-radius:8px;padding:6px 8px;font:inherit}
+.askmacros{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:0 0 6px}
+.askmacros input{width:100%;background:#FAF9F6;color:#2B2A27;border:1px solid #E4DFD4;border-radius:8px;padding:6px 4px;font:inherit;font-size:12px}
+.asksrc{color:#6F6C64;font-size:11px;margin:0 0 6px}
+.askform textarea{min-height:72px}
 .morepop{position:fixed;z-index:45;background:#FAF9F6;border:1px solid #E4DFD4;border-radius:12px;min-width:180px;padding:6px;box-shadow:0 10px 24px rgba(43,42,39,.16);color:#2B2A27}
 .morepop button{display:block;width:100%;text-align:left;background:transparent;border:none;border-radius:8px;padding:8px 10px;color:#2B2A27}
 .brief h3,.brief p,.briefmore button,.setupcard h2,.setupcard p,.codebig,.macros b,.hub b,.list .name{color:#2B2A27}
@@ -1556,6 +1578,18 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
   <h2 class="sec">Training sessions</h2>
   <div id="sessionTraining"></div>
 </section>
+
+<!-- ============ ASK AI ============ -->
+<section class="page" id="page-ask">
+  <h2 class="asktitle">Ask AI</h2>
+  <p class="note">Workout ideas, videos saved on this phone, and meal numbers only when USDA, Open Food Facts, or a saved food already has them. This does not call an outside chat service.</p>
+  <div id="askThread" class="askthread"></div>
+  <form id="askForm" class="askform">
+    <label class="f" for="askInput">Ask</label>
+    <textarea id="askInput" placeholder="Describe the client, or ask about a split, a class, a video, or how to log a meal."></textarea>
+    <button class="primary full" type="submit">Ask</button>
+  </form>
+</section>
 </main>
 
 <nav class="navmenu" id="navMenu" hidden>
@@ -1690,6 +1724,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
     <button type="button" data-tabgo="plan" aria-label="Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>Plan</span></button>
     <button type="button" data-tabgo="progress" aria-label="Progress"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/></svg><span>Progress</span></button>
     <button type="button" data-tabgo="coach" aria-label="Coach"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6L12 3z"/><path d="M18 14l.7 1.8L20.5 16.5 18.7 17.2 18 19l-.7-1.8L15.5 16.5l1.8-.7L18 14z"/></svg><span>Coach</span></button>
+    <button type="button" data-tabgo="ask" aria-label="Ask AI" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v9H8l-3 3V6z"/></svg><span>Ask AI</span></button>
   </div>
   <button type="button" class="tabplus" id="tabPlus" aria-label="Add">+</button>
 </nav>
@@ -2349,7 +2384,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions"};
+const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI"};
 let currentTab = "today";
 let diaryDate = todayStr();
 function tabGroup(tab){
@@ -2358,7 +2393,14 @@ function tabGroup(tab){
   if(tab==="coach") return "coach";
   if(tab==="meals") return "meals";
   if(tab==="today") return "today";
+  if(tab==="ask") return "ask";
   return "";
+}
+function signedInTrainer(){
+  const auth = currentAuth();
+  if(!auth || !auth.email) return false;
+  const account = accountForAuth(auth);
+  return !!(account && account.role==="trainer" && ID.role==="trainer");
 }
 function clientView(){ return ID.role==="client"; }
 function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="workout" || tab==="events" || tab==="calendar" || tab==="checkin" || tab==="photos" || tab==="coach" || tab==="sessions"; }
@@ -2366,6 +2408,7 @@ function sessionsVisible(){ return trainerHere() || clientView(); }
 function go(tab){
   if(!TITLES[tab]) tab="today";
   if(tab==="sessions" && !sessionsVisible()) tab="today";
+  if(tab==="ask" && !signedInTrainer()) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
   currentTab = tab;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+tab));
@@ -2449,6 +2492,10 @@ function syncMenu(){
     $("menuEdit").setAttribute("aria-expanded", "false");
   }
   $("tabPlus").hidden = client;
+  const askBtn = document.querySelector('#tabbar [data-tabgo="ask"]');
+  const trainerAsk = signedInTrainer();
+  if(askBtn) askBtn.hidden = !trainerAsk;
+  document.body.classList.toggle("trainer-bar", trainerAsk);
   const onWelcome = document.body.classList.contains("welcome-on");
   const roleShown = onWelcome ? menuRole() : ID.role;
   document.querySelectorAll("#menuRoles [data-menurole]").forEach(b=>{
@@ -2858,10 +2905,11 @@ async function fetchFoodJsonRetry(url, tries){
   }
   throw last;
 }
-async function usdaFoodPages(query, dataType){
+async function usdaFoodPages(query, dataType, pageLimit){
   const found = [];
   const pageSize = 100;
-  for(let page=1; page<=4; page++){
+  const lastPage = pageLimit>0 ? pageLimit : 4;
+  for(let page=1; page<=lastPage; page++){
     const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/foods/search?query="+encodeURIComponent(query)+"&pageSize="+pageSize+"&pageNumber="+page+"&dataType="+encodeURIComponent(dataType)+"&api_key=DEMO_KEY");
     const batch = data.foods || [];
     const matched = batch.map(food=>listedUsdaFood(food, query)).filter(Boolean);
@@ -2871,7 +2919,7 @@ async function usdaFoodPages(query, dataType){
   }
   return found;
 }
-async function openFoodPages(query){
+async function openFoodPages(query, pageLimit){
   const pageSize = 100;
   const hosts = ["https://world.openfoodfacts.org", "https://us.openfoodfacts.org"];
   let data = null;
@@ -2887,8 +2935,9 @@ async function openFoodPages(query){
   const found = (data.products||[]).map(product=>listedFood(product, query)).filter(Boolean);
   const count = Number(data.count) || 0;
   const first = data.products || [];
-  if(found.length && first.length>=pageSize && count>pageSize){
-    for(let page=2; page<=4; page++){
+  const lastPage = pageLimit>0 ? pageLimit : 4;
+  if(lastPage>1 && found.length && first.length>=pageSize && count>pageSize){
+    for(let page=2; page<=lastPage; page++){
       if((page-1)*pageSize>=count) break;
       const more = await fetchFoodJsonRetry(host+"/cgi/search.pl?search_terms="+encodeURIComponent(query)+"&search_simple=1&action=process&json=1&page_size="+pageSize+"&page="+page, 2);
       const batch = more.products || [];
@@ -3296,6 +3345,7 @@ document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>b.onclick=()=>{
     go(stay ? currentTab : "checkin");
   }
   else if(g==="coach") go("coach");
+  else if(g==="ask") go("ask");
 });
 document.querySelectorAll("#menuRoles [data-menurole]").forEach(b=>{
   b.onclick = () => chooseMenuRole(b.dataset.menurole);
@@ -3333,7 +3383,8 @@ function chooseMenuRole(role){
     ID.role = role;
     persistIdentity();
   }
-  if(role==="client" && !clientAllows(currentTab)) go("today");
+  if(role!=="trainer" && currentTab==="ask") go("today");
+  else if(role==="client" && !clientAllows(currentTab)) go("today");
   else render();
 }
 $("tabPlus").onclick = e => { e.stopPropagation(); openTool("add"); };
@@ -5537,7 +5588,7 @@ function setRole(role){
   toast(role==="trainer"?"Trainer mode":role==="client"?"Client mode":"Personal tracker");
   applyMemberLook();
   if(role==="trainer" || role==="client") go("coach");
-  else if(currentTab==="sessions") go("today");
+  else if(currentTab==="ask" || currentTab==="sessions") go("today");
   else if(currentTab==="coach" || currentTab==="settings") render();
   else { updateDemoBanner(); paintMyPage(); }
   syncMenu();
@@ -6698,12 +6749,547 @@ $("sessionSave").onclick = () => {
     render();
   }).catch(e => toast(e && e.message ? e.message : "Could not store that on this phone"));
 };
+/* ---------- Ask AI (on this phone, no outside chat service) ---------- */
+const ASK_STORE_KEY = "curlyGirlFitness.ask.v1";
+const ASK_PROMPTS = [
+  "Sample week of workouts and meals. 3 days, dumbbells. Likes chicken and rice. Avoids dairy.",
+  "Training split for 4 days",
+  "What videos are already in the app?",
+  "Class ideas for glutes",
+  "How do I log a meal?"
+];
+let askState = null;
+let askSeq = 0;
+function askEmail(){
+  const auth = currentAuth();
+  return auth && auth.email ? auth.email : "";
+}
+function loadAskState(){
+  const email = askEmail();
+  const all = readStore(localStorage, ASK_STORE_KEY) || {};
+  const row = all[email] || {};
+  askState = {email:email, messages:Array.isArray(row.messages) ? row.messages : []};
+}
+function persistAsk(){
+  if(!askState || !askState.email) return;
+  const all = readStore(localStorage, ASK_STORE_KEY) || {};
+  all[askState.email] = {messages:askState.messages.slice(-20)};
+  localStorage.setItem(ASK_STORE_KEY, JSON.stringify(all));
+}
+function askNum(v){
+  if(v==null || v==="") return null;
+  const n = Number(v);
+  return Number.isFinite(n) && n>=0 ? n : null;
+}
+function askFmt(n){
+  if(n==null) return "";
+  const r = Math.round(Number(n)*10)/10;
+  return String(r);
+}
+function askSavedFoods(){
+  const out = [];
+  (S.meals||[]).forEach(m=>{
+    const cal = askNum(m.cal);
+    if(!m || !String(m.name||"").trim() || cal==null) return;
+    out.push({name:String(m.name).trim(), cal:Math.round(cal), protein:askNum(m.protein), carbs:askNum(m.carbs), fat:askNum(m.fat), amount:"", source:"Saved on this phone"});
+  });
+  (S.customRecipes||[]).forEach(r=>{
+    if(!r || !String(r.name||"").trim()) return;
+    const cal = askNum(r.calories);
+    const protein = askNum(r.protein);
+    const carbs = askNum(r.carbs);
+    const fat = askNum(r.fat);
+    const knownCal = cal!=null && cal>0 ? Math.round(cal) : null;
+    const known = (v)=> v!=null && v>0 ? v : null;
+    if(knownCal==null && known(protein)==null && known(carbs)==null && known(fat)==null) return;
+    out.push({name:String(r.name).trim(), cal:knownCal, protein:known(protein), carbs:known(carbs), fat:known(fat), amount:"1 serving", source:"Saved recipe on this phone"});
+  });
+  return out;
+}
+function askGear(name){
+  const n = String(name||"").toLowerCase();
+  if(/cable|pulldown|face pull|crossover|pushdown/.test(n)) return "cable";
+  if(/leg press|leg curl|rowing machine/.test(n)) return "machine";
+  if(/kettlebell/.test(n)) return "kettlebell";
+  if(/barbell|deadlift|overhead press|\bbench press\b/.test(n)) return "barbell";
+  if(/dumbbell|goblet/.test(n)) return "dumbbell";
+  return "body";
+}
+function askGearOk(name, gear){
+  if(!gear) return true;
+  const g = askGear(name);
+  if(gear==="dumbbell") return g==="dumbbell" || g==="body";
+  if(gear==="barbell") return g==="barbell" || g==="body";
+  if(gear==="kettlebell") return g==="kettlebell" || g==="body";
+  if(gear==="cable") return g==="cable" || g==="body";
+  if(gear==="machine") return g==="machine" || g==="body";
+  if(gear==="body") return g==="body";
+  return true;
+}
+function askGearFrom(text){
+  const s = text.toLowerCase();
+  if(/dumbbell/.test(s)) return "dumbbell";
+  if(/kettlebell/.test(s)) return "kettlebell";
+  if(/barbell/.test(s)) return "barbell";
+  if(/cable/.test(s)) return "cable";
+  if(/machine/.test(s)) return "machine";
+  if(/body\s?weight|no equipment|without equipment/.test(s)) return "body";
+  return "";
+}
+function askDays(text){
+  const words = {one:1, two:2, three:3, four:4, five:5, six:6};
+  const m = text.toLowerCase().match(/\b(\d+|one|two|three|four|five|six)\s*-?\s*days?\b/);
+  let n = m ? (words[m[1]] || parseInt(m[1], 10)) : 0;
+  if(!(n>=2 && n<=6)) n = 3;
+  return n;
+}
+function askSplit(days, gear){
+  const plans = {
+    2:[["Upper","chest","back","shoulders","arms"],["Lower","legs","glutes","core"]],
+    3:[["Upper","chest","back","shoulders"],["Lower","legs","glutes"],["Full body","full","core","cardio"]],
+    4:[["Push","chest","shoulders","arms"],["Pull","back","arms"],["Lower","legs","glutes"],["Conditioning","cardio","core"]],
+    5:[["Chest","chest"],["Back","back"],["Legs","legs","glutes"],["Shoulders","shoulders","arms"],["Conditioning","cardio","core"]],
+    6:[["Push","chest","shoulders"],["Pull","back"],["Legs","legs","glutes"],["Upper","chest","back"],["Lower","legs","core"],["Cardio","cardio","full"]]
+  };
+  const spec = plans[days] || plans[3];
+  return spec.map((row, i)=>{
+    const groups = row.slice(1);
+    const seen = {};
+    const exercises = [];
+    allExercises().forEach(e=>{
+      if(exercises.length>=4) return;
+      if(groups.indexOf(e.group)<0 || !askGearOk(e.name, gear)) return;
+      const key = e.name.toLowerCase();
+      if(seen[key]) return;
+      seen[key] = 1;
+      exercises.push({name:e.name, target:""});
+    });
+    return {label:"Day "+(i+1)+" · "+row[0], rest:false, exercises:exercises};
+  });
+}
+function askBuiltinWeek(gear){
+  const labels = {1:"Monday",2:"Tuesday",3:"Wednesday",4:"Thursday",5:"Friday",6:"Saturday",0:"Sunday"};
+  return [1,2,3,4,5,6,0].map(d=>{
+    const day = PLAN[d];
+    const exercises = (day.exercises||[]).filter(e=>askGearOk(e.name, gear)).map(e=>({name:e.name, target:e.target||""}));
+    return {label:labels[d]+" · "+day.title, rest:!!day.rest && !exercises.length, exercises:exercises};
+  });
+}
+function askVideoForName(name){
+  const hit = (S.customExercises||[]).find(e=>String(e.name||"").toLowerCase()===String(name||"").toLowerCase());
+  return hit ? safeUrl(hit.video||"") : "";
+}
+function videosOnPhone(){
+  const list = [];
+  (S.customExercises||[]).forEach(e=>{
+    const url = safeUrl(e.video||"");
+    if(url) list.push({where:"Exercise library", title:e.name, detail:"Link saved on this custom exercise", url:url});
+  });
+  loadSessionRows().forEach(row=>{
+    if(row.kind==="video") list.push({where:"Sessions", title:row.label==="group" ? "Group session" : "Training session", detail:row.name || "Video file saved on this phone", url:""});
+  });
+  const demo = readStore(localStorage, DEMO_KEY);
+  const pairs = demo && Array.isArray(demo.pairs) ? demo.pairs : [];
+  pairs.forEach(p=>{
+    (p.videos||[]).forEach(v=>{
+      const url = v && v.url ? safeUrl(v.url) : "";
+      if((v && v.kind==="file") || url) list.push({where:"Videos", title:v.fileName || (p.clientName||"Client"), detail:v.note || "Saved on a client in Videos", url:url});
+    });
+  });
+  return list;
+}
+function askFoodLists(text){
+  const stop = {};
+  "a an the and or with for from that this client she he they them her his their day days week workout workouts meal meals plan plans food foods like likes eat eats equipment dumbbell dumbbells barbell kettlebell bodyweight gym home goal strength sample please want wants who has have some more".split(" ").forEach(w=>{ stop[w]=1; });
+  function parts(chunk){
+    return String(chunk||"").split(/,|\/|\band\b|\bor\b/i).map(s=>s.replace(/^(some|more|a|an|the)\s+/i,"").replace(/[.?!].*$/,"").trim()).filter(s=>{
+      const k = s.toLowerCase();
+      return s.length>1 && s.length<42 && !stop[k];
+    });
+  }
+  const likes = [];
+  const avoids = [];
+  const likeRe = /(?:likes?|enjoys?|prefers?|wants?)\s+([^.\n]+)/gi;
+  const avoidRe = /(?:avoid(?:s|ing)?|without|allergic to|can't eat|cannot eat|doesn't eat|does not eat|\bno\b)\s+([^.\n]+)/gi;
+  let m;
+  while((m = likeRe.exec(text))) likes.push.apply(likes, parts(m[1]));
+  while((m = avoidRe.exec(text))) avoids.push.apply(avoids, parts(m[1]));
+  const named = text.match(/(?:macros?|calories|protein|carbs|fat)\s+(?:for|in|of)\s+([^?.\n]+)/i);
+  if(named) likes.push.apply(likes, parts(named[1]));
+  function uniq(list){
+    const seen = {};
+    return list.filter(s=>{ const k=s.toLowerCase(); if(seen[k]) return false; seen[k]=1; return true; });
+  }
+  return {likes:uniq(likes), avoids:uniq(avoids)};
+}
+function askBlocked(name, avoids){
+  const n = String(name||"").toLowerCase();
+  return avoids.some(a=>{
+    const w = a.toLowerCase();
+    if(n.indexOf(w)>=0) return true;
+    if(w==="dairy") return /milk|cheese|yogurt|whey|cream|butter/.test(n);
+    return false;
+  });
+}
+function askDeadline(promise, ms){
+  return new Promise((resolve, reject)=>{
+    const t = setTimeout(()=>reject(new Error("lookup")), ms);
+    promise.then(v=>{ clearTimeout(t); resolve(v); }, e=>{ clearTimeout(t); reject(e); });
+  });
+}
+async function askLookupOne(query){
+  const q = String(query||"").trim();
+  if(q.length<2) return {query:q, name:q, cal:null, protein:null, carbs:null, fat:null, amount:"", source:"", missing:true, answered:false};
+  const jobs = [
+    usdaFoodPages(q, "Branded", 1),
+    usdaFoodPages(q, "SR Legacy", 1),
+    usdaFoodPages(q, "Survey (FNDDS)", 1),
+    openFoodPages(q, 1)
+  ];
+  const settled = await Promise.all(jobs.map(job=>askDeadline(job, 7000).then(rows=>({ok:true, rows:rows||[]})).catch(()=>({ok:false, rows:[]}))));
+  const hits = takeFoodHits(settled.reduce((all, item)=>all.concat(item.rows), []), q);
+  const answered = settled.some(item=>item.ok);
+  if(!hits.length || askNum(hits[0].cal)==null) return {query:q, name:q, cal:null, protein:null, carbs:null, fat:null, amount:"", source:"", missing:true, answered:answered};
+  const hit = hits[0];
+  return {query:q, name:hit.name, cal:Math.round(askNum(hit.cal)), protein:askNum(hit.protein), carbs:askNum(hit.carbs), fat:askNum(hit.fat), amount:hit.amount||"", source:hit.source||"", missing:false, answered:true};
+}
+function askMacroLine(food){
+  const bits = [];
+  bits.push(food.cal==null ? "calories not known" : food.cal+" cal");
+  bits.push(food.protein==null ? "protein not known" : askFmt(food.protein)+"g protein");
+  bits.push(food.carbs==null ? "carbs not known" : askFmt(food.carbs)+"g carbs");
+  bits.push(food.fat==null ? "fat not known" : askFmt(food.fat)+"g fat");
+  if(food.amount) bits.push(food.amount);
+  if(food.source) bits.push(food.source);
+  return bits.join(" · ");
+}
+function askDayTotals(items){
+  const named = items.filter(it=>String(it.name||"").trim());
+  if(!named.length) return "No foods on this day, so calories and macros are not known.";
+  function total(key){
+    if(named.some(it=>it[key]==null)) return null;
+    return Math.round(named.reduce((sum, it)=>sum+Number(it[key]), 0)*10)/10;
+  }
+  const cal = total("cal");
+  const protein = total("protein");
+  const carbs = total("carbs");
+  const fat = total("fat");
+  return "Day total: "+(cal==null?"calories not known":cal+" cal")+" · "+(protein==null?"protein not known":askFmt(protein)+"g protein")+" · "+(carbs==null?"carbs not known":askFmt(carbs)+"g carbs")+" · "+(fat==null?"fat not known":askFmt(fat)+"g fat")+". A missing number is left out instead of guessed.";
+}
+function askIntents(text){
+  const s = text.toLowerCase();
+  const plan = /plan|draft|sample|week|\bbuild\b|split/.test(s);
+  const wantsWorkout = /workout|exercise|\blift|split|training|upper|lower|strength|dumbbell|barbell|kettlebell/.test(s);
+  const wantsMeal = /meal|food|calorie|macro|protein|\bcarb|fat|breakfast|lunch|dinner|snack|diet|eat/.test(s);
+  const video = /video|clip|\bwatch\b|youtube/.test(s);
+  const klass = /\bclass\b|group session|booking|\bevents?\b/.test(s);
+  const log = /how (?:do i|to) log|log a meal|log food|barcode|quick add|voice log|meal scan/.test(s);
+  const bodyfat = /body\s?-?fat/.test(s);
+  const bmi = /\bbmi\b/.test(s);
+  return {
+    workout: wantsWorkout || (plan && !wantsMeal && !video && !klass && !log),
+    mealPlan: wantsMeal && plan && !log,
+    macros: wantsMeal && !plan && !log,
+    video: video,
+    klass: klass,
+    log: log,
+    bodyfat: bodyfat,
+    bmi: bmi,
+    broad: !wantsWorkout && !wantsMeal && !video && !klass && !log && !bodyfat && !bmi && !plan
+  };
+}
+function askGroupFocus(text){
+  const s = text.toLowerCase();
+  const hit = GROUPS.find(([id, label])=> s.indexOf(id)>=0 || s.indexOf(label.toLowerCase())>=0);
+  return hit ? hit[0] : "";
+}
+function askClassText(text){
+  const lines = [];
+  const events = (S.events||[]).slice().sort((a,b)=> (a.date+a.time).localeCompare(b.date+b.time));
+  if(!events.length) lines.push("No class is saved on this phone yet. Plan, then Events, can store a group class, a one-on-one, or an open booking. The form asks you for the date, time, length, and spots. This screen does not fill those in.");
+  else {
+    lines.push("Classes already saved on this phone:");
+    events.slice(0,8).forEach(ev=>{
+      const kind = ev.kind==="one" ? "1 on 1" : ev.kind==="open" ? "Open booking" : "Group class";
+      lines.push(ev.name+" · "+kind+" · "+ev.date+" "+(ev.time||"")+" · "+ev.length+" min · "+ev.spots+" spots.");
+    });
+    lines.push("Open Plan, then Events, to edit or add one.");
+  }
+  const focus = askGroupFocus(text) || (/glute/.test(text.toLowerCase()) ? "glutes" : "");
+  if(focus){
+    const moves = allExercises().filter(e=>e.group===focus).slice(0,6).map(e=>e.name);
+    if(moves.length) lines.push("A "+groupLabel(focus).toLowerCase()+" class can use these exercises already in the library: "+moves.join(", ")+". No video link is attached unless you saved one on a custom exercise.");
+  }
+  return lines.join(" ");
+}
+function askLogText(){
+  return "To log a meal, open Today and tap Log on a meal, or open Meals. Search foods. Matches that already have a calorie come from foods saved on this phone, then from USDA and Open Food Facts. A result is listed only when that source returned a calorie number. Barcode scan, voice log, and meal scan are on that same search screen. The photo does not read calories. Quick add asks you to type the calories. If a food has no returned number, it is not known, and the app does not fill one in.";
+}
+function askVideoText(){
+  const list = videosOnPhone();
+  if(!list.length) return "No video is saved on this phone. Videos you send are under Videos. Session clips you upload are under Sessions. Each exercise in the library has a written cue. A video link is shown here only when one was saved on a custom exercise or sent in Videos. No channel or link is made up.";
+  return "Videos already in the app: "+list.map(v=>{
+    const link = v.url ? " "+v.url : "";
+    return v.where+" · "+v.title+" · "+v.detail+link;
+  }).join(" ")+" Open Videos or Sessions to play what was saved. No other video link is added.";
+}
+function askBmiText(){
+  const rows = (S.bmi||[]).slice().sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+  const last = rows.length ? rows[rows.length-1] : null;
+  const height = last && last.heightIn ? last.heightIn : (S.settings && S.settings.heightIn);
+  const weight = last && last.weight ? last.weight : null;
+  if(!(height>0) || !(weight>0)) return "BMI is not known. Height and weight are not both saved. Open Progress, then BMI, and enter them there. Body-fat is not known. This app does not calculate body-fat.";
+  const b = bmiFrom(weight, height);
+  return "The latest saved height and weight on this phone give BMI "+b+" ("+bmiBandName(b)+"), using the same calculation as the BMI screen. That screen says BMI does not see muscle or where fat sits. Body-fat is not known.";
+}
+async function buildAskAnswer(text){
+  const intent = askIntents(text);
+  const gear = askGearFrom(text);
+  const days = askDays(text);
+  const mealDays = /week/.test(text.toLowerCase()) ? 7 : days;
+  const parts = [];
+  let draft = null;
+  if(intent.broad){
+    parts.push("Ask for a workout idea, a meal built from foods you name, a video already on this phone, a class, or how to log a meal. Calories, protein, carbs, and fat are shown only when a saved food or USDA or Open Food Facts already returned that number. If it did not, the number is not known.");
+  }
+  if(intent.bodyfat && !intent.bmi) parts.push("Body-fat is not known. This app does not store or calculate a body-fat number.");
+  if(intent.bmi) parts.push(askBmiText());
+  if(intent.log) parts.push(askLogText());
+  if(intent.video) parts.push(askVideoText());
+  if(intent.klass) parts.push(askClassText(text));
+  if(intent.workout){
+    const gearNote = gear ? " Equipment filter: "+gear+" and moves that do not name another machine." : " No equipment was named, so the library is not filtered.";
+    parts.push(days+"-day idea uses exercises already in the library."+gearNote+" Sets are left blank on that idea because the library does not store a set count. The other idea is the week already built into the app, including the set notes that week already has. This is not a medical plan.");
+    const customVids = [];
+    askSplit(days, gear).forEach(day=>{
+      day.exercises.forEach(ex=>{
+        const url = askVideoForName(ex.name);
+        if(url) customVids.push(ex.name+": "+url);
+      });
+    });
+    if(customVids.length) parts.push("Saved video links on these exercises: "+customVids.join(" "));
+    else parts.push("No saved video link is attached to these exercises. The library cue is text only.");
+    draft = draft || {ideas:[], meals:[]};
+    draft.ideas.push({title:days+"-day library split", days:askSplit(days, gear)});
+    draft.ideas.push({title:"Week already in the app", days:askBuiltinWeek(gear)});
+  }
+  const lists = askFoodLists(text);
+  if(intent.mealPlan || intent.macros){
+    const saved = askSavedFoods();
+    const foods = [];
+    const missing = [];
+    const queries = lists.likes.length ? lists.likes : [];
+    if(!queries.length && intent.mealPlan){
+      saved.forEach(f=>{ if(!askBlocked(f.name, lists.avoids)) foods.push(f); });
+      if(!foods.length) parts.push("No food with a calorie number is saved on this phone, and none was named. Calories, protein, carbs, and fat are not known. You can type a food into the draft. Leave a number blank if you do not have one.");
+    }
+    const looked = queries.length ? await Promise.all(queries.map(q=>askLookupOne(q))) : [];
+    looked.forEach(hit=>{
+      if(askBlocked(hit.name, lists.avoids) || askBlocked(hit.query, lists.avoids)){
+        parts.push(hit.query+" was left out because it matches a food to avoid.");
+        return;
+      }
+      const local = saved.find(f=>f.name.toLowerCase().indexOf(hit.query.toLowerCase())>=0 && !askBlocked(f.name, lists.avoids));
+      if(local && local.cal!=null){
+        foods.push(local);
+        parts.push(local.name+": "+askMacroLine(local)+".");
+        return;
+      }
+      if(hit.missing){
+        missing.push(hit.query);
+        parts.push(hit.answered ? hit.query+" was not found. Calories, protein, carbs, and fat are not known." : "The food lookup did not answer for "+hit.query+". Calories, protein, carbs, and fat are not known.");
+        return;
+      }
+      foods.push(hit);
+      parts.push(hit.name+": "+askMacroLine(hit)+".");
+    });
+    if(intent.mealPlan && !foods.length){
+      saved.forEach(f=>{ if(!askBlocked(f.name, lists.avoids)) foods.push(f); });
+      if(foods.length) parts.push("The named foods did not return a calorie number, so the draft below uses foods already saved on this phone. Leave a box blank where a number is not known.");
+      else parts.push("No saved food on this phone has a calorie number either. The meal boxes stay blank. Calories, protein, carbs, and fat are not known.");
+    }
+    if(intent.mealPlan){
+      const slots = ["Breakfast","Lunch","Dinner"];
+      const meals = [];
+      let i = 0;
+      for(let d=1; d<=mealDays; d++){
+        const items = slots.map(slot=>{
+          if(!foods.length) return {slot:slot, name:"", cal:null, protein:null, carbs:null, fat:null, amount:"", source:"", note:"Calories not known"};
+          const f = foods[i % foods.length];
+          i++;
+          return {slot:slot, name:f.name, cal:f.cal, protein:f.protein, carbs:f.carbs, fat:f.fat, amount:f.amount||"", source:f.source||"", note:f.cal==null?"Calories not known":""};
+        });
+        missing.forEach(name=>{
+          if(d===1) items.push({slot:"Named food", name:name, cal:null, protein:null, carbs:null, fat:null, amount:"", source:"", note:"Not found. Calories not known."});
+        });
+        meals.push({label:"Day "+d, items:items});
+      }
+      draft = draft || {ideas:[], meals:[]};
+      draft.meals = meals;
+      if(foods.length) parts.push("The meal draft repeats foods that already have a calorie number. A macro stays blank when that source did not return it.");
+    }
+  }
+  if(!parts.length) parts.push("That is not in this app’s exercises, videos, classes, or foods with a returned number. Nothing was guessed.");
+  return {text:parts.join("\n\n"), draft:draft};
+}
+function askExerciseOptions(selected){
+  const names = [];
+  const seen = {};
+  allExercises().forEach(e=>{
+    const key = e.name.toLowerCase();
+    if(seen[key]) return;
+    seen[key] = 1;
+    names.push(e.name);
+  });
+  if(selected && !seen[String(selected).toLowerCase()]) names.unshift(selected);
+  return names.map(n=>`<option${n===selected?" selected":""}>${esc(n)}</option>`).join("");
+}
+function paintAskThread(){
+  const box = $("askThread");
+  if(!box) return;
+  if(box.querySelector("[data-aski]")) captureAskEdits();
+  if(!askState) loadAskState();
+  if(!askState.messages.length){
+    box.innerHTML = '<div class="askbubble"><p>Describe the client, or ask for a workout idea, a class, a video already saved here, or how to log a meal.</p><div class="askchips">'+ASK_PROMPTS.map(p=>`<button type="button" data-askprompt="${esc(p)}">${esc(p.replace(/\..*$/, ""))}</button>`).join("")+'</div></div>';
+    box.querySelectorAll("[data-askprompt]").forEach(b=>b.onclick=()=>{ $("askInput").value = b.dataset.askprompt; askSend(b.dataset.askprompt); });
+    return;
+  }
+  box.innerHTML = askState.messages.map((msg, i)=>{
+    if(msg.role==="user") return `<div class="askbubble me"><p>${esc(msg.text)}</p></div>`;
+    let html = `<div class="askbubble" data-aski="${i}">`+esc(msg.text).split(/\n\n/).map(p=>`<p>${p}</p>`).join("");
+    const draft = msg.draft;
+    if(draft && draft.ideas){
+      draft.ideas.forEach((idea, ii)=>{
+        html += `<div class="askday"><b>${esc(idea.title)}</b>`;
+        (idea.days||[]).forEach((day, di)=>{
+          html += `<div class="asksrc">${esc(day.label)}${day.rest?" · Rest":""}</div>`;
+          if(!day.exercises.length) html += `<p class="asksrc">No library exercise matched this day.</p>`;
+          day.exercises.forEach((ex, ei)=>{
+            const url = askVideoForName(ex.name);
+            html += `<div class="askrow"><select data-exname="${ii}.${di}.${ei}" aria-label="Exercise">${askExerciseOptions(ex.name)}</select><input data-extarget="${ii}.${di}.${ei}" value="${esc(ex.target||"")}" placeholder="Sets not set" aria-label="Sets"></div>`;
+            html += `<p class="asksrc">${url ? "Saved video: "+esc(url) : "No video saved for this exercise."}</p>`;
+          });
+        });
+        html += `</div>`;
+      });
+    }
+    if(draft && draft.meals && draft.meals.length){
+      draft.meals.forEach((day, di)=>{
+        html += `<div class="askday"><b>${esc(day.label)}</b>`;
+        day.items.forEach((it, ei)=>{
+          html += `<div class="asksrc">${esc(it.slot)}</div>`;
+          html += `<div class="askrow"><input data-mealname="${di}.${ei}" value="${esc(it.name||"")}" placeholder="Food" aria-label="Food"></div>`;
+          html += `<div class="askmacros"><input data-mealcal="${di}.${ei}" inputmode="decimal" placeholder="Cal" aria-label="Calories" value="${it.cal==null?"":esc(String(it.cal))}"><input data-mealpro="${di}.${ei}" inputmode="decimal" placeholder="Protein" aria-label="Protein" value="${it.protein==null?"":esc(askFmt(it.protein))}"><input data-mealcarb="${di}.${ei}" inputmode="decimal" placeholder="Carbs" aria-label="Carbs" value="${it.carbs==null?"":esc(askFmt(it.carbs))}"><input data-mealfat="${di}.${ei}" inputmode="decimal" placeholder="Fat" aria-label="Fat" value="${it.fat==null?"":esc(askFmt(it.fat))}"></div>`;
+          html += `<p class="asksrc">${esc(it.source||"")}${it.amount?" · "+esc(it.amount):""} ${it.note?esc(it.note):""}</p>`;
+        });
+        html += `<p class="asksrc">${esc(askDayTotals(day.items))}</p></div>`;
+      });
+    }
+    if(draft) html += `<button type="button" class="primary full" data-asksave="${i}">${msg.saved?"Saved on this phone":"Save on this phone"}</button>`;
+    html += `</div>`;
+    return html;
+  }).join("");
+  box.querySelectorAll("[data-asksave]").forEach(b=>b.onclick=()=>saveAskDraft(+b.dataset.asksave));
+  box.querySelectorAll("[data-exname]").forEach(sel=>sel.onchange=()=>{
+    captureAskEdits();
+    const url = askVideoForName(sel.value);
+    const note = sel.parentNode && sel.parentNode.nextElementSibling;
+    if(note) note.textContent = url ? "Saved video: "+url : "No video saved for this exercise.";
+  });
+  box.querySelectorAll("input").forEach(inp=>inp.onchange=()=>captureAskEdits());
+}
+function captureAskEdits(){
+  if(!askState) return;
+  document.querySelectorAll("#askThread [data-aski]").forEach(card=>{
+    const msg = askState.messages[+card.dataset.aski];
+    if(!msg || !msg.draft) return;
+    card.querySelectorAll("[data-exname]").forEach(sel=>{
+      const p = sel.dataset.exname.split(".").map(Number);
+      const ex = msg.draft.ideas[p[0]] && msg.draft.ideas[p[0]].days[p[1]] && msg.draft.ideas[p[0]].days[p[1]].exercises[p[2]];
+      if(ex) ex.name = sel.value;
+    });
+    card.querySelectorAll("[data-extarget]").forEach(inp=>{
+      const p = inp.dataset.extarget.split(".").map(Number);
+      const ex = msg.draft.ideas[p[0]] && msg.draft.ideas[p[0]].days[p[1]] && msg.draft.ideas[p[0]].days[p[1]].exercises[p[2]];
+      if(ex) ex.target = inp.value;
+    });
+    card.querySelectorAll("[data-mealname]").forEach(inp=>{
+      const p = inp.dataset.mealname.split(".").map(Number);
+      const it = msg.draft.meals[p[0]] && msg.draft.meals[p[0]].items[p[1]];
+      if(it) it.name = inp.value;
+    });
+    [["mealcal","cal"],["mealpro","protein"],["mealcarb","carbs"],["mealfat","fat"]].forEach(([attr, key])=>{
+      card.querySelectorAll("[data-"+attr+"]").forEach(inp=>{
+        const p = inp.dataset[attr].split(".").map(Number);
+        const it = msg.draft.meals[p[0]] && msg.draft.meals[p[0]].items[p[1]];
+        if(!it) return;
+        it[key] = inp.value.trim()==="" ? null : askNum(inp.value);
+        if(key==="cal" && it[key]!=null && inp.value.trim()!=="" && !it.source) it.source = "Entered in this draft";
+      });
+    });
+  });
+}
+function saveAskDraft(index){
+  captureAskEdits();
+  const msg = askState && askState.messages[index];
+  if(!msg || !msg.draft) return;
+  msg.saved = true;
+  persistAsk();
+  paintAskThread();
+  toast("Saved on this phone");
+}
+function renderAsk(){
+  $("hdrTitle").textContent = "Ask AI";
+  $("hdrSub").textContent = "Ideas from this phone";
+  const form = $("askForm");
+  if(!signedInTrainer()){
+    if($("askThread")) $("askThread").innerHTML = '<p class="note">Ask AI stays on the bar for a signed-in trainer account.</p>';
+    if(form) form.hidden = true;
+    return;
+  }
+  if(form) form.hidden = false;
+  if(!askState || askState.email!==askEmail()) loadAskState();
+  paintAskThread();
+}
+async function askSend(text){
+  const q = String(text||"").trim();
+  if(!q || !signedInTrainer()) return;
+  if(!askState || askState.email!==askEmail()) loadAskState();
+  askState.messages.push({role:"user", text:q});
+  const seq = ++askSeq;
+  askState.messages.push({role:"app", text:"Checking the exercise library, saved videos, and food numbers from this phone, USDA, and Open Food Facts.", pending:seq});
+  persistAsk();
+  paintAskThread();
+  let answer;
+  try { answer = await buildAskAnswer(q); }
+  catch(e){
+    answer = {text:"That could not be finished. No calorie or macro was guessed.", draft:null};
+  }
+  const slot = askState.messages.find(m=>m.pending===seq);
+  if(slot){
+    slot.text = answer.text;
+    slot.draft = answer.draft;
+    slot.pending = false;
+  }
+  persistAsk();
+  if(currentTab==="ask") paintAskThread();
+  const thread = $("askThread");
+  if(thread && thread.lastElementChild) thread.lastElementChild.scrollIntoView({block:"nearest"});
+}
+$("askForm").onsubmit = (e)=>{
+  e.preventDefault();
+  if(!signedInTrainer()){ toast("Ask AI is for a signed-in trainer"); return; }
+  const text = $("askInput").value.trim();
+  if(!text) return;
+  $("askInput").value = "";
+  askSend(text);
+};
 function render(){
   applyClientLock();
   paintHeader();
   paintSubbar();
   applyMemberLook();
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
