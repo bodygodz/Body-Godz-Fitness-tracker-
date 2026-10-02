@@ -478,6 +478,28 @@ body.welcome-on .profilepic{display:none !important}
 .morebtn{background:transparent;border:none;color:#6b6280;padding:4px 6px}
 .morebtn svg{width:22px;height:22px;display:block}
 .logpill{background:#fff;border:1.5px solid #db2777;color:#db2777;border-radius:999px;padding:6px 16px;font-weight:700;font-size:15px}
+.foodlog{position:fixed;inset:0;z-index:70;background:#4c1d95;color:#fff;display:flex;flex-direction:column;overflow:hidden}
+.foodlog[hidden]{display:none !important}
+.foodlog-top{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top,0px)) 12px 6px}
+.foodlog-back{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.7);background:transparent;color:#fff;padding:0;display:flex;align-items:center;justify-content:center;flex:none}
+.foodlog-back svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.foodlog-meal{flex:1;width:auto;min-width:0;background-color:transparent;border:none;color:#fff;font-size:22px;font-weight:800;text-align:center;padding:0 28px 0 0;appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(135deg,#fff 50%,transparent 50%);background-position:calc(50% + 54px) 55%,calc(50% + 60px) 55%;background-size:6px 6px,6px 6px;background-repeat:no-repeat}
+.foodlog-scroll{flex:1;overflow:auto;padding:8px 14px 28px}
+.foodlog-search{width:100%;background:#fff;color:#1c1430;border:none;border-radius:16px;padding:12px 14px}
+.foodlog-tabs{display:flex;gap:18px;overflow:auto;margin:14px 0 4px}
+.foodlog-tabs button{flex:none;background:transparent;border:none;border-bottom:3px solid transparent;border-radius:0;color:rgba(255,255,255,.75);font-weight:800;padding:8px 0;font-size:15px}
+.foodlog-tabs button.sel{color:#fff;border-bottom-color:#fff}
+.foodlog-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 18px}
+.foodlog-actions button{background:#fff;color:#4c1d95;border:none;border-radius:16px;padding:12px 4px 10px;font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:6px;line-height:1.15;text-align:center}
+.foodlog-actions svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.foodlog h2{margin:0 0 10px;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.02em}
+.foodrow{display:flex;align-items:center;gap:10px;background:#fff;color:#1c1430;border-radius:16px;padding:12px;margin:0 0 10px}
+.foodrow .grow{flex:1;min-width:0}
+.foodrow b{display:block;font-size:15px;line-height:1.25}
+.foodrow small{display:block;color:#6b6280;font-weight:600;font-size:13px;margin-top:2px}
+.foodrow .mark{color:#15803d;font-weight:800;margin-left:4px}
+.foodplus{width:36px;height:36px;border-radius:50%;border:none;background:#4c1d95;color:#fff;font-size:26px;line-height:1;padding:0;flex:none}
+.foodlog-empty{color:#f3e8ff;font-size:15px;padding:8px 2px 18px}
 .habitrow{width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:transparent;border:none;border-radius:0;padding:12px 0;color:#1c1430;border-top:1px solid #efeaf6}
 .habitrow:first-child{border-top:none}
 .habitrow b{display:block;font-size:16px;color:#1c1430}
@@ -1471,6 +1493,32 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
   </div>
   <button type="button" class="menulogout" id="menuLogout">Log out</button>
 </nav>
+<div class="foodlog" id="foodLog" hidden>
+  <div class="foodlog-top">
+    <button type="button" class="foodlog-back" id="foodLogBack" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <select id="foodLogMeal" class="foodlog-meal" aria-label="Meal"></select>
+  </div>
+  <div class="foodlog-scroll" id="foodLogScroll">
+    <input id="foodLogSearch" class="foodlog-search" type="search" placeholder="Search foods" autocomplete="off">
+    <div class="foodlog-tabs" role="tablist">
+      <button type="button" data-foodtab="history" class="sel">History</button>
+      <button type="button" data-foodtab="meals">My Meals</button>
+      <button type="button" data-foodtab="recipes">My Recipes</button>
+      <button type="button" data-foodtab="foods">My Foods</button>
+    </div>
+    <div class="foodlog-actions">
+      <button type="button" id="foodLogBarcode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6v12M8 6v12M12 6v12M16 6v12M20 6v12"/></svg>Barcode scan</button>
+      <button type="button" id="foodLogVoice"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg>Voice log</button>
+      <button type="button" id="foodLogMealScan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/></svg>Meal scan</button>
+      <button type="button" id="foodLogQuick"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>Quick add</button>
+    </div>
+    <div id="foodLogHistory">
+      <h2>Recently logged</h2>
+      <div id="foodLogList"></div>
+    </div>
+    <p class="foodlog-empty" id="foodLogEmpty" hidden>Nothing saved here yet.</p>
+  </div>
+</div>
 <nav class="tabbar" id="tabbar" aria-label="Primary">
   <div class="tabpill">
     <button type="button" data-tabgo="today" class="sel" aria-label="Today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg><span>Today</span></button>
@@ -2413,13 +2461,7 @@ function renderToday(){
     const sub = names.length ? esc(names.join(", ")) : "";
     return `<div class="mealrow"><span class="mealico" aria-hidden="true">${slot.icon}</span><div class="mealmain"><b>${slot.label}</b>${sub?`<small>${sub}</small>`:""}</div><button type="button" class="morebtn" data-more="${slot.type}" aria-label="More for ${slot.label}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button><button type="button" class="logpill" data-logslot="${slot.type}">Log</button></div>`;
   }).join("");
-  $("mealRows").querySelectorAll("[data-logslot]").forEach(b=>b.onclick=()=>{
-    mealDate = diaryDate;
-    $("fType").value = b.dataset.logslot;
-    go("meals");
-    const name=$("fName");
-    if(name) name.focus();
-  });
+  $("mealRows").querySelectorAll("[data-logslot]").forEach(b=>b.onclick=()=>openFoodLog(b.dataset.logslot));
   $("mealRows").querySelectorAll("[data-more]").forEach(b=>b.onclick=(e)=>{
     e.stopPropagation();
     const type=b.dataset.more;
@@ -2449,6 +2491,109 @@ function renderToday(){
     });
   });
 }
+const RECENT_FOODS = [
+  {name:"Unflavored 100% Grass-Fed Whey...", detail:"130 cal, 1 scoop, Transparent Labs", cal:130, mark:true},
+  {name:"Banana", detail:"105 cal, 1 medium", cal:105},
+  {name:"Thai Rice, Fragrant, Jasmine, Boil-i...", detail:"540 cal, 150 g, Success", cal:540, mark:true},
+  {name:"Plant-Based Ultimate Original Chic...", detail:"194 cal, 4 oz(s), Gardein", cal:194, mark:true},
+  {name:"Broccoli Florets", detail:"20 cal, 1 cup, Kroger", cal:20, mark:true},
+  {name:"Sweet potato", detail:"216 cal, 7 ounce", cal:216},
+  {name:"Steak Bites", detail:"340 cal, 6 oz, Impossible", cal:340, mark:true},
+  {name:"Brussels Sprouts", detail:"225 cal, 25 sprouts, Kroger", cal:225, mark:true},
+  {name:"100% Liquid Egg Whites", detail:"50 cal, 6 tbsp, Kroger", cal:50, mark:true},
+  {name:"Cafe Free Brown AA Large Eggs", detail:"210 cal, 3 egg, Simple Truth", cal:210},
+  {name:"Rolled Classic Protein Oats", detail:"190 cal, 0.5 cup, Kodiak", cal:190, mark:true},
+  {name:"21 whole grain", detail:"220 cal, 90 gram, daves", cal:220},
+  {name:"Super Mass Gainer", detail:"650 cal, 1 scoops, Dymatized", cal:650},
+  {name:"6 Large Egg Whites", detail:"103 cal, 6 LG whites, Hectors Egg Whi...", cal:103},
+  {name:"Factor, Chicken Pizzaiola", detail:"480 cal, 1 Tray (366g), Factor", cal:480},
+  {name:"Oatmeal, cooked", detail:"154 cal, 1 cup", cal:154},
+  {name:"Pink Flamingo Smoothie", detail:"340 cal, 24 oz, Nekter", cal:340},
+  {name:"Salmon", detail:"100 cal, 4 ounce", cal:100},
+  {name:"Green bean", detail:"100 cal, 4 ounces, Whole Foods", cal:100},
+  {name:"Watermelon chunks", detail:"45 cal, 1 cup, Wholefoods", cal:45},
+  {name:"Whey", detail:"120 cal, 1 scoop, Golds whey protien", cal:120},
+  {name:"Gold Whey", detail:"120 cal, 1 Scoop, Whey", cal:120},
+  {name:"White Rice", detail:"181 cal, 1 cup, Jasmin White Rice", cal:181},
+  {name:"Egg white", detail:"17 cal, 1 large", cal:17},
+  {name:"Blueberries", detail:"42 cal, 1 cup", cal:42},
+  {name:"Lean turkey", detail:"150 cal, 4 oz, 93/7 Lean turkey", cal:150},
+  {name:"Protein Powder Supplement, Serious Ma...", detail:"630 cal, 1 scoops, ON Optimum Nutriti...", cal:630},
+  {name:"Blueberries", detail:"85 cal, 1 cup", cal:85},
+  {name:"Greek Yogurt, Vanilla, Fat Free", detail:"209 cal, 1 cup, Great Value", cal:209},
+  {name:"Mixed vegetables, frozen", detail:"48 cal, 1 cup", cal:48},
+  {name:"Boneless, Skinless Chicken Breast Fillet...", detail:"110 cal, 4 oz, Great Value", cal:110},
+  {name:"Whole wheat bread", detail:"91 cal, 1 slice", cal:91},
+  {name:"1 Cup Oatmeal", detail:"150 cal, 1 cup, Oatmeal", cal:150},
+  {name:"Brown Rice, Whole Grain, Boil-in-Bag", detail:"180 cal, 0.5 bag, Success", cal:180},
+  {name:"White Turkey", detail:"140 cal, 4 oz., Honeysuckle White", cal:140},
+  {name:"Ground Beef, Extra Lean", detail:"140 cal, 4 oz., Unknown", cal:140},
+  {name:"Ground Beef", detail:"400 cal, 224 g", cal:400},
+  {name:"Wheybolic Performance Protein Dietary...", detail:"180 cal, 2 scoop, AMP", cal:180},
+  {name:"Kidney Beans", detail:"105 cal, 4.6 oz, Bush's", cal:105},
+  {name:"Black Beans", detail:"100 cal, 0.5 cup, Bush's Black Beans *", cal:100},
+  {name:"Pinto Beans (15.5 Ounce Can)", detail:"110 cal, 0.5 cup, Hanover", cal:110},
+  {name:"Honeysuckle White", detail:"160 cal, 4 oz, Turkey-all Natural Fresh...", cal:160},
+  {name:"Unsweetened Vanilla", detail:"30 cal, 1 cup, Silk Pure Almond Milk", cal:30},
+  {name:"Vanilla Icecream", detail:"120 cal, 31 g, Gold Standard Whey", cal:120}
+];
+let foodLogMeal = "breakfast";
+let foodLogTab = "history";
+function paintFoodLog(){
+  const q = ($("foodLogSearch").value||"").trim().toLowerCase();
+  const history = foodLogTab==="history";
+  $("foodLogHistory").hidden = !history;
+  $("foodLogEmpty").hidden = history;
+  if(!history) return;
+  const list = RECENT_FOODS.filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(q)>=0);
+  $("foodLogList").innerHTML = list.map((f,i)=>`<div class="foodrow"><div class="grow"><b>${esc(f.name)}${f.mark?'<span class="mark" aria-label="Checked"> ✓</span>':""}</b><small>${esc(f.detail)}</small></div><button type="button" class="foodplus" data-recent="${i}" aria-label="Add ${esc(f.name)}">+</button></div>`).join("") || '<p class="foodlog-empty">No foods match that search.</p>';
+  $("foodLogList").querySelectorAll("[data-recent]").forEach(btn=>{
+    btn.onclick = () => {
+      const food = list[+btn.dataset.recent];
+      if(!food) return;
+      S.meals.push({id:uid(), date:diaryDate, name:food.name, cal:food.cal, protein:null, carbs:null, fat:null, type:foodLogMeal, ts:Date.now()});
+      save();
+      render();
+      toast("Added "+food.name);
+    };
+  });
+}
+function setFoodTab(tab){
+  foodLogTab = tab;
+  document.querySelectorAll("[data-foodtab]").forEach(b=>{
+    const on = b.dataset.foodtab===tab;
+    b.classList.toggle("sel", on);
+    b.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  paintFoodLog();
+}
+function openFoodLog(type){
+  foodLogMeal = DIARY_SLOTS.some(s=>s.type===type) ? type : "breakfast";
+  $("foodLogMeal").innerHTML = DIARY_SLOTS.map(s=>`<option value="${s.type}">${s.label}</option>`).join("");
+  $("foodLogMeal").value = foodLogMeal;
+  $("fType").value = foodLogMeal;
+  mealDate = diaryDate;
+  $("foodLogSearch").value = "";
+  setFoodTab("history");
+  $("foodLog").hidden = false;
+  $("foodLogScroll").scrollTop = 0;
+}
+function closeFoodLog(){ $("foodLog").hidden = true; }
+$("foodLogBack").onclick = () => closeFoodLog();
+$("foodLogMeal").onchange = () => { foodLogMeal = $("foodLogMeal").value; $("fType").value = foodLogMeal; };
+$("foodLogSearch").addEventListener("input", paintFoodLog);
+document.querySelectorAll("[data-foodtab]").forEach(b=>b.onclick=()=>setFoodTab(b.dataset.foodtab));
+$("foodLogBarcode").onclick = () => {
+  const type = foodLogMeal;
+  closeFoodLog();
+  mealDate = diaryDate;
+  $("fType").value = type;
+  go("meals");
+  startFoodScan();
+};
+$("foodLogVoice").onclick = () => toast("Voice log is not available yet");
+$("foodLogMealScan").onclick = () => toast("Meal scan is not available yet");
+$("foodLogQuick").onclick = () => toast("Quick add is not available yet");
 function setBar(barId, subId, val, target, unit, lowerIsGood){
   const bar=$(barId), sub=$(subId);
   if(!target){ bar.firstElementChild.style.width="0"; bar.classList.remove("over"); sub.innerHTML='<span style="color:var(--warn)">target not set</span>'; return; }
@@ -5948,6 +6093,7 @@ function showWelcome(view){
   $("loginLocalNote").textContent = accountNote();
   closeMenu();
   if($("forgotForm")) showForgot(false);
+  if($("foodLog")) $("foodLog").hidden = true;
   window.scrollTo(0,0);
   if(location.hash) history.replaceState(null, "", location.pathname+location.search);
 }
