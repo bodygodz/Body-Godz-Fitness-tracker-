@@ -136,47 +136,6 @@ body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welc
 body:not(.welcome-on) .welcome-only{display:none !important}
 body:not(.welcome-on) #welcome{display:none !important}
 .welcome{max-width:560px;margin:0 auto;padding:6px 22px 8px;position:relative}
-.bubbles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-.picbubble{position:absolute;left:0;top:0;border-radius:50%;object-fit:cover;object-position:center center;pointer-events:none;opacity:.5;background:#F4F1EA;box-shadow:0 10px 28px rgba(43,42,39,.18);animation:orbit-out 56s linear infinite}
-.picbubble.face{object-position:center 22%}
-.picbubble.pool{object-position:center 72%}
-.b1{width:132px;height:132px;animation-delay:0s}
-.b2{width:168px;height:168px;animation-delay:-14s}
-.b3{width:96px;height:96px;animation-delay:-28s}
-.b4{width:210px;height:210px;animation-delay:-42s;object-fit:contain;object-position:center center;padding:16px;background:transparent}
-.b5{width:88px;height:88px;animation-name:orbit-in;animation-duration:48s;animation-delay:-6s}
-.b6{width:150px;height:150px;animation-name:orbit-in;animation-duration:48s;animation-delay:-18s}
-.b7{width:108px;height:108px;animation-name:orbit-in;animation-duration:48s;animation-delay:-30s}
-.b8{width:116px;height:116px;animation-name:orbit-in;animation-duration:48s;animation-delay:-42s}
-@keyframes orbit-out{
-  0%{transform:translate3d(6vw,14vh,0)}
-  12.5%{transform:translate3d(58vw,8vh,0)}
-  25%{transform:translate3d(74vw,30vh,0)}
-  37.5%{transform:translate3d(62vw,58vh,0)}
-  50%{transform:translate3d(40vw,74vh,0)}
-  62.5%{transform:translate3d(6vw,66vh,0)}
-  75%{transform:translate3d(-4vw,42vh,0)}
-  87.5%{transform:translate3d(0vw,24vh,0)}
-  100%{transform:translate3d(6vw,14vh,0)}
-}
-@keyframes orbit-in{
-  0%{transform:translate3d(22vw,28vh,0)}
-  25%{transform:translate3d(14vw,52vh,0)}
-  50%{transform:translate3d(42vw,48vh,0)}
-  75%{transform:translate3d(48vw,22vh,0)}
-  100%{transform:translate3d(22vw,28vh,0)}
-}
-@media (prefers-reduced-motion: reduce){
-  .picbubble{animation:none}
-  .b1{transform:translate3d(6vw,18vh,0)}
-  .b2{transform:translate3d(62vw,12vh,0)}
-  .b3{transform:translate3d(8vw,62vh,0)}
-  .b4{transform:translate3d(58vw,68vh,0)}
-  .b5{transform:translate3d(24vw,36vh,0)}
-  .b6{transform:translate3d(46vw,28vh,0)}
-  .b7{transform:translate3d(18vw,54vh,0)}
-  .b8{transform:translate3d(48vw,50vh,0)}
-}
 body.welcome-on header{background:#F4F1EA;border-bottom:1px solid rgba(43,42,39,.12);color:#2B2A27}
 body.welcome-on .topgap{flex:none;width:0}
 body.welcome-on .profilebtn{width:44px;height:44px;border-radius:8px;overflow:visible}
@@ -503,6 +462,13 @@ body.welcome-on .profilepic{display:none !important}
 .sechead{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px}
 .sechead h2,.sec{color:#2B2A27;font-size:22px;font-weight:700;margin:0;letter-spacing:-.02em}
 .sec{margin:18px 2px 10px}
+.sessioncard{background:#FAF9F6;border-radius:var(--radius);padding:12px;margin:0 0 12px;color:#2B2A27;box-shadow:0 1px 2px rgba(43,42,39,.08);overflow:hidden}
+.sessioncard img,.sessioncard video{width:100%;max-height:240px;border-radius:12px;display:block;background:#E7EBE4;margin:0 0 8px}
+.sessioncard img{object-fit:cover}
+.sessioncard video{object-fit:contain;background:#2B2A27}
+.sessionmeta{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sessionmeta small{color:#6F6C64;font-weight:600}
+.sessionempty{color:#6F6C64;margin:0 0 16px}
 .linkish{background:transparent;border:none;color:#8A9A86;padding:0;font-weight:700}
 .mealrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid #E7EBE4}
 .mealrow:first-child{border-top:none;padding-top:2px}
@@ -648,16 +614,6 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
   </div>
 </header>
 <div id="welcome" class="welcome">
-  <div class="bubbles" id="welcomeBubbles" aria-hidden="true">
-    <img class="picbubble face b1" src="images/header-portrait.jpg" alt="">
-    <img class="picbubble pool b2" src="images/work/lower-body.jpg" alt="">
-    <img class="picbubble b3" src="images/library-step.jpg" alt="">
-    <img class="picbubble b4" src="images/welcome-rooftop.jpg" alt="">
-    <img class="picbubble b5" src="images/food/salad.jpg" alt="">
-    <img class="picbubble b6" src="images/work/boxing.jpg" alt="">
-    <img class="picbubble b7" src="images/food/salmon-plate.jpg" alt="">
-    <img class="picbubble b8" src="images/work/bike.jpg" alt="">
-  </div>
   <div id="welcomeHome">
     <section class="mhero">
       <div class="phonehero">
@@ -1525,6 +1481,30 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
     <div id="videoList"></div>
   </div>
 </section>
+
+<!-- ============ SESSIONS ============ -->
+<section class="page" id="page-sessions">
+  <div class="card" id="sessionUpload" hidden>
+    <h2>Upload a past session</h2>
+    <p class="note">Pick a photo or video from this phone and label it. It stays on this phone. Every client on this phone can view it.</p>
+    <div class="field">
+      <label class="f">Label</label>
+      <div class="chips" id="sessionLabels">
+        <button type="button" class="chip sel" data-sessionlabel="group">Group session</button>
+        <button type="button" class="chip" data-sessionlabel="training">Training session</button>
+      </div>
+    </div>
+    <div class="field">
+      <label class="f" for="sessionFile">Photo or video</label>
+      <input id="sessionFile" type="file" accept="image/*,video/*">
+    </div>
+    <button class="primary full" id="sessionSave" type="button">Save on this phone</button>
+  </div>
+  <h2 class="sec">Group sessions</h2>
+  <div id="sessionGroup"></div>
+  <h2 class="sec">Training sessions</h2>
+  <div id="sessionTraining"></div>
+</section>
 </main>
 
 <nav class="navmenu" id="navMenu" hidden>
@@ -1576,6 +1556,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
   <button type="button" class="navitem" data-tab="weight">Weight</button>
   <button type="button" class="navitem" data-tab="coach">Coach</button>
   <button type="button" class="navitem" data-tab="videos">Videos</button>
+  <button type="button" class="navitem" data-tab="sessions" hidden>Sessions</button>
   <button type="button" class="navitem" data-tab="settings">Settings</button>
   <button type="button" class="navitem" id="menuCheck">Checklist</button>
   <button type="button" class="navitem" id="menuBell">Notifications</button>
@@ -2317,7 +2298,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos"};
+const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions"};
 let currentTab = "today";
 let diaryDate = todayStr();
 function tabGroup(tab){
@@ -2329,9 +2310,11 @@ function tabGroup(tab){
   return "";
 }
 function clientView(){ return ID.role==="client"; }
-function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="workout" || tab==="events" || tab==="calendar" || tab==="checkin" || tab==="photos" || tab==="coach"; }
+function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="workout" || tab==="events" || tab==="calendar" || tab==="checkin" || tab==="photos" || tab==="coach" || tab==="sessions"; }
+function sessionsVisible(){ return trainerHere() || clientView(); }
 function go(tab){
   if(!TITLES[tab]) tab="today";
+  if(tab==="sessions" && !sessionsVisible()) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
   currentTab = tab;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+tab));
@@ -2398,6 +2381,7 @@ function syncMenu(){
   if(action) action.textContent = trainerHere() ? "Add client" : "Start today's workout";
   const client = clientView();
   document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
+    if(b.dataset.tab==="sessions"){ b.hidden = !sessionsVisible(); return; }
     if(!client){ b.hidden = false; return; }
     b.hidden = !clientAllows(b.dataset.tab) || !!b.dataset.lib;
   });
@@ -5455,6 +5439,7 @@ function setRole(role){
   toast(role==="trainer"?"Trainer mode":role==="client"?"Client mode":"Personal tracker");
   applyMemberLook();
   if(role==="trainer" || role==="client") go("coach");
+  else if(currentTab==="sessions") go("today");
   else if(currentTab==="coach" || currentTab==="settings") render();
   else { updateDemoBanner(); paintMyPage(); }
   syncMenu();
@@ -6482,12 +6467,145 @@ $("bmiSidePick").onclick = ()=>openBmiPhoto("bmiSideFile");
   $(id).onchange = e=>{ const f=e.target.files&&e.target.files[0]; onBmiFile(f, e.target.dataset.angle); e.target.value=""; };
 });
 $("bmiSave").onclick = saveBmi;
+const SESSION_UPLOAD_KEY = "curlyGirlFitness.sessionUploads.v1";
+const SESSION_DB = "curlyGirlFitness.sessionUploads";
+let sessionLabel = "group";
+let sessionPaint = 0;
+const sessionBlobUrls = {};
+function loadSessionRows(){
+  const list = readStore(localStorage, SESSION_UPLOAD_KEY);
+  return Array.isArray(list) ? list.filter(row => row && (row.label==="group" || row.label==="training") && row.id) : [];
+}
+function saveSessionRows(list){
+  localStorage.setItem(SESSION_UPLOAD_KEY, JSON.stringify(list));
+}
+function openSessionDb(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(SESSION_DB, 1);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if(!db.objectStoreNames.contains("files")) db.createObjectStore("files");
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(new Error("Could not store that on this phone"));
+  });
+}
+function idbPutSession(id, blob){
+  return openSessionDb().then(db => new Promise((resolve, reject)=>{
+    const tx = db.transaction("files", "readwrite");
+    tx.objectStore("files").put(blob, id);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(new Error("Could not store that on this phone")); };
+  }));
+}
+function idbGetSession(id){
+  return openSessionDb().then(db => new Promise((resolve, reject)=>{
+    const tx = db.transaction("files", "readonly");
+    const req = tx.objectStore("files").get(id);
+    req.onsuccess = () => { const value = req.result || null; db.close(); resolve(value); };
+    req.onerror = () => { db.close(); reject(new Error("Could not open that session")); };
+  }));
+}
+function idbDeleteSession(id){
+  return openSessionDb().then(db => new Promise((resolve, reject)=>{
+    const tx = db.transaction("files", "readwrite");
+    tx.objectStore("files").delete(id);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(new Error("Could not remove that session")); };
+  }));
+}
+async function blobUrlForSession(id){
+  if(sessionBlobUrls[id]) return sessionBlobUrls[id];
+  const blob = await idbGetSession(id);
+  if(!blob) return "";
+  sessionBlobUrls[id] = URL.createObjectURL(blob);
+  return sessionBlobUrls[id];
+}
+function sessionWhen(ts){
+  const d = new Date(ts || 0);
+  if(!isFinite(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, {month:"short", day:"numeric"});
+}
+function paintSessionGroup(el, rows, urls, trainer){
+  if(!rows.length){
+    el.innerHTML = '<p class="sessionempty">Nothing saved on this phone yet.</p>';
+    return;
+  }
+  el.innerHTML = rows.map(row => {
+    const url = urls[row.id] || "";
+    const media = row.kind==="video"
+      ? (url ? `<video src="${esc(url)}" controls playsinline></video>` : `<p class="note">Opening the video…</p>`)
+      : (url ? `<img src="${esc(url)}" alt="">` : `<p class="note">Opening the photo…</p>`);
+    const remove = trainer ? `<button type="button" class="sm" data-sessiondel="${esc(row.id)}">Remove</button>` : "";
+    return `<article class="sessioncard">${media}<div class="sessionmeta"><small>${esc(sessionWhen(row.createdAt))}</small>${remove}</div></article>`;
+  }).join("");
+  if(trainer){
+    el.querySelectorAll("[data-sessiondel]").forEach(btn => btn.onclick = () => removeSession(btn.dataset.sessiondel));
+  }
+}
+function renderSessions(){
+  const trainer = trainerHere();
+  $("sessionUpload").hidden = !trainer;
+  const rows = loadSessionRows();
+  const seq = ++sessionPaint;
+  const urls = {};
+  rows.forEach(row => { if(sessionBlobUrls[row.id]) urls[row.id] = sessionBlobUrls[row.id]; });
+  paintSessionGroup($("sessionGroup"), rows.filter(row => row.label==="group"), urls, trainer);
+  paintSessionGroup($("sessionTraining"), rows.filter(row => row.label==="training"), urls, trainer);
+  const missing = rows.filter(row => !urls[row.id]);
+  if(!missing.length) return;
+  Promise.all(missing.map(row => blobUrlForSession(row.id).then(url => [row.id, url]).catch(() => [row.id, ""])))
+    .then(pairs => {
+      if(seq!==sessionPaint || currentTab!=="sessions") return;
+      pairs.forEach(([id, url]) => { if(url) urls[id] = url; });
+      paintSessionGroup($("sessionGroup"), rows.filter(row => row.label==="group"), urls, trainer);
+      paintSessionGroup($("sessionTraining"), rows.filter(row => row.label==="training"), urls, trainer);
+    });
+}
+function removeSession(id){
+  if(!trainerHere()) return;
+  saveSessionRows(loadSessionRows().filter(row => row.id!==id));
+  if(sessionBlobUrls[id]){ URL.revokeObjectURL(sessionBlobUrls[id]); delete sessionBlobUrls[id]; }
+  idbDeleteSession(id).catch(()=>{});
+  toast("Removed from this phone");
+  render();
+}
+document.querySelectorAll("#sessionLabels [data-sessionlabel]").forEach(btn => {
+  btn.onclick = () => {
+    sessionLabel = btn.dataset.sessionlabel==="training" ? "training" : "group";
+    document.querySelectorAll("#sessionLabels [data-sessionlabel]").forEach(b => {
+      const on = b===btn;
+      b.classList.toggle("sel", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  };
+});
+$("sessionSave").onclick = () => {
+  if(!trainerHere()){ toast("Only a trainer can upload a session"); return; }
+  const file = $("sessionFile").files && $("sessionFile").files[0];
+  if(!file){ toast("Choose a photo or video"); return; }
+  const isVideo = (file.type||"").indexOf("video/")===0;
+  const isImage = (file.type||"").indexOf("image/")===0;
+  if(!isVideo && !isImage){ toast("Choose a photo or video"); return; }
+  if(isVideo && file.size > 50*1024*1024){ toast("That video is over 50 MB"); return; }
+  if(isImage && file.size > 12*1024*1024){ toast("That photo is over 12 MB"); return; }
+  const id = uid();
+  const row = {id:id, label:sessionLabel, kind:isVideo?"video":"photo", name:file.name||"", mime:file.type||"", createdAt:Date.now()};
+  idbPutSession(id, file).then(() => {
+    const list = loadSessionRows();
+    list.unshift(row);
+    saveSessionRows(list);
+    $("sessionFile").value = "";
+    toast("Saved on this phone");
+    render();
+  }).catch(e => toast(e && e.message ? e.message : "Could not store that on this phone"));
+};
 function render(){
   applyClientLock();
   paintHeader();
   paintSubbar();
   applyMemberLook();
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos})[currentTab]();
+  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
