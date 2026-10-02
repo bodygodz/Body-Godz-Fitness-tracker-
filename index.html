@@ -637,6 +637,8 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
 .fastmarks li{padding:7px 0;border-bottom:1px solid #E4DFD4;color:#6F6C64}
 .fastmarks li.now{color:#2B2A27;font-weight:700}
 .chip.sel{border-color:#8A9A86;color:#8A9A86}
+.devpick{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-weight:650;color:#2B2A27}
+.devpick input{width:auto;flex:none}
 body.theme-dark:not(.welcome-on){--bg:#1C1B19;--card:#2C2A26;--text:#F4F1EA;--muted:#C8C2B6;--line:#3E3B36;background-color:#1C1B19;color:#F4F1EA}
 body.theme-dark:not(.welcome-on) header,
 body.theme-dark.member-look:not(.welcome-on),
@@ -722,6 +724,7 @@ body.theme-dark:not(.welcome-on) .fastmarks li.now{color:#F4F1EA}
 body.theme-dark:not(.welcome-on) .fastclock .fastmark,
 body.theme-dark:not(.welcome-on) .chip.sel{color:#C5D1C0;border-color:#8A9A86}
 body.theme-dark:not(.welcome-on) .fastmarks li{border-color:#3E3B36;color:#C8C2B6}
+body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 #menuEditPanel{gap:8px;padding-bottom:10px}
 #menuEditPanel .note{color:#6F6C64;text-align:right;max-width:260px;margin:0}
 #menuEditPanel .lookpicks{justify-content:flex-end;margin:0}
@@ -7515,7 +7518,8 @@ function loadYou(){
     reminders: Array.isArray(row.reminders) ? row.reminders : [],
     community: String(row.community||""),
     friends: Array.isArray(row.friends) ? row.friends : [],
-    messages: String(row.messages||"")
+    messages: String(row.messages||""),
+    devices: cleanDevices(row.devices)
   };
 }
 function saveYou(patch){
@@ -7526,6 +7530,131 @@ function saveYou(patch){
   all[email] = Object.assign({}, cur, patch);
   localStorage.setItem(YOU_KEY, JSON.stringify(all));
   try { localStorage.setItem(LAST_SAVE_KEY, String(Date.now())); } catch(e){}
+}
+function cleanDevices(list){
+  if(!Array.isArray(list)) return [];
+  return list.map(d=>{
+    if(!d || typeof d!=="object") return null;
+    const name = String(d.name||"").trim().slice(0, 60);
+    if(!name) return null;
+    const id = String(d.id||"").trim() || uid();
+    return {id:id, name:name, steps:!!d.steps, heart:!!d.heart, addedAt: Number(d.addedAt)||Date.now()};
+  }).filter(Boolean);
+}
+let browserStepReading = null;
+let browserHeartReading = null;
+function browserHeartApi(){
+  return !!(navigator.bluetooth && typeof navigator.bluetooth.requestDevice==="function");
+}
+function deviceStatus(d){
+  const parts = ["Saved on this phone."];
+  let missing = false;
+  if(d.steps){
+    if(hasNum(browserStepReading)) parts.push("Steps "+Math.round(browserStepReading)+" from this browser.");
+    else missing = true;
+  }
+  if(d.heart){
+    if(browserHeartReading && hasNum(browserHeartReading.bpm)) parts.push("Heart rate "+Math.round(browserHeartReading.bpm)+" bpm from a Bluetooth sensor this browser read.");
+    else missing = true;
+  }
+  if(missing) parts.push("Watch data cannot come through this page yet.");
+  if(!d.steps && !d.heart) parts.push("Steps and heart rate were not chosen.");
+  return parts.join(" ");
+}
+function paintDeviceStatus(){
+  const devices = loadYou().devices;
+  document.querySelectorAll("[data-devid]").forEach(el=>{
+    const d = devices.find(x=>x.id===el.dataset.devid);
+    if(d) el.textContent = deviceStatus(d);
+  });
+}
+function parseHeartRate(view){
+  if(!view || view.byteLength<2) return null;
+  const flags = view.getUint8(0);
+  const bpm = (flags & 1) ? view.getUint16(1, true) : view.getUint8(1);
+  if(!isFinite(bpm) || bpm<1 || bpm>250) return null;
+  return bpm;
+}
+async function readBrowserSteps(){
+  try {
+    if(typeof Pedometer==="function"){
+      const sensor = new Pedometer();
+      const n = await new Promise((resolve, reject)=>{
+        const timer = setTimeout(()=>reject(new Error("timeout")), 1500);
+        sensor.onreading = ()=>{
+          clearTimeout(timer);
+          const value = Number(sensor.steps);
+          resolve(isFinite(value) && value>=0 ? value : null);
+        };
+        sensor.onerror = ()=>{ clearTimeout(timer); reject(new Error("sensor")); };
+        if(typeof sensor.start==="function") sensor.start();
+        else { clearTimeout(timer); resolve(null); }
+      });
+      if(sensor && typeof sensor.stop==="function") sensor.stop();
+      if(hasNum(n)) return n;
+    }
+  } catch(e){}
+  try {
+    if(navigator.pedometer && typeof navigator.pedometer.read==="function"){
+      const value = Number(await navigator.pedometer.read());
+      if(isFinite(value) && value>=0) return value;
+    }
+  } catch(e){}
+  return null;
+}
+async function probeDeviceReadings(){
+  const steps = await readBrowserSteps();
+  if(hasNum(steps)) browserStepReading = steps;
+  if(currentTab==="you" && youView==="devices") paintDeviceStatus();
+}
+async function readBrowserHeart(){
+  if(!browserHeartApi()){
+    toast("Heart rate cannot come through this page yet");
+    return;
+  }
+  let device;
+  try {
+    device = await navigator.bluetooth.requestDevice({filters:[{services:["heart_rate"]}], optionalServices:["heart_rate"]});
+  } catch(e){
+    toast("No heart-rate sensor was read");
+    return;
+  }
+  try {
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService("heart_rate");
+    const ch = await service.getCharacteristic("heart_rate_measurement");
+    let bpm = null;
+    try { bpm = parseHeartRate(await ch.readValue()); } catch(e){ bpm = null; }
+    if(!hasNum(bpm) && typeof ch.startNotifications==="function"){
+      bpm = await new Promise((resolve, reject)=>{
+        const timer = setTimeout(()=>{ reject(new Error("timeout")); }, 8000);
+        ch.addEventListener("characteristicvaluechanged", ev=>{
+          clearTimeout(timer);
+          resolve(parseHeartRate(ev.target.value));
+        });
+        ch.startNotifications().catch(err=>{ clearTimeout(timer); reject(err); });
+      });
+    }
+    if(!hasNum(bpm)) throw new Error("no reading");
+    browserHeartReading = {bpm:bpm, name: device.name ? String(device.name) : ""};
+    paintDeviceStatus();
+    toast("Heart rate read from a Bluetooth sensor");
+  } catch(e){
+    browserHeartReading = null;
+    paintDeviceStatus();
+    toast("Heart rate cannot come through this page yet");
+  }
+}
+function devicesHtml(y){
+  const cloud = dataReady() ? "Shared keys are saved, so this account can sign in on another phone." : "No shared keys are saved, so another phone cannot see this data.";
+  const rows = y.devices.map(d=>{
+    const picks = [d.steps?"Steps":"", d.heart?"Heart rate":""].filter(Boolean).join(" and ");
+    return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+(picks?esc(picks)+" chosen":"Saved")+'</div><p data-devid="'+esc(d.id)+'">'+esc(deviceStatus(d))+'</p></div><button type="button" class="x" data-youdel="devices" data-id="'+esc(d.id)+'" aria-label="Remove">×</button></li>';
+  }).join("");
+  const readBtn = browserHeartApi()
+    ? '<button type="button" data-devread="heart">Read heart rate from a Bluetooth sensor</button><p class="note">That reads a heart-rate sensor this browser can see. It does not connect Apple Watch or Apple Health.</p>'
+    : "";
+  return '<form class="card" data-youform="device"><p>Add an Apple Watch or another device, and choose steps, heart rate, or both. The choice is saved on this phone. This page cannot talk to Apple Watch or Apple Health.</p><div class="field"><label class="f" for="devName">Device</label><input id="devName" name="name" maxlength="60" placeholder="Device name" autocomplete="off"></div><button type="button" data-devname="Apple Watch">Apple Watch</button><label class="devpick"><input type="checkbox" name="steps"> Steps</label><label class="devpick"><input type="checkbox" name="heart"> Heart rate</label><button class="primary full" type="submit">Save device</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'<p class="note">No device saved on this phone yet.</p>')+'<div class="card">'+readBtn+'<p>The camera opens only when you choose a photo.</p><p>'+esc(cloud)+'</p></div>';
 }
 const FAST_MARKS = [
   {h:4, note:"Around 4 hours, digestion of the last meal is winding down."},
@@ -7747,10 +7876,7 @@ function youHtml(view){
     const rows = y.reminders.map(r=>'<li><div class="grow"><div class="name">'+esc(r.label||"Reminder")+'</div><div class="meta">'+esc(r.time||"")+'</div></div><button type="button" class="x" data-youdel="reminders" data-id="'+esc(r.id)+'" aria-label="Remove">×</button></li>').join("");
     return '<form class="card" data-youform="reminders"><p class="note">Saved on this phone. A reminder cannot ring after the app is closed.</p><div class="field"><label class="f" for="youRemLabel">Label</label><input id="youRemLabel" name="label" placeholder="Label"></div><div class="field"><label class="f" for="youRemTime">Time</label><input id="youRemTime" name="time" type="time"></div><button class="primary full" type="submit">Add reminder</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'');
   }
-  if(view==="devices"){
-    const cloud = dataReady() ? "Shared keys are saved, so this account can sign in on another phone." : "No shared keys are saved, so another phone cannot see this data.";
-    return '<div class="card"><p>Meals, weight, workouts, and the notes in this menu stay in this phone’s storage.</p><p>This phone cannot read a step sensor, a watch, or another app.</p><p>The camera opens only when you choose a photo.</p><p>'+esc(cloud)+'</p></div>';
-  }
+  if(view==="devices") return devicesHtml(y);
   if(view==="steps"){
     const rows = [];
     for(let i=0;i<14;i++){
@@ -7804,6 +7930,7 @@ function renderYou(){
     paintFastClock();
     armFastTimer();
   } else stopFastTimer();
+  if(youView==="devices") probeDeviceReadings();
 }
 function openMember(id){
   if(!(currentAuth() && currentAuth().email)) return;
@@ -7890,7 +8017,15 @@ function onYouSubmit(e){
     toast("Saved on this phone");
     return;
   }
-  if(kind==="messages"){ saveYou({messages: form.note.value}); toast("Saved on this phone"); }
+  if(kind==="messages"){ saveYou({messages: form.note.value}); toast("Saved on this phone"); return; }
+  if(kind==="device"){
+    const name = form.name.value.trim();
+    if(!name){ toast("Enter a device name"); return; }
+    const y = loadYou();
+    saveYou({devices: y.devices.concat([{id:uid(), name:name.slice(0,60), steps:!!(form.steps&&form.steps.checked), heart:!!(form.heart&&form.heart.checked), addedAt:Date.now()}])});
+    refreshYou();
+    toast("Device saved on this phone");
+  }
 }
 function onYouClick(e){
   const theme = e.target.closest("[data-theme]");
@@ -7899,6 +8034,13 @@ function onYouClick(e){
   if(fastActBtn){ runFastAct(fastActBtn.dataset.fastact); return; }
   const fastGoal = e.target.closest("[data-fastgoal]");
   if(fastGoal){ setFastGoal(+fastGoal.dataset.fastgoal); return; }
+  const devName = e.target.closest("[data-devname]");
+  if(devName){
+    const input = $("devName");
+    if(input) input.value = devName.dataset.devname;
+    return;
+  }
+  if(e.target.closest("[data-devread]")){ readBrowserHeart(); return; }
   const del = e.target.closest("[data-youdel]");
   if(del){
     const y = loadYou();
@@ -7906,6 +8048,7 @@ function onYouClick(e){
     if(del.dataset.youdel==="sleep") saveYou({sleep: y.sleep.filter(s=>s.id!==id)});
     else if(del.dataset.youdel==="reminders") saveYou({reminders: y.reminders.filter(s=>s.id!==id)});
     else if(del.dataset.youdel==="friends") saveYou({friends: y.friends.filter(s=>s.id!==id)});
+    else if(del.dataset.youdel==="devices") saveYou({devices: y.devices.filter(d=>d.id!==id)});
     refreshYou();
     toast("Removed");
     return;
