@@ -614,6 +614,7 @@ body.member-look:not(.welcome-on) .menulogout{background:#F4F1EA;background-colo
 body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(--member-page,#F4F1EA) 70%,transparent)}
 .youlist{align-self:stretch;width:100%;margin:0 0 18px;text-align:left}
 .youlist[hidden]{display:none !important}
+.yourow[hidden]{display:none !important}
 .youhead{margin:0 0 8px;font-size:22px;font-weight:600;text-align:left;color:#2B2A27;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
 .yourow{width:100%;display:flex;align-items:center;gap:12px;background:transparent;border:none;border-bottom:1px solid rgba(43,42,39,.12);border-radius:0;padding:13px 0;color:#2B2A27;font-size:16px;font-weight:650;letter-spacing:0;text-transform:none;text-align:left}
 .yourow svg{width:22px;height:22px;stroke:#2B2A27;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
@@ -1718,6 +1719,7 @@ body.theme-dark:not(.welcome-on) .fastmarks li{border-color:#3E3B36;color:#C8C2B
     <p class="youhead">You</p>
     <button type="button" class="yourow" data-you="premium"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg><span class="grow"><b>My Premium</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 19c1.2-3 3.2-4.5 6-4.5S16.8 16 18 19"/></svg><span class="grow"><b>My Profile</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="accounts" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.4"/><circle cx="16" cy="9" r="2.4"/><path d="M4 18c.7-2.2 2.2-3.3 4-3.3s3.3 1.1 4 3.3M12 18c.7-2.2 2.2-3.3 4-3.3s3.3 1.1 4 3.3"/></svg><span class="grow"><b>Accounts</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="glp1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 8h4M10 12h4"/></svg><span class="grow"><b>GLP-1 Support</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="fasting"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg><span class="grow"><b>Intermittent Fasting</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 4a8 8 0 1 0 4 12 7 7 0 0 1-4-12z"/></svg><span class="grow"><b>Sleep</b></span><span class="chev" aria-hidden="true">›</span></button>
@@ -2640,6 +2642,14 @@ function syncMenu(){
   const youList = $("youList");
   const signedHere = !!(currentAuth() && currentAuth().email) && !document.body.classList.contains("welcome-on");
   if(youList) youList.hidden = !signedHere;
+  const accountsRow = document.querySelector('#youList [data-you="accounts"]');
+  if(accountsRow) accountsRow.hidden = !signedInTrainer();
+  if(!signedInTrainer() && youView==="accounts"){
+    youView = "profile";
+    const body = $("youBody");
+    if(body){ body.dataset.view = ""; body.innerHTML = ""; }
+    if($("youTitle") && $("youTitle").textContent==="Accounts") $("youTitle").textContent = "You";
+  }
   const syncWhen = $("youSyncWhen");
   if(syncWhen) syncWhen.textContent = lastSaveText();
   const askBtn = document.querySelector('#tabbar [data-tabgo="ask"]');
@@ -7670,7 +7680,7 @@ function refreshYou(){
   syncMenu();
 }
 const YOU_TITLES = {
-  premium:"My Premium", profile:"My Profile", glp1:"GLP-1 Support", fasting:"Intermittent Fasting",
+  premium:"My Premium", profile:"My Profile", accounts:"Accounts", glp1:"GLP-1 Support", fasting:"Intermittent Fasting",
   sleep:"Sleep", goals:"Goals", weight:"Weight & Measurements", report:"My Weekly Report",
   nutrition:"Nutrition", reminders:"Reminders", devices:"Apps & Devices", steps:"Steps",
   community:"Community", learn:"Learn", friends:"Friends", messages:"Messages",
@@ -7685,6 +7695,7 @@ function youHtml(view){
     if(!account) return '<div class="card"><p>Sign in to see your profile.</p></div>';
     return '<form class="card" data-youform="profile"><div class="field"><label class="f" for="youName">Name</label><input id="youName" name="name" value="'+esc(account.name||"")+'" autocomplete="name"></div><div class="field"><label class="f" for="youEmailBox">Email</label><input id="youEmailBox" value="'+esc(account.email||"")+'" readonly></div><div class="field"><label class="f" for="youRole">Role</label><input id="youRole" value="'+esc(account.role||"")+'" readonly></div><p class="note">Email and role stay as they were when you signed up. The name is saved on this phone.</p><button class="primary full" type="submit">Save profile</button></form>';
   }
+  if(view==="accounts") return accountsHtml();
   if(view==="glp1") return '<form class="card" data-youform="glp1"><p>A private note you write yourself. This is not a dose calculator and it does not give medical advice.</p><div class="field"><label class="f" for="youGlp">Note</label><textarea id="youGlp" name="note">'+esc(y.glp1)+'</textarea></div><button class="primary full" type="submit">Save note</button></form>';
   if(view==="fasting") return fastingClockHtml(y)+'<form class="card" data-youform="fast"><p>Start and end are whatever you type. This screen does not say a fast is safe.</p><div class="field"><label class="f" for="youFastStart">Start</label><input id="youFastStart" name="start" type="time" value="'+esc(y.fastStart)+'"></div><div class="field"><label class="f" for="youFastEnd">End</label><input id="youFastEnd" name="end" type="time" value="'+esc(y.fastEnd)+'"></div><div class="field"><label class="f" for="youFastNote">Note</label><textarea id="youFastNote" name="note">'+esc(y.fastNote)+'</textarea></div><button class="primary full" type="submit">Save</button></form>';
   if(view==="sleep"){
@@ -7782,7 +7793,7 @@ function renderYou(){
   if($("hdrSub")) $("hdrSub").textContent = "";
   const body = $("youBody");
   if(!body) return;
-  if(body.dataset.view===youView){
+  if(body.dataset.view===youView && youView!=="accounts"){
     if(youView==="fasting") armFastTimer();
     else stopFastTimer();
     return;
@@ -7809,6 +7820,7 @@ function openMember(id){
   if(id==="workouts"){ woView = "home"; closeMenu(); go("workout"); return; }
   if(id==="meals"){ closeMenu(); go("meals"); return; }
   if(id==="settings"){ closeMenu(); go("settings"); return; }
+  if(id==="accounts" && !signedInTrainer()) return;
   if(!YOU_TITLES[id]) return;
   youView = id;
   const body = $("youBody");
@@ -8155,6 +8167,50 @@ function accountForAuth(auth){
   const same = accounts.filter(a => a.email===auth.email);
   return same.length===1 ? same[0] : null;
 }
+const SIGNUPS_KEY = "curlyGirlFitness.signups.v1";
+function loadSignups(){
+  let raw = [];
+  try { raw = JSON.parse(localStorage.getItem(SIGNUPS_KEY)||"[]"); } catch(e){ raw = []; }
+  if(!Array.isArray(raw)) return [];
+  return raw.map(row=>{
+    if(!row || typeof row!=="object") return null;
+    const name = String(row.name||"").trim();
+    const email = String(row.email||"").trim();
+    const role = row.role==="trainer" || row.role==="client" ? row.role : "";
+    const createdAt = Number(row.createdAt);
+    if(!name || !email || !role || !isFinite(createdAt) || createdAt<=0) return null;
+    return {name:name, email:email, role:role, createdAt:createdAt};
+  }).filter(Boolean).sort((a,b)=> b.createdAt - a.createdAt);
+}
+function recordSignup(account){
+  if(!account) return;
+  const row = {
+    name: String(account.name||"").trim(),
+    email: String(account.email||"").trim(),
+    role: account.role==="trainer" || account.role==="client" ? account.role : "",
+    createdAt: Number(account.createdAt)||Date.now()
+  };
+  if(!row.name || !row.email || !row.role) return;
+  const list = loadSignups();
+  list.push(row);
+  try { localStorage.setItem(SIGNUPS_KEY, JSON.stringify(list)); } catch(e){}
+}
+function signupWhen(t){
+  const d = new Date(t);
+  if(!isFinite(d.getTime())) return "";
+  return d.toLocaleString(undefined, {year:"numeric", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+}
+function accountsHtml(){
+  if(!signedInTrainer()) return '<div class="card"><p>A client does not see other people’s accounts.</p></div>';
+  const rows = loadSignups();
+  const note = '<p class="note">Saved on this phone when someone creates an account. This list is not sent anywhere.</p>';
+  if(!rows.length) return '<div class="card">'+note+'<p>No one has created an account on this phone yet.</p></div>';
+  const items = rows.map(r=>{
+    const side = r.role==="trainer" ? "Trainer" : "Client";
+    return '<li><div class="grow"><div class="name">'+esc(r.name)+'</div><div class="meta">'+esc(r.email)+'</div><div class="meta">'+esc(side+" · "+signupWhen(r.createdAt))+'</div></div></li>';
+  }).join("");
+  return '<div class="card">'+note+'<ul class="list">'+items+'</ul></div>';
+}
 function rememberAccount(account){
   const accounts = loadAccounts().filter(a => !(a.email===account.email && a.role===account.role));
   accounts.push(account);
@@ -8176,6 +8232,7 @@ async function signUpAccount(name, email, password, role, invite){
   }
   const account = {id:id, name:name, email:email, passHash:hash, role:role, createdAt:Date.now()};
   rememberAccount(account);
+  recordSignup(account);
   enterAccount(account);
   if(role==="client" && invite){
     try {
