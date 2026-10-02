@@ -189,6 +189,43 @@ button.learnmore{background:transparent;border:none;color:#2B2A27;font-weight:70
 .mhero{padding:22px 2px 8px}
 .mhero h2{margin:0 0 14px;color:#2B2A27;font-size:40px;line-height:1.12;font-weight:800;letter-spacing:-.035em;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif}
 .mhero p{margin:0 0 18px;color:#2B2A27;font-size:16px;line-height:1.5;max-width:34em}
+.phonehero{display:flex;flex-wrap:wrap;align-items:flex-start;gap:14px;margin:0 0 4px}
+.phonehero-copy{flex:1 1 168px;min-width:0}
+.phonehero-copy h2{margin-bottom:10px}
+.phonehero-copy p{margin-bottom:12px}
+.loginphone{flex:0 0 158px;width:158px;margin:2px 0 8px}
+.loginphone-bezel{background:#2B2A27;border-radius:26px;padding:8px 7px 10px;box-shadow:0 14px 28px rgba(43,42,39,.18)}
+.loginphone-screen{position:relative;height:292px;background:#F4F1EA;border-radius:18px;overflow:hidden}
+.loginphone-notch{position:absolute;z-index:2;top:6px;left:50%;width:46px;height:8px;margin-left:-23px;border-radius:8px;background:#2B2A27}
+.loginphone-track{display:flex;width:200%;height:100%;animation:phone-slide 9s ease-in-out infinite}
+.loginphone-slide{flex:0 0 50%;width:50%;height:100%;box-sizing:border-box;padding:20px 7px 8px;overflow:hidden;color:#2B2A27}
+.ps-title{font-size:13px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.ps-search{background:#FAF9F6;border-radius:10px;padding:6px 8px;font-size:9px;color:#6F6C64;margin:0 0 6px}
+.ps-acts{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 8px}
+.ps-acts span{background:#FAF9F6;color:#8A9A86;border-radius:8px;font-size:8px;font-weight:800;text-align:center;padding:6px 2px}
+.ps-h{font-size:10px;font-weight:800;margin:0 0 4px}
+.ps-row{display:flex;gap:6px;align-items:center;background:#FAF9F6;border-radius:8px;padding:4px;margin:0 0 4px}
+.ps-row img{width:28px;height:28px;object-fit:cover;border-radius:6px;flex:none;background:#E7EBE4}
+.ps-row b{display:block;font-size:9px;line-height:1.15;font-weight:800}
+.ps-row small{display:block;color:#6F6C64;font-size:8px;font-weight:600;line-height:1.2}
+.ps-photo{width:100%;height:72px;object-fit:cover;border-radius:8px;display:block;margin:0 0 6px;background:#E7EBE4}
+.ps-stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:0 0 6px}
+.ps-stats div{background:#FAF9F6;border-radius:8px;padding:6px 4px}
+.ps-stats small{display:block;color:#6F6C64;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.ps-stats b{display:block;font-size:16px;font-weight:800;color:#8A9A86;line-height:1.1}
+.ps-card{background:#FAF9F6;border-radius:8px;padding:6px}
+.ps-card b{display:block;font-size:10px;font-weight:800;margin:0 0 4px}
+.ps-card small{display:block;color:#6F6C64;font-size:8px;font-weight:700;margin:0 0 3px}
+.ps-fake{background:#F4F1EA;border-radius:6px;color:#6F6C64;font-size:9px;padding:5px 6px;margin:0 0 5px}
+.ps-btn{background:#8A9A86;color:#2B2A27;border-radius:8px;text-align:center;font-size:9px;font-weight:800;padding:6px 4px}
+@keyframes phone-slide{
+  0%,42%{transform:translateX(0)}
+  50%,92%{transform:translateX(-50%)}
+  100%{transform:translateX(0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .loginphone-track{animation:none}
+}
 button.outline{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#2B2A27;border:1.5px solid #2B2A27;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
 .wshot{position:relative;margin:28px -22px 8px 0;min-height:460px}
 .wshot .heroimg{position:absolute;right:0;top:0;bottom:0;width:84%;height:100%;object-fit:cover;border-radius:var(--radius);display:block;background:#F4F1EA}
@@ -623,9 +660,45 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
   </div>
   <div id="welcomeHome">
     <section class="mhero">
-      <h2>Put the workout on their phone in minutes</h2>
-      <p>Write the session, set the meals, and send a video. Clients open Curly Gurl Fitness and the plan is already waiting.</p>
-      <button type="button" class="outline" id="learnMore">View features</button>
+      <div class="phonehero">
+        <div class="phonehero-copy">
+          <h2>Put the workout on their phone in minutes</h2>
+          <p>Write the session, set the meals, and send a video. Clients open Curly Gurl Fitness and the plan is already waiting.</p>
+          <button type="button" class="outline" id="learnMore">View features</button>
+        </div>
+        <div class="loginphone" aria-hidden="true">
+          <div class="loginphone-bezel">
+            <div class="loginphone-screen">
+              <div class="loginphone-notch"></div>
+              <div class="loginphone-track">
+                <div class="loginphone-slide">
+                  <div class="ps-title">Breakfast</div>
+                  <div class="ps-search">Search foods</div>
+                  <div class="ps-acts"><span>Barcode scan</span><span>Voice log</span></div>
+                  <div class="ps-h">Recently logged</div>
+                  <div class="ps-row"><img src="images/food/salmon.jpg" alt=""><div><b>Salmon</b><small>100 cal, 4 ounce</small></div></div>
+                  <div class="ps-row"><img src="images/food/oatmeal.jpg" alt=""><div><b>Oatmeal, cooked</b><small>154 cal, 1 cup</small></div></div>
+                  <div class="ps-row"><img src="images/food/yogurt.jpg" alt=""><div><b>Greek Yogurt, Vanilla, Fat Free</b><small>209 cal, 1 cup, Great Value</small></div></div>
+                </div>
+                <div class="loginphone-slide">
+                  <div class="ps-title">Weight</div>
+                  <img class="ps-photo" src="images/work/weights.jpg" alt="">
+                  <div class="ps-stats">
+                    <div><small>Total lost</small><b>—</b></div>
+                    <div><small>To goal</small><b>—</b><small>set goal in Settings</small></div>
+                  </div>
+                  <div class="ps-card">
+                    <b>Log weight</b>
+                    <small>Weight (lb)</small>
+                    <div class="ps-fake">e.g. 205.4</div>
+                    <div class="ps-btn">Save weight</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="wshot">
         <img class="heroimg pool" src="images/work/lower-body.jpg" alt="Class training by the pool">
         <div class="wcards">
