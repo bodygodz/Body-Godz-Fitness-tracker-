@@ -22,13 +22,13 @@ if ("serviceWorker" in navigator) {
 <meta property="og:title" content="Curly Gurl Fitness">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://bodygodz.github.io/Body-Godz-Fitness-tracker-/">
-<meta property="og:image" content="https://bodygodz.github.io/Body-Godz-Fitness-tracker-/images/login-logo.jpg">
-<meta property="og:image:type" content="image/jpeg">
-<meta property="og:image:width" content="1280">
-<meta property="og:image:height" content="720">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://bodygodz.github.io/Body-Godz-Fitness-tracker-/images/og-logo.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="1200">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Curly Gurl Fitness">
-<meta name="twitter:image" content="https://bodygodz.github.io/Body-Godz-Fitness-tracker-/images/login-logo.jpg">
+<meta name="twitter:image" content="https://bodygodz.github.io/Body-Godz-Fitness-tracker-/images/og-logo.png">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
@@ -237,7 +237,8 @@ button.learnmore{background:transparent;border:none;color:#2B2A27;font-weight:70
 }
 button.outline{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#2B2A27;border:1.5px solid #2B2A27;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
 .wshot{position:relative;margin:28px -22px 8px 0;min-height:460px}
-.wshot .heroimg{position:absolute;right:0;top:0;bottom:0;width:84%;height:100%;object-fit:cover;border-radius:var(--radius);display:block;background:#F4F1EA}
+.heropin{position:absolute;right:0;top:0;bottom:0;width:84%;overflow:hidden;border-radius:var(--radius);z-index:0;pointer-events:none}
+.wshot .heroimg{position:absolute;left:0;top:0;width:100%;height:100vh;max-width:none;object-fit:cover;object-position:center center;display:block;background:#F4F1EA;will-change:transform}
 .wshot .heroimg.pool{object-position:center 72%}
 .wshot .heroimg.face{object-position:center 42%}
 .wshot .heroimg.roofshot{object-fit:contain;object-position:center center}
@@ -713,7 +714,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
         </div>
       </div>
       <div class="wshot">
-        <img class="heroimg pool" src="images/work/lower-body.jpg" alt="Class training by the pool">
+        <div class="heropin"><img class="heroimg pool" src="images/work/lower-body.jpg" alt="Class training by the pool"></div>
         <div class="wcards">
           <div class="fcard">
             <small>Today's class</small>
@@ -743,7 +744,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
       <p>A workout for today, a video from their coach, and the next class on the calendar. That is a reason to open the app again.</p>
       <button type="button" class="outline" id="learnMoreB">View features</button>
       <div class="wshot">
-        <img class="heroimg roofshot" src="images/welcome-rooftop.jpg" alt="Curly Gurl class">
+        <div class="heropin"><img class="heroimg roofshot" src="images/welcome-rooftop.jpg" alt="Curly Gurl class"></div>
         <div class="wcards">
           <div class="fcard">
             <small>On the calendar</small>
@@ -6873,6 +6874,16 @@ function paintMyPage(){
 function paintChrome(){
   applyMemberLook();
 }
+function pinWelcomePhotos(){
+  if(!document.body.classList.contains("welcome-on")) return;
+  const vh = window.innerHeight || document.documentElement.clientHeight;
+  document.querySelectorAll(".heropin").forEach(pin => {
+    const img = pin.querySelector(".heroimg");
+    if(!img) return;
+    img.style.height = vh + "px";
+    img.style.transform = "translate3d(0," + (-pin.getBoundingClientRect().top) + "px,0)";
+  });
+}
 function showWelcome(view){
   applyClientLock();
   document.body.classList.add("welcome-on");
@@ -6896,6 +6907,7 @@ function showWelcome(view){
   if($("foodLog")) $("foodLog").hidden = true;
   window.scrollTo(0,0);
   if(location.hash) history.replaceState(null, "", location.pathname+location.search);
+  pinWelcomePhotos();
 }
 function showApp(){
   document.body.classList.remove("welcome-on");
@@ -7221,6 +7233,8 @@ document.addEventListener("visibilitychange", () => {
   if(document.hidden) markAway();
   else onReturn();
 });
+window.addEventListener("scroll", pinWelcomePhotos, {passive:true});
+window.addEventListener("resize", pinWelcomePhotos);
 window.addEventListener("pagehide", markAway);
 window.addEventListener("pageshow", e => { if(e.persisted) onReturn(); });
 if(sessionStorage.getItem(RETURN_LOGIN_KEY)==="1"){
