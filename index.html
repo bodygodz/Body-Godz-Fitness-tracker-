@@ -1571,7 +1571,7 @@ body.member-look:not(.welcome-on) .tabbar{background:linear-gradient(to top,var(
       </div>
     </div>
     <div id="foodLogHistory">
-      <h2>Recently logged</h2>
+      <h2 id="foodLogHeading">Recently logged</h2>
       <div id="foodLogList"></div>
     </div>
     <p class="foodlog-empty" id="foodLogEmpty" hidden>Nothing saved here yet.</p>
@@ -2599,24 +2599,200 @@ const RECENT_FOODS = [
 ];
 let foodLogMeal = "breakfast";
 let foodLogTab = "history";
+let foodLookupSeq = 0;
+let foodLookupTimer = null;
+let foodLookupHits = [];
+function cancelFoodLookup(){
+  foodLookupSeq++;
+  clearTimeout(foodLookupTimer);
+}
+function macroBit(label, v){
+  if(v==null || !Number.isFinite(Number(v))) return "";
+  return label+" "+(Math.round(Number(v)*10)/10)+" g";
+}
+function foodQueryMatch(query, label){
+  const hay = foodKey(label);
+  const words = foodKey(query).split(" ").filter(w=>w.length>1);
+  if(!words.length) return false;
+  return words.every(w=>hay.indexOf(w)>=0);
+}
+function foodRank(query, name){
+  const q = foodKey(query);
+  const k = foodKey(name);
+  if(!q || !k) return 2;
+  if(k===q) return 0;
+  if(k.indexOf(q)===0) return 1;
+  return 2;
+}
+function packListed(name, brand, cal, protein, carbs, fat, amount){
+  const bits = [Math.round(cal)+" cal"];
+  if(amount) bits.push(amount);
+  if(brand) bits.push(brand);
+  const extra = [macroBit("protein", protein), macroBit("carbs", carbs), macroBit("fat", fat)].filter(Boolean).join(", ");
+  return {name:name, detail:bits.join(", ")+(extra?" · "+extra:""), cal:Math.round(cal), protein:protein, carbs:carbs, fat:fat, amount:amount||""};
+}
+function nutById(list, id){
+  const row = (list||[]).find(n=>n && (n.nutrientId===id || Number(n.nutrientNumber)===id));
+  if(!row || row.value==null || row.value==="") return null;
+  const n = Number(row.value);
+  return Number.isFinite(n) && n>=0 ? n : null;
+}
+function listedUsdaFood(food, query){
+  const name = String(food.description||"").trim();
+  const brand = String(food.brandOwner || food.brandName || "").trim();
+  if(!name || !foodQueryMatch(query, name+" "+brand)) return null;
+  const cal = nutById(food.foodNutrients, 1008);
+  if(cal==null) return null;
+  const protein = nutById(food.foodNutrients, 1003);
+  const fat = nutById(food.foodNutrients, 1004);
+  const carbs = nutById(food.foodNutrients, 1005);
+  let amount = "";
+  if(food.dataType==="Branded"){
+    amount = String(food.householdServingFullText||"").trim();
+    if(!amount && food.servingSize!=null && food.servingSizeUnit) amount = String(food.servingSize)+" "+String(food.servingSizeUnit);
+    if(!amount) return null;
+  } else {
+    amount = "100 g";
+  }
+  return packListed(name, brand, cal, protein, carbs, fat, amount);
+}
+function listedFood(product, query){
+  const name = String(product.product_name || product.product_name_en || "").trim();
+  if(!name) return null;
+  const brand = String(product.brands||"").split(",")[0].trim();
+  if(!foodQueryMatch(query, name+" "+brand)) return null;
+  const n = product.nutriments || {};
+  const servingCal = nutNumber(n, "energy-kcal_serving");
+  const per100 = nutNumber(n, "energy-kcal_100g");
+  const servingText = String(product.serving_size||"").trim();
+  let cal, protein, carbs, fat, amount;
+  if(servingCal!=null && servingText){
+    cal = servingCal;
+    protein = nutNumber(n, "proteins_serving");
+    carbs = nutNumber(n, "carbohydrates_serving");
+    fat = nutNumber(n, "fat_serving");
+    amount = servingText;
+  } else if(per100!=null){
+    cal = per100;
+    protein = nutNumber(n, "proteins_100g");
+    carbs = nutNumber(n, "carbohydrates_100g");
+    fat = nutNumber(n, "fat_100g");
+    amount = "100 g";
+  } else if(servingCal!=null){
+    cal = servingCal;
+    protein = nutNumber(n, "proteins_serving");
+    carbs = nutNumber(n, "carbohydrates_serving");
+    fat = nutNumber(n, "fat_serving");
+    amount = "";
+  } else return null;
+  if(!Number.isFinite(cal) || cal<0) return null;
+  return packListed(name, brand, cal, protein, carbs, fat, amount);
+}
+function takeFoodHits(foods, query){
+  const seen = new Set();
+  const hits = [];
+  foods.forEach(food=>{
+    if(!food) return;
+    const key = foodKey(food.name)+"|"+food.cal+"|"+foodKey(food.amount);
+    if(seen.has(key)) return;
+    seen.add(key);
+    hits.push(food);
+  });
+  hits.sort((a,b)=>{
+    const d = foodRank(query, a.name)-foodRank(query, b.name);
+    if(d) return d;
+    const raw = (name) => /,\s*raw\b/i.test(name) ? 0 : 1;
+    return raw(a.name)-raw(b.name) || a.name.length-b.name.length;
+  });
+  return hits.slice(0, 8);
+}
+function paintFoodRows(foods, source){
+  $("foodLogList").innerHTML = foods.map((f,i)=>`<div class="foodrow"><div class="grow"><b>${esc(f.name)}${f.mark?'<span class="mark" aria-label="Checked"> ✓</span>':""}</b><small>${esc(f.detail)}</small></div><button type="button" class="foodplus" data-foodhit="${i}" data-foodsrc="${source}" aria-label="Add ${esc(f.name)}">+</button></div>`).join("");
+  $("foodLogList").querySelectorAll("[data-foodhit]").forEach(btn=>{
+    btn.onclick = () => {
+      const food = (btn.dataset.foodsrc==="lookup" ? foodLookupHits : RECENT_FOODS.filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(($("foodLogSearch").value||"").trim().toLowerCase())>=0))[+btn.dataset.foodhit];
+      if(!food || food.cal==null || !Number.isFinite(Number(food.cal))) return;
+      const label = food.amount ? food.name+" · "+food.amount : food.name;
+      const macro = (v) => v==null || !Number.isFinite(Number(v)) ? null : r1(Number(v));
+      S.meals.push({id:uid(), date:diaryDate, name:label, cal:Math.round(Number(food.cal)), protein:macro(food.protein), carbs:macro(food.carbs), fat:macro(food.fat), type:foodLogMeal, ts:Date.now()});
+      save();
+      render();
+      toast("Added "+label);
+    };
+  });
+}
+async function fetchFoodJson(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error("lookup");
+  const text = await res.text();
+  if(!text || text.charAt(0)!=="{") throw new Error("lookup");
+  return JSON.parse(text);
+}
+async function lookupPublicFoods(query, seq){
+  const still = () => ($("foodLogSearch").value||"").trim().toLowerCase()===query.toLowerCase() && seq===foodLookupSeq;
+  if(!still()) return;
+  let answered = false;
+  const sources = [
+    {title:"FoodData Central", run: async ()=>{
+      const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/foods/search?query="+encodeURIComponent(query)+"&pageSize=20&dataType="+encodeURIComponent("Survey (FNDDS)")+"&api_key=DEMO_KEY");
+      answered = true;
+      return (data.foods||[]).map(food=>listedUsdaFood(food, query));
+    }},
+    {title:"FoodData Central", run: async ()=>{
+      const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/foods/search?query="+encodeURIComponent(query)+"&pageSize=20&dataType="+encodeURIComponent("Branded")+"&api_key=DEMO_KEY");
+      answered = true;
+      return (data.foods||[]).map(food=>listedUsdaFood(food, query));
+    }},
+    {title:"Open Food Facts", run: async ()=>{
+      const data = await fetchFoodJson("https://world.openfoodfacts.org/api/v2/search?q="+encodeURIComponent(query)+"&page_size=20&fields=product_name,product_name_en,brands,serving_size,nutriments");
+      answered = true;
+      return (data.products||[]).map(product=>listedFood(product, query));
+    }}
+  ];
+  for(const source of sources){
+    if(!still()) return;
+    try {
+      const hits = takeFoodHits(await source.run(), query);
+      if(!still()) return;
+      if(hits.length){
+        foodLookupHits = hits;
+        $("foodLogHeading").textContent = source.title;
+        paintFoodRows(foodLookupHits, "lookup");
+        return;
+      }
+    } catch(err){
+      if(!still()) return;
+    }
+  }
+  if(!still()) return;
+  $("foodLogHeading").textContent = "Search";
+  $("foodLogList").innerHTML = answered
+    ? '<p class="foodlog-empty">'+esc(query)+' was not found.</p>'
+    : '<p class="foodlog-empty">The food lookup didn\'t answer.</p>';
+}
 function paintFoodLog(){
-  const q = ($("foodLogSearch").value||"").trim().toLowerCase();
+  const raw = ($("foodLogSearch").value||"").trim();
+  const q = raw.toLowerCase();
   const history = foodLogTab==="history";
   $("foodLogHistory").hidden = !history;
   $("foodLogEmpty").hidden = history;
+  cancelFoodLookup();
   if(!history) return;
   const list = RECENT_FOODS.filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(q)>=0);
-  $("foodLogList").innerHTML = list.map((f,i)=>`<div class="foodrow"><div class="grow"><b>${esc(f.name)}${f.mark?'<span class="mark" aria-label="Checked"> ✓</span>':""}</b><small>${esc(f.detail)}</small></div><button type="button" class="foodplus" data-recent="${i}" aria-label="Add ${esc(f.name)}">+</button></div>`).join("") || '<p class="foodlog-empty">No foods match that search.</p>';
-  $("foodLogList").querySelectorAll("[data-recent]").forEach(btn=>{
-    btn.onclick = () => {
-      const food = list[+btn.dataset.recent];
-      if(!food) return;
-      S.meals.push({id:uid(), date:diaryDate, name:food.name, cal:food.cal, protein:null, carbs:null, fat:null, type:foodLogMeal, ts:Date.now()});
-      save();
-      render();
-      toast("Added "+food.name);
-    };
-  });
+  if(list.length || !raw){
+    $("foodLogHeading").textContent = "Recently logged";
+    paintFoodRows(list, "recent");
+    return;
+  }
+  if(raw.length<2){
+    $("foodLogHeading").textContent = "Recently logged";
+    $("foodLogList").innerHTML = '<p class="foodlog-empty">No foods match that search.</p>';
+    return;
+  }
+  const seq = foodLookupSeq;
+  $("foodLogHeading").textContent = "Search";
+  $("foodLogList").innerHTML = '<p class="foodlog-empty">Looking up “'+esc(raw)+'”…</p>';
+  foodLookupTimer = setTimeout(()=>lookupPublicFoods(raw, seq), 350);
 }
 function setFoodTab(tab){
   foodLogTab = tab;
@@ -2639,6 +2815,7 @@ function openFoodLog(type){
   $("foodLogScroll").scrollTop = 0;
 }
 function closeFoodLog(){
+  cancelFoodLookup();
   stopFoodTools();
   $("foodLog").hidden = true;
 }
