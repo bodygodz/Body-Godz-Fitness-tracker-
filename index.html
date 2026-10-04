@@ -5396,6 +5396,7 @@ const SETUP_SQL = [
 "update public.profiles p set role = 'trainer'",
 "from auth.users u",
 "where p.id = u.id and u.raw_app_meta_data->>'cgf_role' = 'trainer' and p.role is distinct from 'trainer';",
+"notify pgrst, 'reload schema';",
 "insert into storage.buckets (id, name, public) values ('session-media', 'session-media', false) on conflict (id) do nothing;",
 "drop policy if exists \"cgf session media read\" on storage.objects;",
 "create policy \"cgf session media read\" on storage.objects for select to authenticated using (bucket_id = 'session-media');",
