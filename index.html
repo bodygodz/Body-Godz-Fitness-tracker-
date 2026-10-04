@@ -5219,11 +5219,16 @@ const SETUP_SQL = [
 ");",
 "create or replace function public.cgf_handle_new_user()",
 "returns trigger language plpgsql security definer set search_path = public as $$",
+"declare",
+"  next_role text := case when new.raw_user_meta_data->>'role' = 'trainer' then 'trainer' else 'client' end;",
 "begin",
 "  insert into public.profiles (id, email, name, role)",
-"  values (new.id, coalesce(new.email,''), coalesce(new.raw_user_meta_data->>'name',''),",
-"    case when new.raw_user_meta_data->>'role' = 'trainer' then 'trainer' else 'client' end)",
-"  on conflict (id) do nothing;",
+"  values (new.id, coalesce(new.email,''), coalesce(new.raw_user_meta_data->>'name',''), next_role)",
+"  on conflict (id) do update set",
+"    role = excluded.role,",
+"    email = coalesce(nullif(excluded.email, ''), public.profiles.email),",
+"    name = coalesce(nullif(excluded.name, ''), public.profiles.name)",
+"  where excluded.role = 'trainer' and public.profiles.role is distinct from 'trainer';",
 "  return new;",
 "end; $$;",
 "drop trigger if exists cgf_on_auth_user on auth.users;",
@@ -5274,9 +5279,15 @@ const SETUP_SQL = [
 "  or id in (select trainer_id from public.trainer_clients where client_id = auth.uid())",
 "  or id in (select client_id from public.trainer_clients where trainer_id = auth.uid())",
 ");",
+"create or replace function public.cgf_own_role()",
+"returns text language sql security definer set search_path = public stable as $$",
+"  select role from public.profiles where id = auth.uid()",
+"$$;",
+"revoke all on function public.cgf_own_role() from public, anon;",
+"grant execute on function public.cgf_own_role() to authenticated;",
 "drop policy if exists \"cgf profiles update\" on public.profiles;",
 "create policy \"cgf profiles update\" on public.profiles for update to authenticated",
-"using (id = auth.uid()) with check (id = auth.uid() and role = (select p.role from public.profiles p where p.id = auth.uid()));",
+"using (id = auth.uid()) with check (id = auth.uid() and role = public.cgf_own_role());",
 "drop policy if exists \"cgf invites read\" on public.invites;",
 "create policy \"cgf invites read\" on public.invites for select to authenticated using (trainer_id = auth.uid());",
 "drop policy if exists \"cgf invites insert\" on public.invites;",
@@ -5329,6 +5340,62 @@ const SETUP_SQL = [
 "  return tid;",
 "end; $$;",
 "grant execute on function public.cgf_join_trainer(text) to authenticated;",
+"create or replace function public.cgf_ensure_profile()",
+"returns text language plpgsql security definer set search_path = public as $$",
+"declare",
+"  uid uuid := auth.uid();",
+"  app_role text;",
+"  meta_role text;",
+"  meta_name text;",
+"  meta_email text;",
+"  current_role text;",
+"begin",
+"  if uid is null then raise exception 'Sign in to continue.'; end if;",
+"  select coalesce(u.raw_app_meta_data->>'cgf_role', ''),",
+"         coalesce(u.raw_user_meta_data->>'role', ''),",
+"         coalesce(u.raw_user_meta_data->>'name', ''),",
+"         coalesce(u.email, '')",
+"    into app_role, meta_role, meta_name, meta_email",
+"  from auth.users u where u.id = uid;",
+"  if app_role <> 'trainer' and app_role <> 'client' then",
+"    app_role := case when meta_role = 'trainer' then 'trainer' else 'client' end;",
+"    update auth.users",
+"      set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb) || jsonb_build_object('cgf_role', app_role)",
+"      where id = uid and coalesce(raw_app_meta_data->>'cgf_role', '') = '';",
+"  end if;",
+"  select role into current_role from public.profiles where id = uid;",
+"  if current_role is null then",
+"    insert into public.profiles (id, email, name, role) values (uid, meta_email, meta_name, app_role);",
+"    return app_role;",
+"  end if;",
+"  if app_role = 'trainer' and current_role is distinct from 'trainer' then",
+"    update public.profiles",
+"      set role = 'trainer',",
+"          email = coalesce(nullif(meta_email, ''), email),",
+"          name = coalesce(nullif(meta_name, ''), name)",
+"      where id = uid;",
+"    return 'trainer';",
+"  end if;",
+"  update public.profiles",
+"    set email = coalesce(nullif(meta_email, ''), email),",
+"        name = coalesce(nullif(meta_name, ''), name)",
+"    where id = uid;",
+"  return current_role;",
+"end; $$;",
+"revoke all on function public.cgf_ensure_profile() from public, anon;",
+"grant execute on function public.cgf_ensure_profile() to authenticated;",
+"update auth.users",
+"  set raw_app_meta_data = coalesce(raw_app_meta_data, '{}'::jsonb)",
+"    || jsonb_build_object('cgf_role', case when raw_user_meta_data->>'role' = 'trainer' then 'trainer' else 'client' end)",
+"  where coalesce(raw_app_meta_data->>'cgf_role', '') = '';",
+"insert into public.profiles (id, email, name, role)",
+"select u.id, coalesce(u.email, ''), coalesce(u.raw_user_meta_data->>'name', ''),",
+"  case when u.raw_app_meta_data->>'cgf_role' = 'trainer' then 'trainer' else 'client' end",
+"from auth.users u",
+"where not exists (select 1 from public.profiles p where p.id = u.id);",
+"update public.profiles p set role = 'trainer'",
+"from auth.users u",
+"where p.id = u.id and u.raw_app_meta_data->>'cgf_role' = 'trainer' and p.role is distinct from 'trainer';",
 "insert into storage.buckets (id, name, public) values ('session-media', 'session-media', false) on conflict (id) do nothing;",
 "drop policy if exists \"cgf session media read\" on storage.objects;",
 "create policy \"cgf session media read\" on storage.objects for select to authenticated using (bucket_id = 'session-media');",
@@ -9932,6 +9999,22 @@ async function pullPrivateLog(){
     if(typeof render==="function") render();
   }
 }
+async function ensureOwnProfile(){
+  const session = await authSession();
+  if(!session) return "";
+  try {
+    const role = await sbAuth("rpc/cgf_ensure_profile", { method: "POST", body: {} });
+    return typeof role==="string" ? role : "";
+  } catch(e){
+    if(e && (e.code==="missing" || e.code==="PGRST202")) return "";
+    throw e;
+  }
+}
+async function savedProfileRole(userId){
+  const rows = await sbAuth("profiles?select=role&id=eq."+encodeURIComponent(userId));
+  if(!Array.isArray(rows) || !rows.length) return "";
+  return String(rows[0].role||"");
+}
 async function publishInvite(code){
   const clean = normalizeCode(code);
   if(clean.length<4) throw new Error("No invite code to save");
@@ -9939,6 +10022,13 @@ async function publishInvite(code){
   if(!session) throw new Error("Sign in to add a client.");
   const account = accountForAuth(currentAuth());
   if(!account || account.role!=="trainer") throw new Error("Sign in as a trainer to add a client.");
+  let profileRole = await ensureOwnProfile();
+  if(profileRole!=="trainer"){
+    const saved = await savedProfileRole(session.user.id);
+    if(saved==="trainer") profileRole = saved;
+    else if(profileRole==="client" || saved==="client") throw new Error("This sign-in is saved as a client, so it cannot create an invite.");
+    else throw new Error("This sign-in has no trainer profile, so the invite could not be saved.");
+  }
   const rows = await sbAuth("invites", {
     method: "POST",
     prefer: "return=representation",
@@ -10107,6 +10197,7 @@ async function signUpAccount(name, email, password, role, invite){
     return;
   }
   const created = await authSignUp(name, email, password, role);
+  try { await ensureOwnProfile(); } catch(e){}
   const hash = await passHash(password);
   const account = {id:created.id||makeId(), name:name, email:email, passHash:hash, role:role, createdAt:Date.now()};
   rememberAccount(account);
@@ -10128,6 +10219,7 @@ async function logInAccount(email, password, remember, side){
     try {
       const signed = await authSignIn(email, password);
       if(signed.role && signed.role!==side) throw new Error(otherMessage(signed.role));
+      try { await ensureOwnProfile(); } catch(e){}
       const account = {
         id: signed.id || makeId(),
         name: signed.name || email.split("@")[0],
