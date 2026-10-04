@@ -109,6 +109,67 @@ body.theme-dark #clientFile .cftag button{background:transparent;border:none;col
 @media(min-width:900px){
   body.client-file #clientFile .cfgrid{grid-template-columns:minmax(240px,.9fr) minmax(280px,1.25fr) minmax(240px,.95fr)}
 }
+body.ov-home,body.theme-dark.ov-home{background:#F4F1EA;color:#2B2A27}
+body.ov-home header{padding:0;border-bottom:none;background:transparent;position:static}
+body.ov-home header .topbar,body.ov-home header #hdrSub,body.ov-home header #subbar,body.ov-home header #dayMenu{display:none !important}
+#page-overview{color:#2B2A27;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+#page-overview .ovbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;background:#F4F1EA;padding:4px 0 12px}
+#page-overview .ovicon{width:36px;height:36px;padding:0;border:none;background:transparent;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#2B2A27;position:relative}
+#page-overview .ovicon svg{width:22px;height:22px;stroke:#2B2A27;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#page-overview .ovadd{width:36px;height:36px;padding:0;border:none;border-radius:8px;background:#8A9A86;color:#2B2A27;display:inline-flex;align-items:center;justify-content:center}
+#page-overview .ovadd svg{width:20px;height:20px;stroke:#2B2A27;fill:none;stroke-width:2.2;stroke-linecap:round}
+#page-overview .ovhelp{border:1.5px solid #2B2A27;border-radius:50%;font-size:16px;font-weight:700;line-height:1}
+#page-overview .ovicon.hasdot::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:#e11d48}
+#page-overview .ovme{width:36px;height:36px;border-radius:50%;object-fit:cover;margin-left:auto;background:#F4F1EA;border:1px solid #E4DFD4}
+#page-overview .ovfilter{background:#FAF9F6;border:1px solid #E4DFD4;border-radius:12px;padding:6px;margin:0 0 12px;display:flex;flex-direction:column;gap:2px}
+#page-overview .ovfilter[hidden]{display:none !important}
+#page-overview .ovfilter button{text-align:left;background:transparent;border:none;color:#2B2A27;border-radius:8px}
+#page-overview .ovfilter button.sel{color:#8A9A86}
+#page-overview .ovcard{background:#FAF9F6;color:#2B2A27;border:1px solid #E4DFD4;border-radius:16px;padding:16px;box-shadow:0 1px 2px rgba(43,42,39,.08)}
+#page-overview .ovlead{margin:0 0 4px;color:#2B2A27;font-size:16px;line-height:1.35}
+#page-overview .ovempty{color:#6F6C64;margin:12px 0}
+#page-overview .ovrow{display:flex;gap:10px;align-items:center;padding:14px 0;border-top:1px solid #E4DFD4}
+#page-overview .ovmark{width:36px;height:36px;border-radius:50%;background:#8A9A86;flex:none;display:flex;align-items:center;justify-content:center}
+#page-overview .ovmark svg{width:18px;height:18px;stroke:#F4F1EA;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#page-overview .ovmain{flex:1;min-width:0}
+#page-overview .ovneed{font-weight:700;color:#2B2A27;line-height:1.25}
+#page-overview .ovfaces{display:flex;align-items:center;gap:8px;margin-top:8px}
+#page-overview .ovface{width:46px;height:46px;padding:0;border-radius:50%;overflow:hidden;border:2px solid #E4DFD4;background:#F4F1EA;flex:none}
+#page-overview .ovface img{width:100%;height:100%;object-fit:cover;display:block}
+#page-overview .ovmore{width:46px;height:46px;border-radius:50%;background:#E4DFD4;color:#2B2A27;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+#page-overview .ovall{background:transparent;border:none;color:#8A9A86;padding:8px 0 8px 8px;flex:none;font-weight:700}
+#page-overview .ovfoot{display:flex;justify-content:space-between;gap:12px;align-items:center;padding-top:12px;border-top:1px solid #E4DFD4;margin-top:4px}
+#page-overview .ovfoot button{background:transparent;border:none;color:#8A9A86;padding:8px 0;font-weight:700}
+#page-overview .ovgear{width:16px;height:16px;stroke:#8A9A86;fill:none;stroke-width:1.8;vertical-align:-3px;margin-right:4px}
+#page-overview .ovsections{display:flex;margin-top:18px;border-bottom:1px solid #E4DFD4}
+#page-overview .ovsections button{flex:1;background:transparent;border:none;border-radius:0;border-bottom:2px solid transparent;color:#6F6C64;letter-spacing:.04em;text-transform:uppercase;font-size:13px;padding:12px 4px}
+#page-overview .ovsections button.sel{color:#8A9A86;border-bottom-color:#8A9A86}
+#page-overview .ovback{background:transparent;border:none;color:#8A9A86;padding:0 0 8px;font-weight:700}
+#page-overview .ovperson{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;border-top:1px solid #E4DFD4;border-radius:0;padding:10px 0;color:#2B2A27}
+#page-overview .ovperson img{width:40px;height:40px;border-radius:50%;object-fit:cover;flex:none;border:1px solid #E4DFD4}
+#page-overview .ovcheck{display:flex;align-items:center;gap:8px;margin:8px 0;color:#2B2A27;font-weight:600}
+#page-overview .ovact{background:#FAF9F6;border:1px solid #E4DFD4;border-radius:16px;padding:4px 14px;margin-top:12px}
+#page-overview .ovact button{display:block;width:100%;text-align:left;background:transparent;border:none;border-top:1px solid #E4DFD4;border-radius:0;padding:10px 0;color:#2B2A27}
+#page-overview .ovact button:first-child{border-top:none}
+#page-overview .ovact b{display:block}
+#page-overview .ovact span{color:#6F6C64;font-weight:600;font-size:13px}
+#page-overview #ovAutoForm textarea{min-height:88px}
+body.theme-dark #page-overview,
+body.theme-dark #page-overview .ovbar,
+body.theme-dark #page-overview .ovcard,
+body.theme-dark #page-overview .ovfilter,
+body.theme-dark #page-overview .ovact,
+body.theme-dark #page-overview .ovneed,
+body.theme-dark #page-overview .ovperson,
+body.theme-dark #page-overview .ovlead{background:#FAF9F6;color:#2B2A27}
+body.theme-dark #page-overview .ovbar{background:#F4F1EA}
+body.theme-dark #page-overview .ovempty,
+body.theme-dark #page-overview .ovact span,
+body.theme-dark #page-overview .ovsections button{color:#6F6C64}
+body.theme-dark #page-overview .ovsections button.sel,
+body.theme-dark #page-overview .ovall,
+body.theme-dark #page-overview .ovfoot button,
+body.theme-dark #page-overview .ovback{color:#8A9A86}
 .row{display:flex;gap:10px;align-items:center}
 .row.wrap{flex-wrap:wrap}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -1072,6 +1133,47 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
   </div>
 </div>
 <main>
+<!-- ============ TRAINER OVERVIEW ============ -->
+<section class="page" id="page-overview">
+  <div class="ovbar">
+    <button type="button" class="ovicon" id="ovMenu" aria-label="Open menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <button type="button" class="ovadd" id="ovAdd" aria-label="Add a client"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button type="button" class="ovicon" id="ovFilter" aria-label="Filter groups" aria-expanded="false" aria-controls="ovFilterMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/><circle cx="9" cy="7" r="1.7" fill="#2B2A27" stroke="none"/><circle cx="16" cy="12" r="1.7" fill="#2B2A27" stroke="none"/><circle cx="11" cy="17" r="1.7" fill="#2B2A27" stroke="none"/></svg></button>
+    <button type="button" class="ovicon" id="ovBell" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></button>
+    <button type="button" class="ovicon ovhelp" id="ovHelp" aria-label="Help">?</button>
+    <img class="ovme" id="ovMe" alt="" hidden>
+  </div>
+  <div class="ovfilter" id="ovFilterMenu" hidden>
+    <button type="button" data-ovfilter="all">All needs</button>
+    <button type="button" data-ovfilter="phase">Need a new training phase</button>
+    <button type="button" data-ovfilter="best">New exercise personal bests</button>
+    <button type="button" data-ovfilter="quiet">Not messaged lately</button>
+  </div>
+  <div class="ovcard">
+    <p class="ovlead">Clients grouped by what they need.</p>
+    <div id="ovGroups"></div>
+    <form id="ovAutoForm" hidden>
+      <p class="ovempty">Saved on this phone. Nothing is sent from here.</p>
+      <div class="field"><label class="f" for="ovAutoText">Message</label><textarea id="ovAutoText" maxlength="500" placeholder="Write a message to keep on this phone"></textarea></div>
+      <p class="ovneed">Use this note for</p>
+      <label class="ovcheck"><input type="checkbox" id="ovAutoPhase"> Need a new training phase</label>
+      <label class="ovcheck"><input type="checkbox" id="ovAutoBest"> New exercise personal bests</label>
+      <label class="ovcheck"><input type="checkbox" id="ovAutoQuiet"> Not messaged lately</label>
+      <button class="primary full" type="submit">Save on this phone</button>
+      <button type="button" class="full" id="ovAutoBack">Back</button>
+    </form>
+    <div class="ovfoot">
+      <button type="button" id="ovAllClients">View all clients</button>
+      <button type="button" id="ovAuto"><svg class="ovgear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg>Set up auto messages</button>
+    </div>
+  </div>
+  <div class="ovsections" role="tablist">
+    <button type="button" id="ovTabOverview" role="tab" aria-selected="true" class="sel">Overview</button>
+    <button type="button" id="ovTabActivity" role="tab" aria-selected="false">Recent activities</button>
+  </div>
+  <div id="ovActivity" hidden></div>
+</section>
+
 <!-- ============ TODAY ============ -->
 <section class="page active" id="page-today">
   <div id="targetBanner" hidden></div>
@@ -1907,6 +2009,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <input id="bubbleCamFile" type="file" accept="image/*" capture="environment" hidden>
     <input id="bubbleLibFile" type="file" accept="image/*" hidden>
   </div>
+  <button type="button" class="navitem" data-tab="overview" hidden>Clients</button>
   <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
   <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
   <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
@@ -2007,6 +2110,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 </div>
 <nav class="tabbar" id="tabbar" aria-label="Primary">
   <div class="tabpill">
+    <button type="button" data-tabgo="overview" hidden aria-label="Clients"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.2"/><circle cx="16" cy="9" r="1.8"/><path d="M4.5 18c.6-2.2 2.2-3.3 4.5-3.3s3.9 1.1 4.5 3.3M14 18c.4-1.6 1.5-2.4 3-2.4 1.2 0 2.2.6 2.8 1.8"/></svg><span>Clients</span></button>
     <button type="button" data-tabgo="today" class="sel" aria-label="Today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg><span>Today</span></button>
     <button type="button" data-tabgo="meals" aria-label="Meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v6"/><path d="M5 3v4.5a2 2 0 0 0 4 0V3"/><path d="M7 9.5V21"/><path d="M17 3v18"/><path d="M17 3c2 2.2 2 4.2 0 6.2"/></svg><span>Meals</span></button>
     <button type="button" data-tabgo="plan" aria-label="Plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span>Plan</span></button>
@@ -2676,10 +2780,11 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You"};
+const TITLES = {overview:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You"};
 let currentTab = "today";
 let diaryDate = todayStr();
 function tabGroup(tab){
+  if(tab==="overview") return "overview";
   if(tab==="workout"||tab==="events"||tab==="calendar") return "plan";
   if(tab==="weight"||tab==="photos"||tab==="checkin"||tab==="bmi") return "progress";
   if(tab==="coach") return "coach";
@@ -2699,6 +2804,7 @@ function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="work
 function sessionsVisible(){ return trainerHere() || clientView(); }
 function go(tab){
   if(!TITLES[tab]) tab="today";
+  if(tab==="overview" && !signedInTrainer()) tab="today";
   if(tab==="sessions" && !sessionsVisible()) tab="today";
   if(tab==="ask" && !signedInTrainer()) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
@@ -2767,6 +2873,7 @@ function syncMenu(){
   if(action) action.textContent = trainerHere() ? "Add client" : "Start today's workout";
   const client = clientView();
   document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
+    if(b.dataset.tab==="overview"){ b.hidden = !signedInTrainer(); return; }
     if(b.dataset.tab==="sessions"){ b.hidden = !sessionsVisible(); return; }
     if(!client){ b.hidden = false; return; }
     b.hidden = !clientAllows(b.dataset.tab) || !!b.dataset.lib;
@@ -2799,6 +2906,8 @@ function syncMenu(){
   if(syncWhen) syncWhen.textContent = lastSaveText();
   const askBtn = document.querySelector('#tabbar [data-tabgo="ask"]');
   const trainerAsk = signedInTrainer();
+  const overviewBtn = document.querySelector('#tabbar [data-tabgo="overview"]');
+  if(overviewBtn) overviewBtn.hidden = !trainerAsk;
   if(askBtn) askBtn.hidden = !trainerAsk;
   document.body.classList.toggle("trainer-bar", trainerAsk);
   const onWelcome = document.body.classList.contains("welcome-on");
@@ -3647,7 +3756,8 @@ $("dayPick").onchange=()=>{
 };
 document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>b.onclick=()=>{
   const g=b.dataset.tabgo;
-  if(g==="today") go("today");
+  if(g==="overview") go("overview");
+  else if(g==="today") go("today");
   else if(g==="meals") go("meals");
   else if(g==="plan") go(tabGroup(currentTab)==="plan"?currentTab:"workout");
   else if(g==="progress"){
@@ -6169,6 +6279,385 @@ async function matchClientLog(pair){
     return {log:null, email:"", status:e && e.code==="missing" ? "missing" : "error"};
   }
 }
+function recentWorkoutLines(workouts){
+  const dates = Object.keys(workouts||{}).filter(date=>/^\d{4}-\d{2}-\d{2}$/.test(date) && workoutEntryComplete(workouts[date])).sort().reverse().slice(0,3);
+  return dates.map(date=>{
+    const entry = workouts[date] || {};
+    const names = Object.keys(entry.exercises||{}).filter(id=>entry.exercises[id] && entry.exercises[id].checked).map(planExerciseName).filter(Boolean);
+    const label = names.length ? names.slice(0,2).join(", ") : "Workout";
+    return label+" · "+fmtDate(date);
+  });
+}
+function recentMealLines(meals){
+  const list = (Array.isArray(meals)?meals:[]).filter(m=>m && String(m.name||"").trim());
+  list.sort((a,b)=> String(b.date||"").localeCompare(String(a.date||"")) || ((+b.ts||0)-(+a.ts||0)));
+  return list.slice(0,3).map(m=> String(m.name).trim()+(m.date && /^\d{4}-\d{2}-\d{2}$/.test(m.date) ? " · "+fmtDate(m.date) : ""));
+}
+function latestActivity(pair, workouts, meals){
+  let best = 0;
+  (pair.messages||[]).forEach(m=>{ if(m && m.createdAt>best) best = m.createdAt; });
+  (pair.photos||[]).forEach(p=>{ if(p && p.createdAt>best) best = p.createdAt; });
+  (pair.weighIns||[]).forEach(w=>{
+    const t = w && (w.createdAt || (/^\d{4}-\d{2}-\d{2}$/.test(String(w.date||"")) ? parseYmd(w.date).getTime() : 0));
+    if(t>best) best = t;
+  });
+  Object.keys(workouts||{}).forEach(date=>{
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || !workoutEntryComplete(workouts[date])) return;
+    const t = parseYmd(date).getTime();
+    if(t>best) best = t;
+  });
+  (Array.isArray(meals)?meals:[]).forEach(m=>{
+    if(!m || !/^\d{4}-\d{2}-\d{2}$/.test(String(m.date||""))) return;
+    const t = +m.ts || parseYmd(m.date).getTime();
+    if(t>best) best = t;
+  });
+  return best ? fmtStamp(best) : "";
+}
+function weightChangeText(list){
+  const rows = (list||[]).filter(w=>w && isFinite(+w.weight) && /^\d{4}-\d{2}-\d{2}$/.test(String(w.date||"")));
+  if(rows.length<2) return "";
+  rows.sort((a,b)=> a.date<b.date ? -1 : a.date>b.date ? 1 : 0);
+  const delta = Math.round((+rows[rows.length-1].weight - +rows[0].weight)*10)/10;
+  if(!delta) return "0 lb";
+  return (delta<0 ? "−" : "+")+Math.abs(delta)+" lb";
+}
+function lastMessageLine(messages){
+  const rows = (messages||[]).filter(m=>m && String(m.body||"").trim() && m.createdAt);
+  if(!rows.length) return "";
+  rows.sort((a,b)=> b.createdAt-a.createdAt);
+  const m = rows[0];
+  const who = m.sender==="trainer" ? "You" : "Client";
+  return who+": "+String(m.body).replace(/\s+/g," ").trim().slice(0,80);
+}
+async function overviewLogs(){
+  if(!signedInTrainer() || !authKeyReady()) return {status:"local", byName:{}};
+  try {
+    const session = await authSession();
+    if(!session) return {status:"local", byName:{}};
+    const logs = await sbAuth("private_logs?select=owner_id,meals,workouts,notes,updated_at");
+    const people = await sbAuth("profiles?select=id,name,role");
+    const byOwner = {};
+    (Array.isArray(logs)?logs:[]).forEach(row=>{ if(row && row.owner_id) byOwner[row.owner_id] = row; });
+    const counts = {};
+    (Array.isArray(people)?people:[]).forEach(p=>{
+      if(!p || p.role!=="client") return;
+      const name = String(p.name||"").trim().toLowerCase();
+      if(!name) return;
+      counts[name] = (counts[name]||0)+1;
+    });
+    const byName = {};
+    (Array.isArray(people)?people:[]).forEach(p=>{
+      if(!p || p.role!=="client") return;
+      const name = String(p.name||"").trim().toLowerCase();
+      if(name && counts[name]===1) byName[name] = byOwner[p.id] || null;
+    });
+    return {status:"ready", byName:byName};
+  } catch(e){
+    return {status:e && e.code==="missing" ? "missing" : "error", byName:{}};
+  }
+}
+const OV_LATELY = 14*24*60*60*1000;
+const OV_FACE_MAX = 3;
+const AUTO_MSG_KEY = "curlyGirlFitness.autoMessages.v1";
+const OV_MARK = {
+  phase:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h8l3 3v13H7z"/><path d="M15 4v3h3"/></svg>',
+  best:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.2 4.8 5.3.6-3.9 3.6.9 5.3L12 15.4 7.5 17.8l.9-5.3L4.5 8.9l5.3-.6z"/></svg>',
+  quiet:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v9H8l-3 3z"/></svg>'
+};
+const OV_GROUP_DEFS = [
+  {id:"phase", label:"Need a new training phase"},
+  {id:"best", label:"New exercise personal bests"},
+  {id:"quiet", label:"Not messaged lately"}
+];
+let overviewTab = "overview";
+let overviewFilter = "all";
+let overviewListMode = "";
+let overviewAutoOpen = false;
+let overviewPaintToken = 0;
+function readAutoMessages(){
+  const all = readStore(localStorage, AUTO_MSG_KEY);
+  const row = all && ID.deviceId && all[ID.deviceId] && typeof all[ID.deviceId]==="object" ? all[ID.deviceId] : {};
+  return {
+    text: String(row.text||"").slice(0,500),
+    phase: !!row.phase,
+    best: !!row.best,
+    quiet: !!row.quiet
+  };
+}
+function writeAutoMessages(row){
+  const all = readStore(localStorage, AUTO_MSG_KEY);
+  const bag = all && typeof all==="object" && !Array.isArray(all) ? all : {};
+  bag[ID.deviceId||"device"] = {
+    text: String(row.text||"").slice(0,500),
+    phase: !!row.phase,
+    best: !!row.best,
+    quiet: !!row.quiet
+  };
+  localStorage.setItem(AUTO_MSG_KEY, JSON.stringify(bag));
+}
+function trainerPhotoSrc(){
+  const mine = readMyLook();
+  return mine.bubble && mine.bubble.indexOf("data:image/")===0 ? mine.bubble : "";
+}
+function needsPhase(log){
+  const program = log && log.program && typeof log.program==="object" ? log.program : null;
+  const name = program ? String(program.name||"").trim() : "";
+  const phase = program && program.phase && typeof program.phase==="object" ? program.phase : null;
+  const phaseName = phase ? String(phase.name||"").trim() : "";
+  return !name || !phaseName;
+}
+function logMeasure(text){
+  const s = String(text||"").trim();
+  if(!s) return null;
+  const wx = s.match(/(\d+(?:\.\d+)?)\s*(?:lb|lbs|kg)?\s*[×x]\s*(\d+(?:\.\d+)?)/i);
+  if(wx){
+    const reps = (s.split(/[×x]/i)[1]||"").match(/\d+(?:\.\d+)?/g);
+    const bestRep = reps && reps.length ? Math.max.apply(null, reps.map(Number)) : parseFloat(wx[2]);
+    return {kind:"load", weight:parseFloat(wx[1]), reps:bestRep};
+  }
+  if(/[×x]/i.test(s)) return null;
+  const mins = s.match(/(\d+(?:\.\d+)?)\s*min/i);
+  if(mins) return {kind:"time", n:parseFloat(mins[1])};
+  const secs = s.match(/\d+(?:\.\d+)?\s*s(?:ec)?\b/i);
+  if(secs){
+    const all = s.match(/\d+(?:\.\d+)?/g);
+    if(!all) return null;
+    return {kind:"time", n:Math.max.apply(null, all.map(Number))};
+  }
+  if(/^\d+(?:\.\d+)?$/.test(s)) return {kind:"num", n:parseFloat(s)};
+  return null;
+}
+function measureBeats(later, earlier){
+  if(!later || !earlier || later.kind!==earlier.kind) return false;
+  if(later.kind==="load"){
+    if(later.weight>earlier.weight) return true;
+    return later.weight===earlier.weight && later.reps>earlier.reps;
+  }
+  return later.n>earlier.n;
+}
+function hasPersonalBest(workouts){
+  const byName = {};
+  Object.keys(workouts||{}).forEach(date=>{
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+    const entry = workouts[date];
+    const exercises = entry && entry.exercises && typeof entry.exercises==="object" ? entry.exercises : {};
+    Object.keys(exercises).forEach(id=>{
+      const row = exercises[id];
+      if(!row) return;
+      const measure = logMeasure(row.log);
+      if(!measure) return;
+      const name = planExerciseName(id) || String(id);
+      if(!byName[name]) byName[name] = [];
+      byName[name].push({date:date, measure:measure});
+    });
+  });
+  return Object.keys(byName).some(name=>{
+    const rows = byName[name].slice().sort((a,b)=> a.date<b.date ? -1 : a.date>b.date ? 1 : 0);
+    for(let i=1;i<rows.length;i++){
+      for(let j=0;j<i;j++){
+        if(measureBeats(rows[i].measure, rows[j].measure)) return true;
+      }
+    }
+    return false;
+  });
+}
+function quietClient(messages){
+  let best = 0;
+  (messages||[]).forEach(m=>{
+    if(!m || !String(m.body||"").trim()) return;
+    const t = Number(m.createdAt)||0;
+    if(t>best) best = t;
+  });
+  if(!best) return true;
+  return Date.now()-best > OV_LATELY;
+}
+function clearOverview(){
+  if($("ovGroups")){ $("ovGroups").innerHTML = ""; $("ovGroups").hidden = false; }
+  if($("ovActivity")){ $("ovActivity").innerHTML = ""; $("ovActivity").hidden = true; }
+  if($("ovAutoForm")) $("ovAutoForm").hidden = true;
+  if($("ovFilterMenu")) $("ovFilterMenu").hidden = true;
+  const me = $("ovMe");
+  if(me){ me.hidden = true; me.removeAttribute("src"); }
+}
+function paintOverviewChrome(){
+  const me = $("ovMe");
+  const src = signedInTrainer() ? trainerPhotoSrc() : "";
+  if(me){
+    if(src){ me.hidden = false; if(me.getAttribute("src")!==src) me.src = src; }
+    else { me.hidden = true; me.removeAttribute("src"); }
+  }
+  const bell = $("ovBell");
+  if(bell) bell.classList.toggle("hasdot", upcomingToday().length>0);
+  document.querySelectorAll("#ovFilterMenu [data-ovfilter]").forEach(btn=>{
+    btn.classList.toggle("sel", btn.dataset.ovfilter===overviewFilter);
+  });
+  const onOverview = overviewTab==="overview";
+  $("ovTabOverview").classList.toggle("sel", onOverview);
+  $("ovTabActivity").classList.toggle("sel", !onOverview);
+  $("ovTabOverview").setAttribute("aria-selected", onOverview ? "true" : "false");
+  $("ovTabActivity").setAttribute("aria-selected", onOverview ? "false" : "true");
+}
+function personButton(p){
+  const photo = p.photo ? '<img alt="" src="'+esc(p.photo)+'">' : "";
+  return '<button type="button" class="ovperson" data-overview="'+esc(p.id)+'">'+photo+"<span>"+esc(p.name)+"</span></button>";
+}
+function groupFaces(people){
+  const shown = people.filter(p=>p.photo).slice(0, OV_FACE_MAX);
+  const extra = people.length - shown.length;
+  const faces = shown.map(p=>'<button type="button" class="ovface" data-overview="'+esc(p.id)+'" aria-label="'+esc(p.name)+'"><img alt="" src="'+esc(p.photo)+'"></button>').join("");
+  const more = extra>0 ? '<span class="ovmore">+'+extra+"</span>" : "";
+  return faces || more ? '<div class="ovfaces">'+faces+more+"</div>" : "";
+}
+function groupRow(def, people){
+  return '<div class="ovrow"><span class="ovmark">'+OV_MARK[def.id]+'</span><div class="ovmain"><div class="ovneed">'+esc(def.label)+"</div>"+groupFaces(people)+'</div><button type="button" class="ovall" data-ovgroup="'+def.id+'">View all ›</button></div>';
+}
+function listBlock(title, people){
+  const rows = people.length ? people.map(personButton).join("") : '<p class="ovempty">No clients in this group.</p>';
+  return '<button type="button" class="ovback" data-ovback="1">Back</button><p class="ovneed">'+esc(title)+"</p>"+rows;
+}
+function activityItems(people){
+  const items = [];
+  people.forEach(p=>{
+    const workouts = p.log && p.log.workouts && typeof p.log.workouts==="object" ? p.log.workouts : {};
+    Object.keys(workouts).forEach(date=>{
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || !workoutEntryComplete(workouts[date])) return;
+      const names = Object.keys((workouts[date].exercises)||{}).filter(id=>workouts[date].exercises[id] && workouts[date].exercises[id].checked).map(planExerciseName).filter(Boolean);
+      const label = names.length ? names.slice(0,2).join(", ") : "Workout";
+      items.push({id:p.id, ts:parseYmd(date).getTime(), title:p.name, meta:"Workout · "+label+" · "+fmtDate(date)});
+    });
+    const meals = p.log && Array.isArray(p.log.meals) ? p.log.meals : [];
+    meals.forEach(m=>{
+      if(!m || !String(m.name||"").trim()) return;
+      const date = /^\d{4}-\d{2}-\d{2}$/.test(String(m.date||"")) ? String(m.date) : "";
+      const ts = Number(m.ts)|| (date ? parseYmd(date).getTime() : 0);
+      items.push({id:p.id, ts:ts, title:p.name, meta:"Meal · "+String(m.name).trim()+(date ? " · "+fmtDate(date) : "")});
+    });
+    (p.pair.messages||[]).forEach(m=>{
+      if(!m || !String(m.body||"").trim() || !Number(m.createdAt)) return;
+      const who = m.sender==="trainer" ? "You" : "Client";
+      items.push({id:p.id, ts:Number(m.createdAt), title:p.name, meta:"Message · "+who+": "+String(m.body).replace(/\s+/g," ").trim().slice(0,80)});
+    });
+    (p.file.notes||[]).forEach(n=>{
+      if(!n || !n.text) return;
+      const ts = Number(n.createdAt)|| (n.date ? parseYmd(n.date).getTime() : 0);
+      items.push({id:p.id, ts:ts, title:p.name, meta:"Note · "+n.text.replace(/\s+/g," ").trim().slice(0,80)+(n.date ? " · "+fmtDate(n.date) : "")});
+    });
+    const notes = p.log && p.log.notes && typeof p.log.notes==="object" && !Array.isArray(p.log.notes) ? p.log.notes : null;
+    if(notes){
+      Object.keys(notes).forEach(key=>{
+        const text = String(notes[key]||"").trim();
+        if(!text) return;
+        const date = String(key).slice(0,10);
+        const ok = /^\d{4}-\d{2}-\d{2}$/.test(date);
+        items.push({id:p.id, ts: ok ? parseYmd(date).getTime() : 0, title:p.name, meta:"Note · "+text.replace(/\s+/g," ").slice(0,80)+(ok ? " · "+fmtDate(date) : "")});
+      });
+    }
+  });
+  items.sort((a,b)=> (b.ts||0)-(a.ts||0));
+  return items;
+}
+function paintActivity(people){
+  const box = $("ovActivity");
+  if(!box) return;
+  const show = overviewTab==="activity";
+  box.hidden = !show;
+  if(!show) return;
+  const items = activityItems(people);
+  if(!items.length){
+    box.innerHTML = '<p class="ovempty">No saved activity yet.</p>';
+    return;
+  }
+  box.innerHTML = '<div class="ovact">'+items.map(item=>'<button type="button" data-overview="'+esc(item.id)+'"><b>'+esc(item.title)+'</b><span>'+esc(item.meta)+'</span></button>').join("")+"</div>";
+}
+function paintOverviewBody(people, status){
+  const box = $("ovGroups");
+  const form = $("ovAutoForm");
+  if(!box || !form) return;
+  form.hidden = !overviewAutoOpen;
+  box.hidden = overviewAutoOpen;
+  paintOverviewChrome();
+  paintActivity(people);
+  if(overviewAutoOpen) return;
+  if(overviewListMode==="all"){
+    box.innerHTML = listBlock("All clients", people);
+    return;
+  }
+  const focused = OV_GROUP_DEFS.find(g=>g.id===overviewListMode);
+  if(focused){
+    box.innerHTML = listBlock(focused.label, people.filter(p=>p[focused.id]));
+    return;
+  }
+  const groups = OV_GROUP_DEFS.filter(g=> overviewFilter==="all" || overviewFilter===g.id).map(g=>({def:g, people:people.filter(p=>p[g.id])})).filter(g=>g.people.length);
+  let note = "";
+  if(!people.length) note = '<p class="ovempty">No clients yet.</p>';
+  else if(!groups.length) note = '<p class="ovempty">No clients fit a group yet.</p>';
+  if(status==="missing" && people.length) note += '<p class="ovempty">Shared meal and workout logs are not in the project yet.</p>';
+  box.innerHTML = note+groups.map(g=>groupRow(g.def, g.people)).join("");
+}
+async function paintOverview(){
+  const token = ++overviewPaintToken;
+  if(!$("ovGroups")) return;
+  if(!signedInTrainer()){
+    clearOverview();
+    return;
+  }
+  const pairs = await Link.pairsForTrainer();
+  if(token!==overviewPaintToken) return;
+  const packed = await overviewLogs();
+  if(token!==overviewPaintToken) return;
+  const people = [];
+  for(const pair of pairs){
+    const full = await Link.loadPair(pair.id) || pair;
+    if(token!==overviewPaintToken) return;
+    if(!full || full.trainerDevice!==ID.deviceId) continue;
+    const key = String(full.clientName||"").trim().toLowerCase();
+    const log = key && packed.byName ? packed.byName[key] : null;
+    const workouts = log && log.workouts && typeof log.workouts==="object" ? log.workouts : {};
+    people.push({
+      id: full.id,
+      name: String(full.clientName||"").trim() || "Client",
+      photo: pickClientPhoto(full),
+      log: log,
+      pair: full,
+      file: readClientFile(full.id),
+      phase: needsPhase(log),
+      best: hasPersonalBest(workouts),
+      quiet: quietClient(full.messages)
+    });
+  }
+  if(token!==overviewPaintToken) return;
+  paintOverviewBody(people, packed.status);
+}
+function renderOverview(){
+  if($("hdrSub")) $("hdrSub").textContent = "";
+  if(!signedInTrainer()){
+    clearOverview();
+    return;
+  }
+  paintOverviewChrome();
+  paintOverview().catch(()=>{});
+}
+function openOverviewClient(id){
+  if(!signedInTrainer() || !id) return;
+  ID.activePairId = id;
+  pairOpen = true;
+  clientFileMode = true;
+  clientFileSection = "summary";
+  cfEditing = false;
+  persistIdentity();
+  go("coach");
+}
+function overviewAddClient(){
+  if(!signedInTrainer()) return;
+  clientFileMode = false;
+  cfEditing = false;
+  pairOpen = false;
+  ID.activePairId = "";
+  persistIdentity();
+  go("coach");
+  const name = $("trName");
+  if(name) name.focus();
+}
 function trainerFileOpen(){
   return trainerHere() && showingPair() && clientFileMode;
 }
@@ -6424,7 +6913,8 @@ function setRole(role){
   updateDemoBanner();
   toast(role==="trainer"?"Trainer mode":role==="client"?"Client mode":"Personal tracker");
   applyMemberLook();
-  if(role==="trainer" || role==="client") go("coach");
+  if(role==="trainer") go("overview");
+  else if(role==="client") go("today");
   else if(currentTab==="ask" || currentTab==="sessions") go("today");
   else if(currentTab==="coach" || currentTab==="settings") render();
   else { updateDemoBanner(); paintMyPage(); }
@@ -6568,11 +7058,102 @@ function closeClientPage(){
   pairOpen = false;
   ID.activePairId = "";
   persistIdentity();
-  renderCoach();
-  refreshCoachData().catch(()=>{});
+  if(signedInTrainer()) go("overview");
+  else {
+    renderCoach();
+    refreshCoachData().catch(()=>{});
+  }
 }
 $("pairBack").onclick = () => closeClientPage();
 $("clientFileBack").onclick = () => closeClientPage();
+$("ovMenu").onclick = () => { if(signedInTrainer()) $("menuBtn").click(); };
+$("ovAdd").onclick = () => overviewAddClient();
+$("ovFilter").onclick = () => {
+  if(!signedInTrainer()) return;
+  const menu = $("ovFilterMenu");
+  menu.hidden = !menu.hidden;
+  $("ovFilter").setAttribute("aria-expanded", menu.hidden ? "false" : "true");
+};
+$("ovBell").onclick = (e) => { e.stopPropagation(); if(signedInTrainer()) openTool("bell"); };
+$("ovHelp").onclick = () => {
+  if(!signedInTrainer()) return;
+  youView = "help";
+  const body = $("youBody");
+  if(body) body.dataset.view = "";
+  go("you");
+};
+$("ovAllClients").onclick = () => {
+  if(!signedInTrainer()) return;
+  overviewAutoOpen = false;
+  overviewListMode = "all";
+  overviewTab = "overview";
+  paintOverview().catch(()=>{});
+};
+$("ovAuto").onclick = () => {
+  if(!signedInTrainer()) return;
+  overviewListMode = "";
+  overviewAutoOpen = true;
+  const saved = readAutoMessages();
+  $("ovAutoText").value = saved.text;
+  $("ovAutoPhase").checked = saved.phase;
+  $("ovAutoBest").checked = saved.best;
+  $("ovAutoQuiet").checked = saved.quiet;
+  paintOverview().catch(()=>{});
+};
+$("ovAutoBack").onclick = () => {
+  overviewAutoOpen = false;
+  paintOverview().catch(()=>{});
+};
+$("ovAutoForm").onsubmit = (e) => {
+  e.preventDefault();
+  if(!signedInTrainer()) return;
+  writeAutoMessages({
+    text: $("ovAutoText").value.trim(),
+    phase: $("ovAutoPhase").checked,
+    best: $("ovAutoBest").checked,
+    quiet: $("ovAutoQuiet").checked
+  });
+  overviewAutoOpen = false;
+  toast("Saved on this phone");
+  paintOverview().catch(()=>{});
+};
+$("ovTabOverview").onclick = () => {
+  if(!signedInTrainer()) return;
+  overviewTab = "overview";
+  paintOverview().catch(()=>{});
+};
+$("ovTabActivity").onclick = () => {
+  if(!signedInTrainer()) return;
+  overviewTab = "activity";
+  paintOverview().catch(()=>{});
+};
+$("page-overview").addEventListener("click", (e) => {
+  if(!signedInTrainer()) return;
+  const filter = e.target.closest("[data-ovfilter]");
+  if(filter){
+    overviewFilter = filter.dataset.ovfilter || "all";
+    $("ovFilterMenu").hidden = true;
+    $("ovFilter").setAttribute("aria-expanded", "false");
+    overviewListMode = "";
+    paintOverview().catch(()=>{});
+    return;
+  }
+  if(e.target.closest("[data-ovback]")){
+    overviewListMode = "";
+    paintOverview().catch(()=>{});
+    return;
+  }
+  const group = e.target.closest("[data-ovgroup]");
+  if(group){
+    overviewListMode = group.dataset.ovgroup || "";
+    overviewAutoOpen = false;
+    overviewTab = "overview";
+    paintOverview().catch(()=>{});
+    return;
+  }
+  const card = e.target.closest("[data-overview]");
+  if(card) openOverviewClient(card.dataset.overview);
+});
 $("pairFile").onclick = () => {
   if(!trainerHere()) return;
   clientFileMode = true;
@@ -8871,11 +9452,12 @@ $("youBody").addEventListener("submit", onYouSubmit);
 $("youBody").addEventListener("click", onYouClick);
 function render(){
   if(currentTab!=="coach") document.body.classList.remove("client-file");
+  document.body.classList.toggle("ov-home", currentTab==="overview" && signedInTrainer());
   applyClientLock();
   paintHeader();
   paintSubbar();
   applyMemberLook();
-  ({today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou})[currentTab]();
+  ({overview:renderOverview, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
@@ -8961,7 +9543,9 @@ function restoreRememberedSession(){
   }
   showApp();
   const tab = (location.hash||"").replace("#","");
-  go(TITLES[tab] ? tab : "today");
+  let next = TITLES[tab] ? tab : "today";
+  if(account && account.role==="trainer" && (!tab || tab==="today" || tab==="overview" || !TITLES[tab])) next = "overview";
+  go(next);
   return true;
 }
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
@@ -9082,7 +9666,7 @@ function enterAccount(account, remember){
   sessionStorage.removeItem(RETURN_LOGIN_KEY);
   showApp();
   setRole(account.role);
-  go("today");
+  if(account.role!=="trainer") go("today");
   const invite = takePendingInvite(account.email);
   if(account.role==="client" && invite){
     run(async () => {
