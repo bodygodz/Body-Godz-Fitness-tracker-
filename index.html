@@ -1085,11 +1085,6 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
       <button class="primary full" type="submit">Create account</button>
       <button type="button" class="full" id="signupToLogin" style="margin-top:8px">Already have an account? Log in</button>
     </form>
-    <div class="card" id="signupPending" hidden>
-      <h2>Check your email</h2>
-      <p class="note" id="signupPendingText">Check your email and confirm your address before you can sign in.</p>
-      <button type="button" class="primary full" id="signupPendingLogin">Go to log in</button>
-    </div>
   </div>
   <div id="welcomeLogin" hidden>
     <button type="button" class="learnmore welcome-back" id="loginBack">Back</button>
@@ -1580,7 +1575,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 <section class="page" id="page-coach">
   <div class="card setupcard" id="coachDemoCard" hidden>
     <h2>How a client joins</h2>
-    <p>Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
+    <p>The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.</p>
   </div>
   <div id="coachSolo">
     <div class="card">
@@ -1689,7 +1684,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <div id="clJoin">
       <div class="card">
         <h2>Join your trainer</h2>
-        <p class="note" style="margin-bottom:8px">Confirm your email, then enter the invite code your trainer copied.</p>
+        <p class="note" style="margin-bottom:8px">Enter the invite code your trainer copied.</p>
         <div class="field"><label class="f">Invite code</label><input id="clCode" maxlength="12" autocapitalize="characters" autocomplete="off" placeholder="e.g. K7MQ2P"></div>
         <button class="primary full" id="clJoinBtn" type="button">Join</button>
       </div>
@@ -1770,7 +1765,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
   </div>
   <div class="card" id="keysCard">
     <h2>Clients</h2>
-    <p class="note">Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
+    <p class="note">The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.</p>
   </div>
   <div class="card">
     <h2>Targets</h2>
@@ -1868,7 +1863,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
   </div>
   <div class="card" id="videoDemoNote" hidden>
     <h2>How a client joins</h2>
-    <p class="note">Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
+    <p class="note">The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.</p>
   </div>
   <div id="videoCoach" hidden>
     <div class="card" id="videoSend">
@@ -1895,7 +1890,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
   </div>
   <div class="card" id="videoClientWait" hidden>
     <h2>Videos</h2>
-    <p class="note">Confirm your email, sign in on this phone, then open Join your trainer and enter the code your trainer copied.</p>
+    <p class="note">Sign in on this phone, open Join your trainer, and enter the code your trainer copied.</p>
     <button class="full" id="videoJoinCoach" type="button">Open Coach to join</button>
   </div>
   <div class="card" id="videoListCard" hidden>
@@ -5708,11 +5703,12 @@ const Link = {
     }
     return pairs.filter(p=>hidden.indexOf(p.id)<0);
   },
-  async createClient(name){
+  async createClient(name, inviteCode){
+    const code = normalizeCode(inviteCode) || makeCode();
     const localPair = () => {
       const bus = demoLoad();
       const pair = {
-        id:makeId(), inviteCode:makeCode(), clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
+        id:makeId(), inviteCode:code, clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
         dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[], checkins:[],
         call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
       };
@@ -5723,7 +5719,7 @@ const Link = {
     if(linkMode()==="demo") return localPair();
     let last = null;
     for(let i=0;i<5;i++){
-      const row = {id:makeId(), invite_code:makeCode(), client_name:name, trainer_device:ID.deviceId};
+      const row = {id:makeId(), invite_code:code, client_name:name, trainer_device:ID.deviceId};
       try {
         const data = await sbFetch("pairs", {method:"POST", body:row});
         const saved = Array.isArray(data) ? data[0] : data;
@@ -6676,19 +6672,30 @@ async function finishNewClient(name){
   const clean = String(name||"").trim().slice(0,40);
   if(!clean) throw new Error("Enter a client name");
   if(!signedInTrainer()) throw new Error("Sign in as a trainer to add a client.");
-  const pair = await Link.createClient(clean);
+  let code = "";
+  let last = null;
+  for(let i=0;i<5;i++){
+    try { code = await publishInvite(makeCode()); break; }
+    catch(e){
+      last = e;
+      const dup = e && (String(e.code)==="23505" || /duplicate|unique/i.test(e.message||""));
+      if(!dup) throw e;
+    }
+  }
+  if(!code) throw last || new Error("Could not save the invite");
+  const pair = await Link.createClient(clean, code);
+  pair.inviteCode = code;
+  const bus = demoLoad();
+  const saved = bus.pairs.find(p=>p.id===pair.id);
+  if(saved && saved.inviteCode!==code){ saved.inviteCode = code; demoSave(bus); }
   ID.activePairId = pair.id;
   pairOpen = true;
   clientFileMode = true;
   clientFileSection = "summary";
   cfEditing = false;
   persistIdentity();
-  let inviteError = "";
-  try { await publishInvite(pair.inviteCode); }
-  catch(e){ inviteError = e && e.message ? e.message : "Could not save the invite"; }
   go("coach");
-  if(inviteError) toast(inviteError+" Invite code "+pair.inviteCode+".");
-  else toast("Invite code "+pair.inviteCode);
+  toast("Invite code "+code);
   return pair;
 }
 function trainerFileOpen(){
@@ -6782,7 +6789,7 @@ async function paintClientFile(){
     $("cfName").textContent = pair.clientName || "Client";
   }
   const joined = pair.clientDevice ? "Joined on their phone." : "Waiting for them to enter the code.";
-  $("cfInvite").textContent = pair.inviteCode ? "Invite code "+pair.inviteCode+". "+joined : joined;
+  $("cfInvite").textContent = pair.inviteCode ? pair.inviteCode+" · "+joined : joined;
   $("cfBadges").textContent = "No badges yet.";
   const workoutCount = countWorkouts(workouts);
   const cardioCount = countCardio(workouts);
@@ -6906,8 +6913,8 @@ function fillConnectionSettings(){
   document.querySelectorAll("#modePicks [data-mode]").forEach(btn=>{
     btn.classList.toggle("sel", btn.dataset.mode===ID.role);
   });
-  $("modeNote").textContent = ID.role==="trainer" ? "Add a client and copy the invite code. They confirm their email, sign in on their own phone, open Join your trainer, and enter that code."
-    : ID.role==="client" ? "Confirm your email, open Join your trainer, and enter the code your trainer copied."
+  $("modeNote").textContent = ID.role==="trainer" ? "Add a client and copy the invite code. They sign in on their own phone, open Join your trainer, and enter that code."
+    : ID.role==="client" ? "Open Join your trainer and enter the code your trainer copied."
     : ID.role==="solo" ? "Personal tracker only. Coaching stays off until you switch mode."
     : "Choose a mode to continue.";
 }
@@ -7036,29 +7043,7 @@ $("ovAddForm").onsubmit = (e) => {
   });
 };
 $("clJoinBtn").onclick = () => run(async ()=>{
-  const code = normalizeCode($("clCode").value);
-  if(code.length<4) throw new Error("Enter the invite code");
-  let pair = null;
-  try { pair = await Link.joinWithCode(code); }
-  catch(e){ pair = null; }
-  const trainerId = await joinTrainerCloud(code);
-  if(!pair){
-    let trainerName = "";
-    try {
-      const rows = await sbAuth("profiles?id=eq."+encodeURIComponent(trainerId)+"&select=name");
-      trainerName = rows && rows[0] && rows[0].name ? String(rows[0].name) : "";
-    } catch(e){}
-    const bus = demoLoad();
-    pair = {
-      id:makeId(), inviteCode:code, clientName:trainerName, trainerDevice:"", clientDevice:ID.deviceId,
-      dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[], checkins:[],
-      call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
-    };
-    bus.pairs.unshift(pair);
-    demoSave(bus);
-  }
-  ID.activePairId = pair.id;
-  persistIdentity();
+  const pair = await finishJoin($("clCode").value);
   $("clCode").value = "";
   toast("Joined "+(pair.clientName||"your trainer"));
   renderCoach();
@@ -7928,7 +7913,7 @@ async function paintTrainerCheckins(){
   const pairs = await Link.pairsForTrainer();
   if(!pairs.length){
     $("checkinNote").textContent = "Client answers show up here.";
-    $("checkinBody").innerHTML = '<div class="card"><p>No clients yet. Add a client and copy the invite code. They confirm their email, sign in on their own phone, open Join your trainer, and enter that code.</p></div>';
+    $("checkinBody").innerHTML = '<div class="card"><p>No clients yet. Add a client and copy the invite code. They sign in on their own phone, open Join your trainer, and enter that code.</p></div>';
     return;
   }
   if(!checkinPairId || !pairs.some(p=>p.id===checkinPairId)) checkinPairId = pairs[0].id;
@@ -8302,7 +8287,7 @@ $("sessionSave").onclick = () => {
       toast("Shared with signed-in clients");
     }).catch(e => {
       if(e && e.code==="missing") toast("Saved on this phone. Session storage is not created in Supabase yet");
-      else if(e && e.code==="signin") toast("Saved on this phone. Confirm your email and sign in to share it");
+      else if(e && e.code==="signin") toast("Saved on this phone. Sign in to share it");
       else toast("Saved on this phone");
     });
   }).catch(e => toast(e && e.message ? e.message : "Could not store that on this phone"));
@@ -9036,7 +9021,7 @@ async function readBrowserHeart(){
   }
 }
 function devicesHtml(y){
-  const cloud = "Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.";
+  const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
   const rows = y.devices.map(d=>{
     const picks = [d.steps?"Steps":"", d.heart?"Heart rate":""].filter(Boolean).join(" and ");
     return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+(picks?esc(picks)+" chosen":"Saved")+'</div><p data-devid="'+esc(d.id)+'">'+esc(deviceStatus(d))+'</p></div><button type="button" class="x" data-youdel="devices" data-id="'+esc(d.id)+'" aria-label="Remove">×</button></li>';
@@ -9291,12 +9276,12 @@ function youHtml(view){
     return '<p class="themelabel">Select Theme</p>'+row("system","System Default")+row("light","Light Theme")+row("dark","Dark Theme")+'<p class="note">Until you pick a theme, this phone uses Light Theme. System Default follows this phone’s light or dark setting. The login screen stays linen either way.</p>';
   }
   if(view==="privacy"){
-    const cloud = "Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.";
+    const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
     return '<div class="card"><p>Meals, workouts, weight, photos, and the notes in this menu are stored on this phone.</p><p>The theme you pick is stored on this phone.</p><p>'+esc(cloud)+'</p></div>';
   }
   if(view==="help") return '<div class="card"><p>Log a meal from Meals. Calories and macros are saved only when the food already has them.</p><p>Workouts are on Workout Routines in this menu.</p><p>Weight and tape measurements are under Weight &amp; Measurements.</p><p>This menu is the profile button after you are signed in. It is not on the login screen.</p></div>';
   if(view==="sync"){
-    const cloud = "Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.";
+    const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
     return '<div class="card"><p id="youSyncLine">'+esc(lastSaveText())+'</p><p class="note">This is the last time this phone saved your log. It is not a cloud sync.</p><p>'+esc(cloud)+'</p><button type="button" class="primary full" data-syncnow>Save now</button></div>';
   }
   return '<div class="card"><p>Open a row from the menu.</p></div>';
@@ -9539,13 +9524,20 @@ function onReturn(){
   }
   localStorage.removeItem(AWAY_KEY);
 }
-function restoreRememberedSession(){
+async function restoreRememberedSession(){
   const auth = currentAuth();
   if(!auth || !auth.email) return false;
   keepSignedIn(auth);
   if(awayTooLong()){
     endSession(true, "Signed out after 1 hour away");
     return true;
+  }
+  if(authKeyReady()){
+    const session = await authSession();
+    if(!session){
+      localStorage.removeItem(AUTH_KEY);
+      return false;
+    }
   }
   localStorage.removeItem(AWAY_KEY);
   const account = accountForAuth(auth);
@@ -9562,7 +9554,7 @@ function restoreRememberedSession(){
 }
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 function accountNote(){
-  return "A confirmation email is required. You can sign in after you confirm.";
+  return "Trainer and client need two different emails.";
 }
 async function passHash(pw){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
@@ -9646,11 +9638,8 @@ function showWelcome(view){
   $("welcomeDock").hidden = view!=="home";
   $("roleGate").style.display = "none";
   $("signupForm").hidden = false;
-  $("signupPending").hidden = true;
-  $("signupLocalNote").textContent = authKeyReady()
-    ? "A confirmation email is required. You can sign in after you confirm."
-    : accountNote();
-  $("loginLocalNote").textContent = accountNote();
+  $("signupLocalNote").textContent = "Trainer and client need two different emails.";
+  $("loginLocalNote").textContent = "Trainer and client need two different emails.";
   if(view==="signup" || view==="login"){
     const side = sideFromMenu();
     if(side){ signupRole = side; loginRole = side; }
@@ -9680,15 +9669,9 @@ function enterAccount(account, remember){
   const invite = takePendingInvite(account.email);
   if(account.role==="client" && invite){
     run(async () => {
-      try {
-        const pair = await Link.joinWithCode(invite);
-        ID.activePairId = pair.id;
-        persistIdentity();
-        if(currentTab==="coach") render();
-        toast("Joined your trainer");
-      } catch(e){
-        toast(e && e.message ? e.message : "Could not use that invite code");
-      }
+      await finishJoin(invite);
+      if(currentTab==="coach") render();
+      toast("Joined your trainer");
     });
   }
   pullPrivateLog().catch(()=>{});
@@ -9775,13 +9758,6 @@ const AUTH_PROJECT_URL = "https://igqxmqirscpurssbuacu.supabase.co";
 const AUTH_PUBLISHABLE_KEY = "sb_publishable_BF_Sqfkxz78CNzAZCHOQcw_jPp5tb5z";
 const PENDING_INVITE_KEY = "curlyGirlFitness.pendingInvite.v1";
 let authSb = null;
-function showSignupPending(email){
-  $("signupForm").hidden = true;
-  $("signupPending").hidden = false;
-  $("signupPendingText").textContent = email
-    ? "Check "+email+" and confirm your address before you can sign in."
-    : "Check your email and confirm your address before you can sign in.";
-}
 function takePendingInvite(email){
   let raw = null;
   try { raw = JSON.parse(sessionStorage.getItem(PENDING_INVITE_KEY)||"null"); } catch(e){ raw = null; }
@@ -9823,19 +9799,22 @@ async function authSignUp(name, email, password, role){
   if(error){
     const msg = String(error.message||"");
     if(/already registered|already exists/i.test(msg)){
-      const err = new Error("That email already has an account. Confirm it before you sign in. Trainer and client stay separate.");
+      const err = new Error("That email already has an account. Trainer and client need two different emails.");
       err.code = "already";
       throw err;
     }
-    throw new Error(msg || "Could not send the confirmation email.");
-  }
-  if(data && data.session){
-    try { await client.auth.signOut(); } catch(e){}
+    throw new Error(msg || "Could not create the account.");
   }
   const user = data && data.user || null;
-  if(!user) throw new Error("Could not send the confirmation email.");
+  if(!user) throw new Error("Could not create the account.");
   const identities = Array.isArray(user.identities) ? user.identities : [];
-  return { already: identities.length===0, id: user.id||"", role: role };
+  if(!identities.length){
+    const err = new Error("That email already has an account. Trainer and client need two different emails.");
+    err.code = "already";
+    throw err;
+  }
+  if(!data.session) throw new Error("Sign-up did not start a session because Confirm email is still turned on for this project.");
+  return { already: false, id: user.id||"", role: role };
 }
 async function authSignIn(email, password){
   const client = await authClient();
@@ -9872,7 +9851,7 @@ async function authSession(){
 async function sbAuth(path, options){
   const session = await authSession();
   if(!session){
-    const err = new Error("Sign in after confirming your email.");
+    const err = new Error("Sign in to continue.");
     err.code = "signin";
     throw err;
   }
@@ -9894,6 +9873,7 @@ async function sbAuth(path, options){
     const msg = (data && (data.message || data.error_description || data.hint || data.msg)) || ("Request failed ("+res.status+")");
     const err = new Error(typeof msg==="string" ? msg : "Request failed");
     const code = data && (data.code || data.error_code);
+    err.code = code || "";
     if(res.status===404 || code==="PGRST205" || code==="42P01" || code==="PGRST202") err.code = "missing";
     throw err;
   }
@@ -9953,26 +9933,57 @@ async function pullPrivateLog(){
   }
 }
 async function publishInvite(code){
-  const clean = String(code||"").toUpperCase();
-  if(!clean) throw new Error("No invite code to save");
+  const clean = normalizeCode(code);
+  if(clean.length<4) throw new Error("No invite code to save");
   const session = await authSession();
-  if(!session) throw new Error("Sign in after confirming your email.");
+  if(!session) throw new Error("Sign in to add a client.");
   const account = accountForAuth(currentAuth());
   if(!account || account.role!=="trainer") throw new Error("Sign in as a trainer to add a client.");
-  await sbAuth("invites?on_conflict=code", {
+  const rows = await sbAuth("invites", {
     method: "POST",
-    prefer: "resolution=merge-duplicates,return=minimal",
+    prefer: "return=representation",
     body: { code: clean, trainer_id: session.user.id }
   });
+  const saved = Array.isArray(rows) ? rows[0] : rows;
+  const stored = saved && saved.code ? normalizeCode(saved.code) : "";
+  if(stored!==clean) throw new Error(stored ? "The saved invite code did not match the one on screen." : "The invite was not saved.");
+  return stored;
 }
 async function joinTrainerCloud(code){
-  const clean = String(code||"").toUpperCase();
-  if(!clean) throw new Error("Enter the invite code");
+  const clean = normalizeCode(code);
+  if(clean.length<4) throw new Error("Enter the invite code");
   const session = await authSession();
-  if(!session) throw new Error("Sign in after confirming your email.");
+  if(!session) throw new Error("Sign in to join your trainer.");
   const trainerId = await sbAuth("rpc/cgf_join_trainer", { method: "POST", body: { invite_code: clean } });
-  await pushPrivateLog();
-  return trainerId;
+  try { await pushPrivateLog(); } catch(e){}
+  return typeof trainerId==="string" ? trainerId : "";
+}
+async function finishJoin(raw){
+  const code = normalizeCode(raw);
+  if(code.length<4) throw new Error("Enter the invite code");
+  const trainerId = await joinTrainerCloud(code);
+  let pair = null;
+  try { pair = await Link.joinWithCode(code); } catch(e){ pair = null; }
+  if(!pair){
+    let trainerName = "";
+    try {
+      if(trainerId){
+        const rows = await sbAuth("profiles?id=eq."+encodeURIComponent(trainerId)+"&select=name");
+        trainerName = rows && rows[0] && rows[0].name ? String(rows[0].name) : "";
+      }
+    } catch(e){}
+    const bus = demoLoad();
+    pair = {
+      id:makeId(), inviteCode:code, clientName:trainerName, trainerDevice:"", clientDevice:ID.deviceId,
+      dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[], checkins:[],
+      call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
+    };
+    bus.pairs.unshift(pair);
+    demoSave(bus);
+  }
+  ID.activePairId = pair.id;
+  persistIdentity();
+  return pair;
 }
 async function loadClientLogs(){
   const account = accountForAuth(currentAuth());
@@ -9995,7 +10006,7 @@ function paintClientLogs(rows, missing){
     return;
   }
   if(!rows.length){
-    body.innerHTML = '<p class="note">No client logs yet. A client’s meals, workouts, and notes show here after they confirm email and join your invite.</p>';
+    body.innerHTML = '<p class="note">No client logs yet. A client’s meals, workouts, and notes show here after they sign in and join your invite.</p>';
     return;
   }
   body.innerHTML = rows.map(row => {
@@ -10018,7 +10029,7 @@ function refreshClientLogs(){
 async function shareSessionFile(row, file){
   const session = await authSession();
   if(!session){
-    const err = new Error("Sign in after confirming your email.");
+    const err = new Error("Sign in to continue.");
     err.code = "signin";
     throw err;
   }
@@ -10096,29 +10107,14 @@ async function signUpAccount(name, email, password, role, invite){
     return;
   }
   const created = await authSignUp(name, email, password, role);
-  if(created.already){
-    try {
-      const signed = await authSignIn(email, password);
-      if(!signed.role || signed.role===role) throw new Error("That email already has a "+role+" account. Log in after you confirm it.");
-      const hash = await passHash(password);
-      rememberAccount({id:(signed.id||makeId())+":"+role, name:name, email:email, passHash:hash, role:role, createdAt:Date.now()});
-      recordSignup({name:name, email:email, role:role, createdAt:Date.now()});
-      $("signupForm").hidden = true;
-      $("signupPending").hidden = false;
-      $("signupPendingText").textContent = "This email is already confirmed. Log in as a "+role+" to use that side.";
-      return;
-    } catch(e){
-      if(e && e.code==="email_not_confirmed") throw new Error("Confirm your email before you can sign in. Check your inbox.");
-      if(e && e.message && e.message.indexOf("already has")>=0) throw e;
-      if(e && e.code==="invalid") throw new Error("That email already has an account. Trainer and client stay separate, and the password did not match.");
-      throw e;
-    }
-  }
+  const hash = await passHash(password);
+  const account = {id:created.id||makeId(), name:name, email:email, passHash:hash, role:role, createdAt:Date.now()};
+  rememberAccount(account);
+  recordSignup(account);
   if(role==="client" && invite){
-    try { sessionStorage.setItem(PENDING_INVITE_KEY, JSON.stringify({email:email, code:invite})); } catch(e){}
+    try { sessionStorage.setItem(PENDING_INVITE_KEY, JSON.stringify({email:email, code:normalizeCode(invite)})); } catch(e){}
   }
-  recordSignup({name:name, email:email, role:role, createdAt:Date.now()});
-  showSignupPending(email);
+  enterAccount(account);
 }
 async function logInAccount(email, password, remember, side){
   if(!emailOk(email)) throw new Error("Enter a valid email");
@@ -10127,7 +10123,29 @@ async function logInAccount(email, password, remember, side){
   const hash = await passHash(password);
   const localSide = () => loadAccounts().find(a => a.email===email && a.passHash===hash && a.role===side) || null;
   const localOther = () => loadAccounts().find(a => a.email===email && a.passHash===hash && (a.role==="trainer" || a.role==="client") && a.role!==side) || null;
-  const otherMessage = (have) => "This email is a "+have+" account. Sign up as a "+side+" to use that side.";
+  const otherMessage = (have) => "This email is a "+have+" account. Trainer and client need two different emails.";
+  if(authKeyReady()){
+    try {
+      const signed = await authSignIn(email, password);
+      if(signed.role && signed.role!==side) throw new Error(otherMessage(signed.role));
+      const account = {
+        id: signed.id || makeId(),
+        name: signed.name || email.split("@")[0],
+        email: email,
+        passHash: hash,
+        role: side,
+        createdAt: Date.now()
+      };
+      rememberAccount(account);
+      enterAccount(account, !!remember);
+      return;
+    } catch(e){
+      if(e && e.code==="email_not_confirmed") throw new Error("Sign-in did not start a session because Confirm email is still turned on for this project.");
+      if(e && e.message && e.message.indexOf("two different emails")>=0) throw e;
+      if(e && e.code==="invalid") throw new Error("That email or password does not match.");
+      throw new Error(e && e.message ? e.message : "Could not sign in");
+    }
+  }
   const onPhone = localSide();
   if(onPhone){
     enterAccount(onPhone, !!remember);
@@ -10150,8 +10168,8 @@ async function logInAccount(email, password, remember, side){
     return;
   } catch(e){
     if(e && e.code==="email_not_confirmed"){
-      $("loginLocalNote").textContent = "Confirm your email before you can sign in. Check your inbox.";
-      throw new Error("Confirm your email before you can sign in. Check your inbox.");
+      $("loginLocalNote").textContent = "Sign-in did not start a session because Confirm email is still turned on for this project.";
+      throw new Error("Sign-in did not start a session because Confirm email is still turned on for this project.");
     }
     if(e && e.message && e.message.indexOf("Sign up as a")>=0) throw e;
     if(e && e.code==="invalid") authMiss = true;
@@ -10235,7 +10253,6 @@ $("menuSignup").onclick = () => showWelcome("signup");
 $("signupBack").onclick = () => showWelcome("home");
 $("loginBack").onclick = () => showWelcome("home");
 $("signupToLogin").onclick = () => showWelcome("login");
-$("signupPendingLogin").onclick = () => showWelcome("login");
 $("loginToSignup").onclick = () => showWelcome("signup");
 $("welcomeMeals").onclick = () => { showWelcome("login"); toast("Log in to open the meal planner"); };
 $("welcomeWork").onclick = () => { showWelcome("login"); toast("Log in to open workouts and videos"); };
@@ -10396,7 +10413,7 @@ if(!clientPhone){
   persistIdentity();
 }
 const linkNote = $("clientLinkNote");
-if(linkNote) linkNote.textContent = "Add a client and copy the invite code. They confirm their email, sign in on their own phone, open Join your trainer, and enter that code.";
+if(linkNote) linkNote.textContent = "Add a client and copy the invite code. They sign in on their own phone, open Join your trainer, and enter that code.";
 applyClientLock();
 document.addEventListener("visibilitychange", () => {
   if(document.hidden) markAway();
@@ -10404,15 +10421,12 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("pagehide", markAway);
 window.addEventListener("pageshow", e => { if(e.persisted) onReturn(); });
-const justConfirmed = emailJustConfirmed();
 if(sessionStorage.getItem(RETURN_LOGIN_KEY)==="1"){
   sessionStorage.removeItem(RETURN_LOGIN_KEY);
   showWelcome("login");
-} else if(justConfirmed){
-  showWelcome("login");
-  $("loginLocalNote").textContent = "Email confirmed. Sign in to use your account.";
-} else if(!restoreRememberedSession()){
-  showWelcome("home");
+} else {
+  const hadAccount = !!currentAuth();
+  restoreRememberedSession().then(ok => { if(!ok) showWelcome(hadAccount ? "login" : "home"); });
 }
 window.__fitness = {get state(){return S;}, KEY, applyBarcode};
 })();
