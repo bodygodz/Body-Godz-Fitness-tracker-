@@ -1443,6 +1443,11 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
         <p class="note" style="margin-bottom:8px">Delete removes a client from this phone.</p>
         <div id="trList"></div>
       </div>
+      <div class="card" id="clientLogCard" hidden>
+        <h2>Client logs</h2>
+        <p class="note">Meals, workouts, and notes from clients linked to you. Another client cannot open these.</p>
+        <div id="clientLogBody"></div>
+      </div>
     </div>
   </div>
   <div id="coachClient" style="display:none">
@@ -1678,7 +1683,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 <section class="page" id="page-sessions">
   <div class="card" id="sessionUpload" hidden>
     <h2>Upload a past session</h2>
-    <p class="note">Pick a photo or video from this phone and label it. It stays on this phone. Every client on this phone can view it.</p>
+    <p class="note">Pick a photo or video and label it. Signed-in clients can view it on their own phones.</p>
     <div class="field">
       <label class="f">Label</label>
       <div class="chips" id="sessionLabels">
@@ -2467,6 +2472,7 @@ let S = load();
 function save(){
   localStorage.setItem(KEY, JSON.stringify(S));
   try { localStorage.setItem("curlyGirlFitness.lastSave.v1", String(Date.now())); } catch(e){}
+  if(typeof schedulePrivateSync==="function") schedulePrivateSync();
 }
 
 /* ---------- Helpers ---------- */
@@ -4978,7 +4984,137 @@ const SETUP_SQL = [
 "do $$ begin alter publication supabase_realtime add table public.weigh_ins; exception when duplicate_object then null; end $$;",
 "do $$ begin alter publication supabase_realtime add table public.photos; exception when duplicate_object then null; end $$;",
 "do $$ begin alter publication supabase_realtime add table public.pairs; exception when duplicate_object then null; end $$;",
-"do $$ begin alter publication supabase_realtime add table public.videos; exception when duplicate_object then null; end $$;"
+"do $$ begin alter publication supabase_realtime add table public.videos; exception when duplicate_object then null; end $$;",
+"-- Shared sessions and private client logs. Run this in the Supabase SQL editor.",
+"create table if not exists public.profiles (",
+"  id uuid primary key references auth.users(id) on delete cascade,",
+"  email text not null,",
+"  name text not null default '',",
+"  role text not null check (role in ('trainer','client'))",
+");",
+"create or replace function public.cgf_handle_new_user()",
+"returns trigger language plpgsql security definer set search_path = public as $$",
+"begin",
+"  insert into public.profiles (id, email, name, role)",
+"  values (new.id, coalesce(new.email,''), coalesce(new.raw_user_meta_data->>'name',''),",
+"    case when new.raw_user_meta_data->>'role' = 'trainer' then 'trainer' else 'client' end)",
+"  on conflict (id) do nothing;",
+"  return new;",
+"end; $$;",
+"drop trigger if exists cgf_on_auth_user on auth.users;",
+"create trigger cgf_on_auth_user after insert on auth.users",
+"  for each row execute function public.cgf_handle_new_user();",
+"create table if not exists public.invites (",
+"  code text primary key,",
+"  trainer_id uuid not null references public.profiles(id) on delete cascade,",
+"  created_at timestamptz not null default now()",
+");",
+"create table if not exists public.trainer_clients (",
+"  trainer_id uuid not null references public.profiles(id) on delete cascade,",
+"  client_id uuid not null references public.profiles(id) on delete cascade,",
+"  created_at timestamptz not null default now(),",
+"  primary key (trainer_id, client_id)",
+");",
+"create table if not exists public.session_uploads (",
+"  id text primary key,",
+"  trainer_id uuid not null references public.profiles(id) on delete cascade,",
+"  label text not null check (label in ('group','training')),",
+"  kind text not null check (kind in ('photo','video')),",
+"  storage_path text not null,",
+"  mime text not null default '',",
+"  created_at timestamptz not null default now()",
+");",
+"create table if not exists public.private_logs (",
+"  owner_id uuid primary key references public.profiles(id) on delete cascade,",
+"  trainer_id uuid references public.profiles(id) on delete set null,",
+"  meals jsonb not null default '[]'::jsonb,",
+"  workouts jsonb not null default '{}'::jsonb,",
+"  notes jsonb not null default '{}'::jsonb,",
+"  updated_at timestamptz not null default now()",
+");",
+"alter table public.profiles enable row level security;",
+"alter table public.invites enable row level security;",
+"alter table public.trainer_clients enable row level security;",
+"alter table public.session_uploads enable row level security;",
+"alter table public.private_logs enable row level security;",
+"revoke all on public.profiles, public.invites, public.trainer_clients, public.session_uploads, public.private_logs from anon;",
+"grant select, update on public.profiles to authenticated;",
+"grant select, insert, delete on public.invites to authenticated;",
+"grant select, insert, delete on public.trainer_clients to authenticated;",
+"grant select, insert, delete on public.session_uploads to authenticated;",
+"grant select, insert, update on public.private_logs to authenticated;",
+"drop policy if exists \"cgf profiles read\" on public.profiles;",
+"create policy \"cgf profiles read\" on public.profiles for select to authenticated using (",
+"  id = auth.uid()",
+"  or id in (select trainer_id from public.trainer_clients where client_id = auth.uid())",
+"  or id in (select client_id from public.trainer_clients where trainer_id = auth.uid())",
+");",
+"drop policy if exists \"cgf profiles update\" on public.profiles;",
+"create policy \"cgf profiles update\" on public.profiles for update to authenticated",
+"using (id = auth.uid()) with check (id = auth.uid() and role = (select p.role from public.profiles p where p.id = auth.uid()));",
+"drop policy if exists \"cgf invites read\" on public.invites;",
+"create policy \"cgf invites read\" on public.invites for select to authenticated using (trainer_id = auth.uid());",
+"drop policy if exists \"cgf invites insert\" on public.invites;",
+"create policy \"cgf invites insert\" on public.invites for insert to authenticated with check (",
+"  trainer_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'trainer')",
+");",
+"drop policy if exists \"cgf invites delete\" on public.invites;",
+"create policy \"cgf invites delete\" on public.invites for delete to authenticated using (trainer_id = auth.uid());",
+"drop policy if exists \"cgf links read\" on public.trainer_clients;",
+"create policy \"cgf links read\" on public.trainer_clients for select to authenticated using (client_id = auth.uid() or trainer_id = auth.uid());",
+"drop policy if exists \"cgf links insert\" on public.trainer_clients;",
+"create policy \"cgf links insert\" on public.trainer_clients for insert to authenticated with check (",
+"  client_id = auth.uid() and exists (select 1 from public.profiles t where t.id = trainer_id and t.role = 'trainer')",
+");",
+"drop policy if exists \"cgf sessions read\" on public.session_uploads;",
+"create policy \"cgf sessions read\" on public.session_uploads for select to authenticated using (true);",
+"drop policy if exists \"cgf sessions insert\" on public.session_uploads;",
+"create policy \"cgf sessions insert\" on public.session_uploads for insert to authenticated with check (",
+"  trainer_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'trainer')",
+");",
+"drop policy if exists \"cgf sessions delete\" on public.session_uploads;",
+"create policy \"cgf sessions delete\" on public.session_uploads for delete to authenticated using (trainer_id = auth.uid());",
+"drop policy if exists \"cgf logs owner read\" on public.private_logs;",
+"create policy \"cgf logs owner read\" on public.private_logs for select to authenticated using (owner_id = auth.uid());",
+"drop policy if exists \"cgf logs trainer read\" on public.private_logs;",
+"create policy \"cgf logs trainer read\" on public.private_logs for select to authenticated using (",
+"  trainer_id = auth.uid() or exists (select 1 from public.trainer_clients tc where tc.trainer_id = auth.uid() and tc.client_id = private_logs.owner_id)",
+");",
+"drop policy if exists \"cgf logs owner insert\" on public.private_logs;",
+"create policy \"cgf logs owner insert\" on public.private_logs for insert to authenticated with check (",
+"  owner_id = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'client')",
+"  and (trainer_id is null or exists (select 1 from public.profiles t where t.id = trainer_id and t.role = 'trainer'))",
+");",
+"drop policy if exists \"cgf logs owner update\" on public.private_logs;",
+"create policy \"cgf logs owner update\" on public.private_logs for update to authenticated",
+"using (owner_id = auth.uid()) with check (",
+"  owner_id = auth.uid() and (trainer_id is null or exists (select 1 from public.profiles t where t.id = trainer_id and t.role = 'trainer'))",
+");",
+"create or replace function public.cgf_join_trainer(invite_code text)",
+"returns uuid language plpgsql security definer set search_path = public as $$",
+"declare tid uuid;",
+"begin",
+"  if not exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'client') then",
+"    raise exception 'Only a client can join';",
+"  end if;",
+"  select trainer_id into tid from public.invites where code = upper(trim(invite_code));",
+"  if tid is null then raise exception 'That invite code was not found'; end if;",
+"  insert into public.trainer_clients (trainer_id, client_id) values (tid, auth.uid()) on conflict do nothing;",
+"  update public.private_logs set trainer_id = tid where owner_id = auth.uid();",
+"  return tid;",
+"end; $$;",
+"grant execute on function public.cgf_join_trainer(text) to authenticated;",
+"insert into storage.buckets (id, name, public) values ('session-media', 'session-media', false) on conflict (id) do nothing;",
+"drop policy if exists \"cgf session media read\" on storage.objects;",
+"create policy \"cgf session media read\" on storage.objects for select to authenticated using (bucket_id = 'session-media');",
+"drop policy if exists \"cgf session media write\" on storage.objects;",
+"create policy \"cgf session media write\" on storage.objects for insert to authenticated with check (",
+"  bucket_id = 'session-media' and (storage.foldername(name))[1] = auth.uid()::text",
+");",
+"drop policy if exists \"cgf session media delete\" on storage.objects;",
+"create policy \"cgf session media delete\" on storage.objects for delete to authenticated using (",
+"  bucket_id = 'session-media' and (storage.foldername(name))[1] = auth.uid()::text",
+");"
 ].join("\n");
 
 function readStore(store, key){
@@ -5717,6 +5853,7 @@ function renderCoach(){
   $("pairWeighForm").style.display = ID.role==="client" ? "" : "none";
   $("pairPhotoForm").style.display = ID.role==="client" ? "" : "none";
   if(ID.role==="client" && $("cwDate") && !$("cwDate").value) $("cwDate").value = todayStr();
+  if(typeof refreshClientLogs==="function") refreshClientLogs();
 }
 function fillConnectionSettings(){
   const k = readKeys();
@@ -5881,6 +6018,8 @@ $("trCreate").onclick = () => run(async ()=>{
   toast("Invite code ready");
   renderCoach();
   await refreshCoachData();
+  try { await publishInvite(pair.inviteCode); }
+  catch(e){ if(e && e.code==="missing") toast("Invite stays on this phone until the shared tables are created"); }
 });
 $("clJoinBtn").onclick = () => run(async ()=>{
   const pair = await Link.joinWithCode($("clCode").value);
@@ -5890,6 +6029,9 @@ $("clJoinBtn").onclick = () => run(async ()=>{
   toast("Joined "+(pair.clientName||"your trainer"));
   renderCoach();
   await refreshCoachData();
+  const joinedCode = pair.inviteCode || "";
+  try { await joinTrainerCloud(joinedCode); }
+  catch(e){ if(e && e.code==="missing") toast("Joined on this phone. Shared tables are not created yet"); }
 });
 $("pairBack").onclick = () => {
   pairOpen = false;
@@ -6851,7 +6993,7 @@ function sessionWhen(ts){
 }
 function paintSessionGroup(el, rows, urls, trainer){
   if(!rows.length){
-    el.innerHTML = '<p class="sessionempty">Nothing saved on this phone yet.</p>';
+    el.innerHTML = '<p class="sessionempty">No sessions yet.</p>';
     return;
   }
   el.innerHTML = rows.map(row => {
@@ -6875,7 +7017,27 @@ function renderSessions(){
   rows.forEach(row => { if(sessionBlobUrls[row.id]) urls[row.id] = sessionBlobUrls[row.id]; });
   paintSessionGroup($("sessionGroup"), rows.filter(row => row.label==="group"), urls, trainer);
   paintSessionGroup($("sessionTraining"), rows.filter(row => row.label==="training"), urls, trainer);
-  const missing = rows.filter(row => !urls[row.id]);
+  const missing = rows.filter(row => !urls[row.id] && !row.storage_path);
+  if(authKeyReady()){
+    loadSharedSessions().then(async remote => {
+      if(seq!==sessionPaint || currentTab!=="sessions") return;
+      const seen = {};
+      rows.forEach(row => { seen[row.id] = true; });
+      for(const item of remote){
+        if(!item || seen[item.id]) continue;
+        if(item.label!=="group" && item.label!=="training") continue;
+        rows.push({id:item.id, label:item.label, kind:item.kind, createdAt:Date.parse(item.created_at)||Date.now(), storage_path:item.storage_path||""});
+        seen[item.id] = true;
+      }
+      await Promise.all(rows.filter(row => row.storage_path && !urls[row.id]).map(async row => {
+        const url = await remoteSessionUrl(row.storage_path);
+        if(url){ sessionBlobUrls[row.id] = url; urls[row.id] = url; }
+      }));
+      if(seq!==sessionPaint || currentTab!=="sessions") return;
+      paintSessionGroup($("sessionGroup"), rows.filter(row => row.label==="group"), urls, trainer);
+      paintSessionGroup($("sessionTraining"), rows.filter(row => row.label==="training"), urls, trainer);
+    }).catch(()=>{});
+  }
   if(!missing.length) return;
   Promise.all(missing.map(row => blobUrlForSession(row.id).then(url => [row.id, url]).catch(() => [row.id, ""])))
     .then(pairs => {
@@ -6890,7 +7052,15 @@ function removeSession(id){
   saveSessionRows(loadSessionRows().filter(row => row.id!==id));
   if(sessionBlobUrls[id]){ URL.revokeObjectURL(sessionBlobUrls[id]); delete sessionBlobUrls[id]; }
   idbDeleteSession(id).catch(()=>{});
-  toast("Removed from this phone");
+  authSession().then(session => {
+    if(!session) return;
+    sbAuth("session_uploads?id=eq."+encodeURIComponent(id), {method:"DELETE", prefer:"return=minimal"}).catch(()=>{});
+    fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/storage/v1/object/session-media/"+session.user.id+"/"+id, {
+      method: "DELETE",
+      headers: { apikey: AUTH_PUBLISHABLE_KEY, Authorization: "Bearer "+session.access_token }
+    }).catch(()=>{});
+  }).catch(()=>{});
+  toast("Removed");
   render();
 }
 document.querySelectorAll("#sessionLabels [data-sessionlabel]").forEach(btn => {
@@ -6919,8 +7089,18 @@ $("sessionSave").onclick = () => {
     list.unshift(row);
     saveSessionRows(list);
     $("sessionFile").value = "";
-    toast("Saved on this phone");
     render();
+    if(!authKeyReady()){
+      toast("Saved on this phone");
+      return;
+    }
+    return shareSessionFile(row, file).then(() => {
+      toast("Shared with signed-in clients");
+    }).catch(e => {
+      if(e && e.code==="missing") toast("Saved on this phone. Session storage is not created in Supabase yet");
+      else if(e && e.code==="signin") toast("Saved on this phone. Confirm your email and sign in to share it");
+      else toast("Saved on this phone");
+    });
   }).catch(e => toast(e && e.message ? e.message : "Could not store that on this phone"));
 };
 /* ---------- Ask AI (on this phone, no outside chat service) ---------- */
@@ -8121,6 +8301,7 @@ function clearSessionStores(){
   sessionStorage.removeItem(RETURN_LOGIN_KEY);
 }
 function endSession(toLogin, message){
+  if(authSb){ authSb.auth.signOut().catch(()=>{}); }
   clearSessionStores();
   ID.activePairId = "";
   pairOpen = false;
@@ -8260,7 +8441,9 @@ function showWelcome(view){
   $("roleGate").style.display = "none";
   $("signupForm").hidden = false;
   $("signupPending").hidden = true;
-  $("signupLocalNote").textContent = "A confirmation email is required. You can sign in after you confirm.";
+  $("signupLocalNote").textContent = authKeyReady()
+    ? "A confirmation email is required. You can sign in after you confirm."
+    : accountNote();
   $("loginLocalNote").textContent = accountNote();
   if(view==="signup" || view==="login"){
     const side = sideFromMenu();
@@ -8302,6 +8485,7 @@ function enterAccount(account, remember){
       }
     });
   }
+  pullPrivateLog().catch(()=>{});
 }
 const ENTRY_KEY = "curlyGirlFitness.entry.v1";
 function clientRequested(){
@@ -8405,15 +8589,16 @@ function emailJustConfirmed(){
   const type = String(h.get("type") || q.get("type") || "").toLowerCase();
   return type==="signup" || type==="email";
 }
+function authKeyReady(){
+  return AUTH_PUBLISHABLE_KEY.length>20 && AUTH_PUBLISHABLE_KEY.indexOf("sb_secret_")!==0;
+}
 async function authClient(){
-  if(!AUTH_PUBLISHABLE_KEY || AUTH_PUBLISHABLE_KEY.indexOf("sb_secret_")==0){
-    throw new Error("Sign-up needs the publishable Supabase key.");
-  }
+  if(!authKeyReady()) throw new Error("Sign-up needs the publishable Supabase key.");
   await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js");
   if(!window.supabase || !window.supabase.createClient) throw new Error("Could not load Supabase");
   if(!authSb){
     authSb = window.supabase.createClient(AUTH_PROJECT_URL, AUTH_PUBLISHABLE_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }
     });
   }
   return authSb;
@@ -8457,13 +8642,222 @@ async function authSignIn(email, password){
     else err.code = "auth";
     throw err;
   }
-  if(data && data.session){
-    try { await client.auth.signOut(); } catch(e){}
-  }
   const user = data && data.user || {};
   const meta = user.user_metadata || {};
   const role = meta.role==="trainer" || meta.role==="client" ? meta.role : "";
   return { id: user.id||"", name: String(meta.name||"").trim(), role: role };
+}
+let privateSyncTimer = null;
+function schedulePrivateSync(){
+  if(!authKeyReady()) return;
+  clearTimeout(privateSyncTimer);
+  privateSyncTimer = setTimeout(() => { pushPrivateLog().catch(()=>{}); }, 700);
+}
+async function authSession(){
+  if(!authKeyReady()) return null;
+  try {
+    const client = await authClient();
+    const got = await client.auth.getSession();
+    const session = got && got.data && got.data.session;
+    if(!session || !session.access_token || !session.user) return null;
+    return session;
+  } catch(e){ return null; }
+}
+async function sbAuth(path, options){
+  const session = await authSession();
+  if(!session){
+    const err = new Error("Sign in after confirming your email.");
+    err.code = "signin";
+    throw err;
+  }
+  const opt = options || {};
+  const res = await fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/rest/v1/"+path, {
+    method: opt.method || "GET",
+    headers: {
+      apikey: AUTH_PUBLISHABLE_KEY,
+      Authorization: "Bearer "+session.access_token,
+      "Content-Type": "application/json",
+      Prefer: opt.prefer || "return=representation"
+    },
+    body: opt.body!=null ? JSON.stringify(opt.body) : undefined
+  });
+  const text = await res.text();
+  let data = null;
+  if(text){ try { data = JSON.parse(text); } catch(e){ data = {message:text}; } }
+  if(!res.ok){
+    const msg = (data && (data.message || data.error_description || data.hint || data.msg)) || ("Request failed ("+res.status+")");
+    const err = new Error(typeof msg==="string" ? msg : "Request failed");
+    const code = data && (data.code || data.error_code);
+    if(res.status===404 || code==="PGRST205" || code==="42P01" || code==="PGRST202") err.code = "missing";
+    throw err;
+  }
+  return data;
+}
+function noteMapFromState(){
+  const notes = {};
+  Object.keys(S.workouts||{}).forEach(date => {
+    const n = S.workouts[date] && S.workouts[date].notes;
+    if(n) notes[date] = String(n);
+  });
+  Object.keys(S.customLogs||{}).forEach(date => {
+    const day = S.customLogs[date] || {};
+    Object.keys(day).forEach(id => {
+      if(day[id] && day[id].notes) notes[date+" · "+id] = String(day[id].notes);
+    });
+  });
+  return notes;
+}
+async function pushPrivateLog(){
+  const account = accountForAuth(currentAuth());
+  if(!account || account.role!=="client") return;
+  const session = await authSession();
+  if(!session) return;
+  const row = {
+    owner_id: session.user.id,
+    meals: S.meals||[],
+    workouts: S.workouts||{},
+    notes: noteMapFromState(),
+    updated_at: new Date().toISOString()
+  };
+  await sbAuth("private_logs?on_conflict=owner_id", {
+    method: "POST",
+    prefer: "resolution=merge-duplicates,return=minimal",
+    body: row
+  });
+}
+async function pullPrivateLog(){
+  const account = accountForAuth(currentAuth());
+  if(!account || account.role!=="client") return;
+  const session = await authSession();
+  if(!session) return;
+  const rows = await sbAuth("private_logs?owner_id=eq."+encodeURIComponent(session.user.id)+"&select=*");
+  const row = Array.isArray(rows) ? rows[0] : null;
+  if(!row){
+    await pushPrivateLog();
+    return;
+  }
+  const remoteAt = Date.parse(row.updated_at)||0;
+  const localAt = parseInt(localStorage.getItem("curlyGirlFitness.lastSave.v1")||"0", 10)||0;
+  if(remoteAt > localAt){
+    if(Array.isArray(row.meals)) S.meals = row.meals;
+    if(row.workouts && typeof row.workouts==="object") S.workouts = row.workouts;
+    localStorage.setItem(KEY, JSON.stringify(S));
+    try { localStorage.setItem("curlyGirlFitness.lastSave.v1", String(remoteAt)); } catch(e){}
+    if(typeof render==="function") render();
+  }
+}
+async function publishInvite(code){
+  const session = await authSession();
+  if(!session || !code) return;
+  const account = accountForAuth(currentAuth());
+  if(!account || account.role!=="trainer") return;
+  await sbAuth("invites?on_conflict=code", {
+    method: "POST",
+    prefer: "resolution=merge-duplicates,return=minimal",
+    body: { code: String(code).toUpperCase(), trainer_id: session.user.id }
+  });
+}
+async function joinTrainerCloud(code){
+  const session = await authSession();
+  if(!session || !code) return;
+  await sbAuth("rpc/cgf_join_trainer", { method: "POST", body: { invite_code: String(code).toUpperCase() } });
+  await pushPrivateLog();
+}
+async function loadClientLogs(){
+  const account = accountForAuth(currentAuth());
+  if(!account || account.role!=="trainer") return [];
+  const logs = await sbAuth("private_logs?select=owner_id,meals,workouts,notes,updated_at");
+  const people = await sbAuth("profiles?select=id,name,email");
+  const names = {};
+  (Array.isArray(people)?people:[]).forEach(p => { names[p.id] = p.name || p.email || "Client"; });
+  return (Array.isArray(logs)?logs:[]).map(row => Object.assign({}, row, { name: names[row.owner_id] || "Client" }));
+}
+function paintClientLogs(rows, missing){
+  const card = $("clientLogCard");
+  if(!card) return;
+  const trainer = trainerHere() && authKeyReady();
+  card.hidden = !trainer;
+  if(!trainer) return;
+  const body = $("clientLogBody");
+  if(missing){
+    body.innerHTML = '<p class="note">Shared tables are not in this Supabase project yet. Run the setup SQL once in the SQL editor.</p>';
+    return;
+  }
+  if(!rows.length){
+    body.innerHTML = '<p class="note">No client logs yet. A client’s meals, workouts, and notes show here after they confirm email and join your invite.</p>';
+    return;
+  }
+  body.innerHTML = rows.map(row => {
+    const meals = Array.isArray(row.meals) ? row.meals : [];
+    const mealLine = meals.slice(-4).map(m => m && m.name ? m.name : "").filter(Boolean).join(", ");
+    const notes = row.notes && typeof row.notes==="object" ? Object.keys(row.notes).map(k => row.notes[k]).filter(Boolean) : [];
+    const noteLine = notes.slice(-3).join(" · ");
+    return '<div class="card" style="margin:0 0 8px;box-shadow:none"><b>'+esc(row.name)+'</b><div class="note">'+(mealLine?esc(mealLine):"No meals saved")+'</div>'+(noteLine?'<div class="note">'+esc(noteLine)+'</div>':'')+'</div>';
+  }).join("");
+}
+function refreshClientLogs(){
+  if(!trainerHere() || !authKeyReady()){
+    paintClientLogs([], false);
+    return;
+  }
+  loadClientLogs().then(rows => paintClientLogs(rows, false)).catch(e => {
+    paintClientLogs([], !!(e && e.code==="missing"));
+  });
+}
+async function shareSessionFile(row, file){
+  const session = await authSession();
+  if(!session){
+    const err = new Error("Sign in after confirming your email.");
+    err.code = "signin";
+    throw err;
+  }
+  const path = session.user.id+"/"+row.id;
+  const up = await fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/storage/v1/object/session-media/"+path, {
+    method: "POST",
+    headers: {
+      apikey: AUTH_PUBLISHABLE_KEY,
+      Authorization: "Bearer "+session.access_token,
+      "Content-Type": file.type || "application/octet-stream",
+      "x-upsert": "true"
+    },
+    body: file
+  });
+  if(!up.ok){
+    const err = new Error("Could not share that session");
+    if(up.status===404 || up.status===400) err.code = "missing";
+    throw err;
+  }
+  await sbAuth("session_uploads", {
+    method: "POST",
+    prefer: "return=minimal",
+    body: {
+      id: row.id,
+      trainer_id: session.user.id,
+      label: row.label,
+      kind: row.kind,
+      storage_path: path,
+      mime: file.type||"",
+      created_at: new Date(row.createdAt).toISOString()
+    }
+  });
+}
+async function remoteSessionUrl(path){
+  const session = await authSession();
+  if(!session || !path) return "";
+  const res = await fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/storage/v1/object/authenticated/session-media/"+path, {
+    headers: {
+      apikey: AUTH_PUBLISHABLE_KEY,
+      Authorization: "Bearer "+session.access_token
+    }
+  });
+  if(!res.ok) return "";
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  return url;
+}
+async function loadSharedSessions(){
+  const rows = await sbAuth("session_uploads?select=*&order=created_at.desc");
+  return Array.isArray(rows) ? rows : [];
 }
 async function signUpAccount(name, email, password, role, invite){
   if(!name) throw new Error("Enter your name");
@@ -8471,6 +8865,25 @@ async function signUpAccount(name, email, password, role, invite){
   if(password.length<6) throw new Error("Use at least 6 characters");
   if(role!=="trainer" && role!=="client") throw new Error("Choose trainer or client");
   if(loadAccounts().some(a => a.email===email && a.role===role)) throw new Error("That email already has a "+role+" account on this phone.");
+  if(!authKeyReady()){
+    const hash = await passHash(password);
+    const account = {id:makeId(), name:name, email:email, passHash:hash, role:role, createdAt:Date.now()};
+    rememberAccount(account);
+    recordSignup(account);
+    enterAccount(account);
+    if(role==="client" && invite){
+      try {
+        const pair = await Link.joinWithCode(invite);
+        ID.activePairId = pair.id;
+        persistIdentity();
+        if(currentTab==="coach") render();
+        toast("Joined your trainer");
+      } catch(e){
+        toast(e && e.message ? e.message : "Could not use that invite code");
+      }
+    }
+    return;
+  }
   const created = await authSignUp(name, email, password, role);
   if(created.already){
     try {
