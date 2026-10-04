@@ -967,6 +967,11 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
       <button class="primary full" type="submit">Create account</button>
       <button type="button" class="full" id="signupToLogin" style="margin-top:8px">Already have an account? Log in</button>
     </form>
+    <div class="card" id="signupPending" hidden>
+      <h2>Check your email</h2>
+      <p class="note" id="signupPendingText">Check your email and confirm your address before you can sign in.</p>
+      <button type="button" class="primary full" id="signupPendingLogin">Go to log in</button>
+    </div>
   </div>
   <div id="welcomeLogin" hidden>
     <button type="button" class="learnmore welcome-back" id="loginBack">Back</button>
@@ -8253,7 +8258,9 @@ function showWelcome(view){
   $("welcomeLogin").hidden = view!=="login";
   $("welcomeDock").hidden = view!=="home";
   $("roleGate").style.display = "none";
-  $("signupLocalNote").textContent = accountNote();
+  $("signupForm").hidden = false;
+  $("signupPending").hidden = true;
+  $("signupLocalNote").textContent = "A confirmation email is required. You can sign in after you confirm.";
   $("loginLocalNote").textContent = accountNote();
   if(view==="signup" || view==="login"){
     const side = sideFromMenu();
@@ -8281,6 +8288,20 @@ function enterAccount(account, remember){
   showApp();
   setRole(account.role);
   go("today");
+  const invite = takePendingInvite(account.email);
+  if(account.role==="client" && invite){
+    run(async () => {
+      try {
+        const pair = await Link.joinWithCode(invite);
+        ID.activePairId = pair.id;
+        persistIdentity();
+        if(currentTab==="coach") render();
+        toast("Joined your trainer");
+      } catch(e){
+        toast(e && e.message ? e.message : "Could not use that invite code");
+      }
+    });
+  }
 }
 const ENTRY_KEY = "curlyGirlFitness.entry.v1";
 function clientRequested(){
@@ -8360,35 +8381,120 @@ function rememberAccount(account){
   accounts.push(account);
   saveAccounts(accounts);
 }
+const AUTH_PROJECT_URL = "https://igqxmqirscpurssbuacu.supabase.co";
+const AUTH_PUBLISHABLE_KEY = "";
+const PENDING_INVITE_KEY = "curlyGirlFitness.pendingInvite.v1";
+let authSb = null;
+function showSignupPending(email){
+  $("signupForm").hidden = true;
+  $("signupPending").hidden = false;
+  $("signupPendingText").textContent = email
+    ? "Check "+email+" and confirm your address before you can sign in."
+    : "Check your email and confirm your address before you can sign in.";
+}
+function takePendingInvite(email){
+  let raw = null;
+  try { raw = JSON.parse(sessionStorage.getItem(PENDING_INVITE_KEY)||"null"); } catch(e){ raw = null; }
+  sessionStorage.removeItem(PENDING_INVITE_KEY);
+  if(!raw || raw.email!==email || !raw.code) return "";
+  return String(raw.code);
+}
+function emailJustConfirmed(){
+  const h = new URLSearchParams(String(location.hash||"").replace(/^#/,""));
+  const q = new URLSearchParams(location.search);
+  const type = String(h.get("type") || q.get("type") || "").toLowerCase();
+  return type==="signup" || type==="email";
+}
+async function authClient(){
+  if(!AUTH_PUBLISHABLE_KEY || AUTH_PUBLISHABLE_KEY.indexOf("sb_secret_")==0){
+    throw new Error("Sign-up needs the publishable Supabase key.");
+  }
+  await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js");
+  if(!window.supabase || !window.supabase.createClient) throw new Error("Could not load Supabase");
+  if(!authSb){
+    authSb = window.supabase.createClient(AUTH_PROJECT_URL, AUTH_PUBLISHABLE_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
+  }
+  return authSb;
+}
+async function authSignUp(name, email, password, role){
+  const client = await authClient();
+  const redirect = location.origin + location.pathname;
+  const { data, error } = await client.auth.signUp({
+    email: email,
+    password: password,
+    options: {
+      data: { name: name, role: role },
+      emailRedirectTo: redirect
+    }
+  });
+  if(error){
+    const msg = String(error.message||"");
+    if(/already registered|already exists/i.test(msg)){
+      const err = new Error("That email already has an account. Confirm it before you sign in. Trainer and client stay separate.");
+      err.code = "already";
+      throw err;
+    }
+    throw new Error(msg || "Could not send the confirmation email.");
+  }
+  if(data && data.session){
+    try { await client.auth.signOut(); } catch(e){}
+  }
+  const user = data && data.user || null;
+  if(!user) throw new Error("Could not send the confirmation email.");
+  const identities = Array.isArray(user.identities) ? user.identities : [];
+  return { already: identities.length===0, id: user.id||"", role: role };
+}
+async function authSignIn(email, password){
+  const client = await authClient();
+  const { data, error } = await client.auth.signInWithPassword({ email: email, password: password });
+  if(error){
+    const msg = String(error.message||"");
+    const err = new Error(msg || "Could not sign in");
+    if(/not confirmed/i.test(msg)) err.code = "email_not_confirmed";
+    else if(/invalid login|invalid credentials/i.test(msg)) err.code = "invalid";
+    else err.code = "auth";
+    throw err;
+  }
+  if(data && data.session){
+    try { await client.auth.signOut(); } catch(e){}
+  }
+  const user = data && data.user || {};
+  const meta = user.user_metadata || {};
+  const role = meta.role==="trainer" || meta.role==="client" ? meta.role : "";
+  return { id: user.id||"", name: String(meta.name||"").trim(), role: role };
+}
 async function signUpAccount(name, email, password, role, invite){
   if(!name) throw new Error("Enter your name");
   if(!emailOk(email)) throw new Error("Enter a valid email");
   if(password.length<6) throw new Error("Use at least 6 characters");
   if(role!=="trainer" && role!=="client") throw new Error("Choose trainer or client");
   if(loadAccounts().some(a => a.email===email && a.role===role)) throw new Error("That email already has a "+role+" account on this phone.");
-  const hash = await passHash(password);
-  const id = makeId();
-  if(dataReady()){
-    const rows = await sbFetch("accounts?email=eq."+encodeURIComponent(email)+"&select=id,role");
-    const list = Array.isArray(rows) ? rows : [];
-    if(list.some(r => r.role===role)) throw new Error("That email already has a "+role+" account.");
-    if(!list.length) await sbFetch("accounts", {method:"POST", body:{id:id, email:email, name:name, pass_hash:hash, role:role}});
-  }
-  const account = {id:id, name:name, email:email, passHash:hash, role:role, createdAt:Date.now()};
-  rememberAccount(account);
-  recordSignup(account);
-  enterAccount(account);
-  if(role==="client" && invite){
+  const created = await authSignUp(name, email, password, role);
+  if(created.already){
     try {
-      const pair = await Link.joinWithCode(invite);
-      ID.activePairId = pair.id;
-      persistIdentity();
-      if(currentTab==="coach") render();
-      toast("Joined your trainer");
+      const signed = await authSignIn(email, password);
+      if(!signed.role || signed.role===role) throw new Error("That email already has a "+role+" account. Log in after you confirm it.");
+      const hash = await passHash(password);
+      rememberAccount({id:(signed.id||makeId())+":"+role, name:name, email:email, passHash:hash, role:role, createdAt:Date.now()});
+      recordSignup({name:name, email:email, role:role, createdAt:Date.now()});
+      $("signupForm").hidden = true;
+      $("signupPending").hidden = false;
+      $("signupPendingText").textContent = "This email is already confirmed. Log in as a "+role+" to use that side.";
+      return;
     } catch(e){
-      toast(e && e.message ? e.message : "Could not use that invite code");
+      if(e && e.code==="email_not_confirmed") throw new Error("Confirm your email before you can sign in. Check your inbox.");
+      if(e && e.message && e.message.indexOf("already has")>=0) throw e;
+      if(e && e.code==="invalid") throw new Error("That email already has an account. Trainer and client stay separate, and the password did not match.");
+      throw e;
     }
   }
+  if(role==="client" && invite){
+    try { sessionStorage.setItem(PENDING_INVITE_KEY, JSON.stringify({email:email, code:invite})); } catch(e){}
+  }
+  recordSignup({name:name, email:email, role:role, createdAt:Date.now()});
+  showSignupPending(email);
 }
 async function logInAccount(email, password, remember, side){
   if(!emailOk(email)) throw new Error("Enter a valid email");
@@ -8398,6 +8504,35 @@ async function logInAccount(email, password, remember, side){
   const localSide = () => loadAccounts().find(a => a.email===email && a.passHash===hash && a.role===side) || null;
   const localOther = () => loadAccounts().find(a => a.email===email && a.passHash===hash && (a.role==="trainer" || a.role==="client") && a.role!==side) || null;
   const otherMessage = (have) => "This email is a "+have+" account. Sign up as a "+side+" to use that side.";
+  const onPhone = localSide();
+  if(onPhone){
+    enterAccount(onPhone, !!remember);
+    return;
+  }
+  let authMiss = false;
+  try {
+    const signed = await authSignIn(email, password);
+    if(signed.role && signed.role!==side) throw new Error(otherMessage(signed.role));
+    const account = {
+      id: signed.id ? signed.id+":"+side : makeId(),
+      name: signed.name || email.split("@")[0],
+      email: email,
+      passHash: hash,
+      role: side,
+      createdAt: Date.now()
+    };
+    rememberAccount(account);
+    enterAccount(account, !!remember);
+    return;
+  } catch(e){
+    if(e && e.code==="email_not_confirmed"){
+      $("loginLocalNote").textContent = "Confirm your email before you can sign in. Check your inbox.";
+      throw new Error("Confirm your email before you can sign in. Check your inbox.");
+    }
+    if(e && e.message && e.message.indexOf("Sign up as a")>=0) throw e;
+    if(e && e.code==="invalid") authMiss = true;
+    else if(e && e.code==="auth") throw new Error(e.message || "Could not sign in");
+  }
   let account = null;
   if(dataReady()){
     const rows = await sbFetch("accounts?email=eq."+encodeURIComponent(email)+"&select=*");
@@ -8420,7 +8555,7 @@ async function logInAccount(email, password, remember, side){
     if(!account){
       const other = localOther();
       if(other) throw new Error(otherMessage(other.role));
-      throw new Error(dataReady() ? "That email or password does not match." : "That email or password does not match an account on this phone.");
+      throw new Error(authMiss || dataReady() ? "That email or password does not match." : "That email or password does not match an account on this phone.");
     }
     if(dataReady()){
       try {
@@ -8476,6 +8611,7 @@ $("menuSignup").onclick = () => showWelcome("signup");
 $("signupBack").onclick = () => showWelcome("home");
 $("loginBack").onclick = () => showWelcome("home");
 $("signupToLogin").onclick = () => showWelcome("login");
+$("signupPendingLogin").onclick = () => showWelcome("login");
 $("loginToSignup").onclick = () => showWelcome("signup");
 $("welcomeMeals").onclick = () => { showWelcome("login"); toast("Log in to open the meal planner"); };
 $("welcomeWork").onclick = () => { showWelcome("login"); toast("Log in to open workouts and videos"); };
@@ -8644,9 +8780,13 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("pagehide", markAway);
 window.addEventListener("pageshow", e => { if(e.persisted) onReturn(); });
+const justConfirmed = emailJustConfirmed();
 if(sessionStorage.getItem(RETURN_LOGIN_KEY)==="1"){
   sessionStorage.removeItem(RETURN_LOGIN_KEY);
   showWelcome("login");
+} else if(justConfirmed){
+  showWelcome("login");
+  $("loginLocalNote").textContent = "Email confirmed. Sign in to use your account.";
 } else if(!restoreRememberedSession()){
   showWelcome("home");
 }
