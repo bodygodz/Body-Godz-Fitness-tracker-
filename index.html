@@ -154,6 +154,9 @@ body.ov-home header .topbar,body.ov-home header #hdrSub,body.ov-home header #sub
 #page-overview .ovact b{display:block}
 #page-overview .ovact span{color:#6F6C64;font-weight:600;font-size:13px}
 #page-overview #ovAutoForm textarea{min-height:88px}
+#page-overview #ovAddForm{margin:0 0 12px}
+#page-overview #ovAddForm[hidden]{display:none !important}
+#page-overview #ovAddForm .full{margin-top:8px}
 body.theme-dark #page-overview,
 body.theme-dark #page-overview .ovbar,
 body.theme-dark #page-overview .ovcard,
@@ -442,7 +445,7 @@ textarea:focus{border-color:var(--accent)}
 .ing li,.steps li{margin:4px 0}
 .hub{display:block;width:100%;text-align:left;padding:14px}
 .hub b{display:block;font-size:15px;margin-bottom:4px}
-.demobanner{margin:8px 0 0;background:#FAF9F6;color:#7c2d12;border-radius:10px;padding:8px 10px;font-size:11.5px;font-weight:700;line-height:1.35}
+.demobanner{margin:8px 0 0;background:#FAF9F6;color:#2B2A27;border:1px solid #E4DFD4;border-radius:10px;padding:8px 10px;font-size:13px;font-weight:600;line-height:1.35}
 .demobanner[hidden]{display:none}
 .gate{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(43,42,39,.45)}
 .gatebox{background:#FAF9F6;color:#2B2A27;border-radius:var(--radius);padding:18px 16px;width:100%;max-width:400px;box-shadow:0 16px 50px rgba(43,42,39,.18);overflow:hidden}
@@ -890,7 +893,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
   </div>
   <div class="subbar" id="subbar" hidden></div>
   <div class="sub" id="hdrSub" hidden></div>
-  <p class="demobanner" id="demoBanner" hidden>Demo mode · two tabs on this browser. Add Supabase and Daily keys in Settings to connect two phones.</p>
+  <p class="demobanner" id="demoBanner" hidden></p>
   <div class="apptools" id="appTools">
     <button type="button" class="toolplus" id="toolPlus" aria-label="Add" aria-expanded="false" aria-controls="addPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     <button type="button" class="toolicon" id="toolCheck" aria-label="Today's workout checklist" aria-expanded="false" aria-controls="checkPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6.5l1.2 1.2L7.5 5.5M4 12.5l1.2 1.2L7.5 11.5M4 18.5l1.2 1.2L7.5 17.5"/></svg></button>
@@ -1143,6 +1146,12 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <button type="button" class="ovicon ovhelp" id="ovHelp" aria-label="Help">?</button>
     <img class="ovme" id="ovMe" alt="" hidden>
   </div>
+  <form class="ovcard" id="ovAddForm" hidden>
+    <p class="ovneed">New client</p>
+    <div class="field"><label class="f" for="ovClientName">Client name</label><input id="ovClientName" maxlength="40" placeholder="Name" autocomplete="name"></div>
+    <button class="primary full" type="submit">Add client</button>
+    <button type="button" class="full" id="ovAddCancel">Cancel</button>
+  </form>
   <div class="ovfilter" id="ovFilterMenu" hidden>
     <button type="button" data-ovfilter="all">All needs</button>
     <button type="button" data-ovfilter="phase">Need a new training phase</button>
@@ -1570,13 +1579,8 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 <!-- ============ COACH ============ -->
 <section class="page" id="page-coach">
   <div class="card setupcard" id="coachDemoCard" hidden>
-    <h2>Demo mode</h2>
-    <p>Two tabs in this browser: Trainer in one, Client in the other. Chat, photos, weigh-ins, and a simulated call sync here.</p>
-    <div class="row" style="margin-top:8px">
-      <button class="sm" id="demoAsTrainer" type="button">This tab: Trainer</button>
-      <button class="sm" id="demoAsClient" type="button">This tab: Client</button>
-    </div>
-    <button class="primary full" id="coachOpenSettings" type="button" style="margin-top:8px">Add phone keys in Settings</button>
+    <h2>How a client joins</h2>
+    <p>Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
   </div>
   <div id="coachSolo">
     <div class="card">
@@ -1685,7 +1689,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <div id="clJoin">
       <div class="card">
         <h2>Join your trainer</h2>
-        <p class="note" style="margin-bottom:8px">Enter the invite code from your trainer. In demo mode, create that code in another tab of this browser.</p>
+        <p class="note" style="margin-bottom:8px">Confirm your email, then enter the invite code your trainer copied.</p>
         <div class="field"><label class="f">Invite code</label><input id="clCode" maxlength="12" autocapitalize="characters" autocomplete="off" placeholder="e.g. K7MQ2P"></div>
         <button class="primary full" id="clJoinBtn" type="button">Join</button>
       </div>
@@ -1764,20 +1768,9 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     </div>
     <div class="note" id="modeNote" style="margin-top:8px"></div>
   </div>
-  <div class="card setupcard" id="keysCard">
-    <h2 id="keysHeading">Setup</h2>
-    <p class="note" id="keysIntro"></p>
-    <div class="field"><label class="f">Supabase project URL</label><input id="keyUrl" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://xxxx.supabase.co"></div>
-    <div class="field"><label class="f">Supabase anon key</label><input id="keyAnon" autocomplete="off" spellcheck="false" placeholder="eyJhbGciOi..."></div>
-    <div class="field"><label class="f">Daily API key</label><input id="keyDaily" autocomplete="off" spellcheck="false" placeholder="From Daily → Developers"></div>
-    <button class="primary full" id="keysSave" type="button">Save keys</button>
-    <p class="note" style="margin-top:8px">Keys stay in this browser only. They are never built into the page.</p>
-    <details style="margin-top:8px">
-      <summary>Supabase setup SQL</summary>
-      <p class="note">Run this once in the Supabase SQL editor. It creates invite codes, weigh-ins, realtime chat, progress photos, trainer videos, and accounts.</p>
-      <textarea id="setupSql" readonly style="min-height:140px;font-size:11px"></textarea>
-      <button class="sm" id="copySql" type="button" style="margin-top:6px">Copy SQL</button>
-    </details>
+  <div class="card" id="keysCard">
+    <h2>Clients</h2>
+    <p class="note">Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
   </div>
   <div class="card">
     <h2>Targets</h2>
@@ -1874,8 +1867,8 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <p>Videos are sent from a trainer account.</p>
   </div>
   <div class="card" id="videoDemoNote" hidden>
-    <h2>Demo mode</h2>
-    <p class="note">Demo mode · two tabs on this browser. Videos sync here the same way chat does. Add Supabase in Settings to reach another phone.</p>
+    <h2>How a client joins</h2>
+    <p class="note">Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
   </div>
   <div id="videoCoach" hidden>
     <div class="card" id="videoSend">
@@ -1902,7 +1895,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
   </div>
   <div class="card" id="videoClientWait" hidden>
     <h2>Videos</h2>
-    <p class="note">Enter the invite code from your trainer. In demo mode, create that code in another tab of this browser.</p>
+    <p class="note">Confirm your email, sign in on this phone, then open Join your trainer and enter the code your trainer copied.</p>
     <button class="full" id="videoJoinCoach" type="button">Open Coach to join</button>
   </div>
   <div class="card" id="videoListCard" hidden>
@@ -2161,8 +2154,8 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <button class="danger sm" id="callEnd" type="button">End</button>
   </div>
   <div id="callDemo" class="calldemo">
-    <div class="callbadge">Simulated call · Demo mode</div>
-    <p id="callDemoText">This is a practice call inside this browser. It is not a live Daily.co connection. The other tab can join the same simulated call.</p>
+    <div class="callbadge">Call</div>
+    <p id="callDemoText">This call stays on this phone.</p>
     <video id="callPreview" autoplay playsinline muted hidden></video>
     <button class="sm" id="callCam" type="button">Preview my camera</button>
     <div id="callTimer" class="note" style="margin-top:8px;color:#8A9A86"></div>
@@ -2967,11 +2960,8 @@ $("menuLogout").onclick = () => logOut();
 $("menuAction").onclick = () => {
   closeMenu();
   if(trainerHere()){
-    pairOpen = false;
-    go("coach");
-    const name = $("trName");
-    if(name && name.value.trim()) $("trCreate").click();
-    else if(name) name.focus();
+    go("overview");
+    overviewAddClient();
     return;
   }
   woView = "home";
@@ -5422,19 +5412,27 @@ function readKeys(){
     dailyApiKey: String(k.dailyApiKey||"").trim()
   };
 }
-function dataReady(){
+function typedDataReady(){
   const k = readKeys();
   try {
     const u = new URL(k.supabaseUrl);
-    return u.protocol==="https:" && !!u.hostname && k.supabaseAnonKey.length>20;
+    return u.protocol==="https:" && !!u.hostname && k.supabaseAnonKey.length>20 && k.supabaseAnonKey.indexOf("sb_secret_")!==0;
   } catch(e){ return false; }
+}
+function cloudKeys(){
+  const k = readKeys();
+  if(typedDataReady()) return {supabaseUrl:k.supabaseUrl, supabaseAnonKey:k.supabaseAnonKey, dailyApiKey:k.dailyApiKey};
+  return {supabaseUrl:AUTH_PROJECT_URL, supabaseAnonKey:AUTH_PUBLISHABLE_KEY, dailyApiKey:k.dailyApiKey};
+}
+function dataReady(){
+  return authKeyReady() || typedDataReady();
 }
 function videoReady(){ return readKeys().dailyApiKey.length>8; }
 function linkMode(){ return dataReady() ? "live" : "demo"; }
 function normalizeCode(raw){ return String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
 function updateDemoBanner(){
-  const show = currentTab!=="today" && (ID.role==="trainer" || ID.role==="client") && !dataReady();
-  $("demoBanner").hidden = !show;
+  const banner = $("demoBanner");
+  if(banner) banner.hidden = true;
 }
 function run(fn){
   Promise.resolve().then(fn).catch(e => toast(e && e.message ? e.message : "Something went wrong"));
@@ -5488,7 +5486,7 @@ function demoLoad(){
 }
 function demoSave(bus){
   const raw = JSON.stringify(bus);
-  if(raw.length>4500000) throw new Error("Demo storage is full on this browser. Remove a photo or switch to live mode.");
+  if(raw.length>4500000) throw new Error("This phone is full. Remove a photo and try again.");
   localStorage.setItem(DEMO_KEY, raw);
   if(demoChannel){ try { demoChannel.postMessage({type:"sync"}); } catch(e){} }
 }
@@ -5508,7 +5506,7 @@ function loadScript(src){
   return scriptLoads[src];
 }
 async function getSb(){
-  const k = readKeys();
+  const k = cloudKeys();
   const sig = k.supabaseUrl+"|"+k.supabaseAnonKey;
   if(sb && sbSig===sig) return sb;
   await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js");
@@ -5518,7 +5516,7 @@ async function getSb(){
   return sb;
 }
 async function sbFetch(path, options){
-  const k = readKeys();
+  const k = cloudKeys();
   const opt = options || {};
   const res = await fetch(k.supabaseUrl.replace(/\/$/,"")+"/rest/v1/"+path, {
     method: opt.method || "GET",
@@ -5536,7 +5534,9 @@ async function sbFetch(path, options){
   if(!res.ok){
     const msg = (data && (data.message || data.error_description || data.hint)) || ("Request failed ("+res.status+")");
     const err = new Error(typeof msg==="string" ? msg : "Request failed");
-    err.code = data && data.code;
+    const code = data && (data.code || data.error_code);
+    err.code = code || "";
+    if(res.status===404 || code==="PGRST205" || code==="42P01" || code==="PGRST202") err.code = "missing";
     throw err;
   }
   return data;
@@ -5561,11 +5561,11 @@ function mapPairRow(row, extras){
   };
 }
 function photoPublicUrl(path){
-  const base = readKeys().supabaseUrl.replace(/\/$/,"");
+  const base = cloudKeys().supabaseUrl.replace(/\/$/,"");
   return base+"/storage/v1/object/public/progress-photos/"+String(path).split("/").map(encodeURIComponent).join("/");
 }
 function videoPublicUrl(path){
-  const base = readKeys().supabaseUrl.replace(/\/$/,"");
+  const base = cloudKeys().supabaseUrl.replace(/\/$/,"");
   return base+"/storage/v1/object/public/coach-videos/"+String(path).split("/").map(encodeURIComponent).join("/");
 }
 function safeVideoUrl(url){
@@ -5698,13 +5698,18 @@ const Link = {
     if(linkMode()==="demo"){
       pairs = demoLoad().pairs.filter(p=>p.trainerDevice===ID.deviceId).map(demoCopy);
     } else {
-      const rows = await sbFetch("pairs?trainer_device=eq."+encodeURIComponent(ID.deviceId)+"&select=*&order=created_at.desc");
-      pairs = (rows||[]).map(r=>mapPairRow(r));
+      try {
+        const rows = await sbFetch("pairs?trainer_device=eq."+encodeURIComponent(ID.deviceId)+"&select=*&order=created_at.desc");
+        pairs = (rows||[]).map(r=>mapPairRow(r));
+      } catch(e){
+        if(!(e && e.code==="missing")) throw e;
+        pairs = demoLoad().pairs.filter(p=>p.trainerDevice===ID.deviceId).map(demoCopy);
+      }
     }
     return pairs.filter(p=>hidden.indexOf(p.id)<0);
   },
   async createClient(name){
-    if(linkMode()==="demo"){
+    const localPair = () => {
       const bus = demoLoad();
       const pair = {
         id:makeId(), inviteCode:makeCode(), clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
@@ -5714,7 +5719,8 @@ const Link = {
       bus.pairs.unshift(pair);
       demoSave(bus);
       return demoCopy(pair);
-    }
+    };
+    if(linkMode()==="demo") return localPair();
     let last = null;
     for(let i=0;i<5;i++){
       const row = {id:makeId(), invite_code:makeCode(), client_name:name, trainer_device:ID.deviceId};
@@ -5724,6 +5730,7 @@ const Link = {
         return mapPairRow(saved || row);
       } catch(e){
         last = e;
+        if(e && e.code==="missing") return localPair();
         if(String(e.code)!=="23505" && !/duplicate|unique/i.test(e.message||"")) throw e;
       }
     }
@@ -5751,7 +5758,7 @@ const Link = {
     if(linkMode()==="demo"){
       const bus = demoLoad();
       const pair = bus.pairs.find(p=>p.inviteCode===code);
-      if(!pair) throw new Error("That invite code was not found. In demo mode, create it in another tab of this browser.");
+      if(!pair) throw new Error("That invite code was not found. Ask your trainer for the code they copied.");
       pair.clientDevice = ID.deviceId;
       demoSave(bus);
       return demoCopy(pair);
@@ -5769,7 +5776,13 @@ const Link = {
       const pair = demoLoad().pairs.find(p=>p.id===id);
       return demoCopy(pair);
     }
-    const rows = await sbFetch("pairs?id=eq."+encodeURIComponent(id)+"&select=*");
+    let rows;
+    try { rows = await sbFetch("pairs?id=eq."+encodeURIComponent(id)+"&select=*"); }
+    catch(e){
+      if(!(e && e.code==="missing")) throw e;
+      const pair = demoLoad().pairs.find(p=>p.id===id);
+      return demoCopy(pair);
+    }
     const row = Array.isArray(rows) ? rows[0] : null;
     if(!row) return null;
     const q = encodeURIComponent(id);
@@ -5856,7 +5869,7 @@ const Link = {
     }
     const id = makeId();
     const path = pairId+"/"+id+".jpg";
-    const k = readKeys();
+    const k = cloudKeys();
     const res = await fetch(k.supabaseUrl.replace(/\/$/,"")+"/storage/v1/object/progress-photos/"+path, {
       method:"POST",
       headers:{
@@ -5912,7 +5925,7 @@ const Link = {
       assertVideoFile(file);
       const ext = String((file.name||"mp4").split(".").pop()||"mp4").replace(/[^a-zA-Z0-9]/g,"").slice(0,8) || "mp4";
       const path = pairId+"/"+id+"."+ext;
-      const k = readKeys();
+      const k = cloudKeys();
       const res = await fetch(k.supabaseUrl.replace(/\/$/,"")+"/storage/v1/object/coach-videos/"+path, {
         method:"POST",
         headers:{
@@ -6016,22 +6029,22 @@ function paintCallStatus(pair){
   if(linkMode()==="demo"){
     const on = !!(pair.call && pair.call.active);
     $("pairCallNote").textContent = on
-      ? "A simulated call is on. It stays in this browser and is labeled demo."
-      : "Demo mode uses a simulated call so two tabs can practice without Daily.";
+      ? "A call is open on this phone."
+      : "This call stays on this phone.";
     $("pairCall").disabled = ID.role==="client" && !on;
     $("pairCall").textContent = ID.role==="trainer"
-      ? (on ? "Rejoin simulated call" : "Start simulated call")
-      : (on ? "Join simulated call" : "Waiting for trainer");
+      ? (on ? "Rejoin call" : "Start call")
+      : (on ? "Join call" : "Waiting for trainer");
     return;
   }
   $("pairCall").disabled = false;
   if(pair.dailyRoomUrl){
-    $("pairCallNote").textContent = "A Daily.co room is ready for this trainer and client.";
+    $("pairCallNote").textContent = "A video room is ready for this trainer and client.";
     $("pairCall").textContent = ID.role==="trainer" ? "Rejoin live video call" : "Join video call";
   } else if(ID.role==="trainer"){
     $("pairCallNote").textContent = videoReady()
-      ? "Starts one Daily.co room for you and this client."
-      : "Add your Daily API key in Settings to start a live call.";
+      ? "Starts one video room for you and this client."
+      : "A live video call is not open on this phone yet.";
     $("pairCall").textContent = "Start live video call";
   } else {
     $("pairCallNote").textContent = "Join after your trainer starts the call.";
@@ -6649,14 +6662,34 @@ function openOverviewClient(id){
 }
 function overviewAddClient(){
   if(!signedInTrainer()) return;
-  clientFileMode = false;
+  if(currentTab!=="overview") go("overview");
+  const form = $("ovAddForm");
+  if(!form) return;
+  form.hidden = false;
+  const input = $("ovClientName");
+  if(input){
+    input.focus();
+    input.scrollIntoView({block:"center"});
+  }
+}
+async function finishNewClient(name){
+  const clean = String(name||"").trim().slice(0,40);
+  if(!clean) throw new Error("Enter a client name");
+  if(!signedInTrainer()) throw new Error("Sign in as a trainer to add a client.");
+  const pair = await Link.createClient(clean);
+  ID.activePairId = pair.id;
+  pairOpen = true;
+  clientFileMode = true;
+  clientFileSection = "summary";
   cfEditing = false;
-  pairOpen = false;
-  ID.activePairId = "";
   persistIdentity();
+  let inviteError = "";
+  try { await publishInvite(pair.inviteCode); }
+  catch(e){ inviteError = e && e.message ? e.message : "Could not save the invite"; }
   go("coach");
-  const name = $("trName");
-  if(name) name.focus();
+  if(inviteError) toast(inviteError+" Invite code "+pair.inviteCode+".");
+  else toast("Invite code "+pair.inviteCode);
+  return pair;
 }
 function trainerFileOpen(){
   return trainerHere() && showingPair() && clientFileMode;
@@ -6864,34 +6897,19 @@ function renderCoach(){
   $("pairPanel").style.display = (showingPair() && !file) ? "" : "none";
   $("pairBack").style.display = trainerHere() ? "" : "none";
   if($("pairFile")) $("pairFile").hidden = !trainerHere();
-  $("demoAsTrainer").hidden = !trainerHere();
   $("pairWeighForm").style.display = ID.role==="client" ? "" : "none";
   $("pairPhotoForm").style.display = ID.role==="client" ? "" : "none";
   if(ID.role==="client" && $("cwDate") && !$("cwDate").value) $("cwDate").value = todayStr();
   if(typeof refreshClientLogs==="function") refreshClientLogs();
 }
 function fillConnectionSettings(){
-  const k = readKeys();
-  const live = dataReady();
-  $("keysHeading").textContent = live ? "Connection" : "Setup";
-  if(!live){
-    $("keysIntro").textContent = "Demo mode stays on until these are saved. On each phone, fill in Supabase project URL, Supabase anon key, and Daily API key. Run the SQL once in Supabase.";
-  } else if(!videoReady()){
-    $("keysIntro").textContent = "Supabase is connected for invite codes, chat, weigh-ins, photos, and videos. Add the Daily API key on the trainer phone to start a live video call.";
-  } else {
-    $("keysIntro").textContent = "Live mode is on. These keys stay on this phone and are not part of the page.";
-  }
-  if(document.activeElement!==$("keyUrl")) $("keyUrl").value = k.supabaseUrl;
-  if(document.activeElement!==$("keyAnon")) $("keyAnon").value = k.supabaseAnonKey;
-  if(document.activeElement!==$("keyDaily")) $("keyDaily").value = k.dailyApiKey;
   document.querySelectorAll("#modePicks [data-mode]").forEach(btn=>{
     btn.classList.toggle("sel", btn.dataset.mode===ID.role);
   });
-  $("modeNote").textContent = ID.role==="trainer" ? "This phone can create clients and review their check-ins."
-    : ID.role==="client" ? "This phone can join with an invite code and check in with your trainer."
+  $("modeNote").textContent = ID.role==="trainer" ? "Add a client and copy the invite code. They confirm their email, sign in on their own phone, open Join your trainer, and enter that code."
+    : ID.role==="client" ? "Confirm your email, open Join your trainer, and enter the code your trainer copied."
     : ID.role==="solo" ? "Personal tracker only. Coaching stays off until you switch mode."
     : "Choose a mode to continue.";
-  if(!$("setupSql").value) $("setupSql").value = SETUP_SQL;
 }
 function setRole(role){
   if(role!=="trainer" && role!=="client" && role!=="solo") return;
@@ -6951,7 +6969,7 @@ function showSimCall(){
   $("callLive").hidden = true;
   $("callDemo").hidden = false;
   $("callLayer").hidden = false;
-  $("callTitle").textContent = "Simulated call · Demo mode";
+  $("callTitle").textContent = "Call";
   simStarted = Date.now();
   if(tickTimer) clearInterval(tickTimer);
   const tick = ()=>{
@@ -6999,58 +7017,52 @@ window.addEventListener("storage", (e)=>{ if(e.key===DEMO_KEY) scheduleRefresh()
 $("pickTrainer").onclick = () => setRole("trainer");
 $("pickClient").onclick = () => setRole("client");
 $("pickSolo").onclick = () => setRole("solo");
-$("demoAsTrainer").onclick = () => setRole("trainer");
-$("demoAsClient").onclick = () => setRole("client");
-$("coachOpenSettings").onclick = () => go("settings");
 $("soloSettings").onclick = () => go("settings");
 document.querySelectorAll("#modePicks [data-mode]").forEach(btn=>{ btn.onclick = () => setRole(btn.dataset.mode); });
-$("keysSave").onclick = () => {
-  localStorage.setItem(KEYS_KEY, JSON.stringify({
-    supabaseUrl:$("keyUrl").value.trim(),
-    supabaseAnonKey:$("keyAnon").value.trim(),
-    dailyApiKey:$("keyDaily").value.trim()
-  }));
-  if(liveChannel && sb){ try { sb.removeChannel(liveChannel); } catch(e){} }
-  liveChannel = null; livePairId = ""; sb = null; sbSig = "";
-  updateDemoBanner();
-  if(currentTab==="settings" || currentTab==="coach") render();
-  if(dataReady()) toast(videoReady() ? "Live mode on" : "Supabase saved. Add the Daily API key for video.");
-  else toast("Saved. Demo mode stays on until the Supabase fields are set.");
-};
-$("copySql").onclick = () => {
-  const text = $("setupSql").value;
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>toast("SQL copied"), ()=>toast("Select the SQL and copy it"));
-  } else toast("Select the SQL and copy it");
-};
 $("trCreate").onclick = () => run(async ()=>{
-  const name = $("trName").value.trim();
-  if(!name) throw new Error("Enter a client name");
-  const pair = await Link.createClient(name.slice(0,40));
+  await finishNewClient($("trName").value);
   $("trName").value = "";
-  ID.activePairId = pair.id;
-  pairOpen = true;
-  clientFileMode = true;
-  clientFileSection = "summary";
-  cfEditing = false;
-  persistIdentity();
-  toast("Invite code ready");
-  renderCoach();
-  await refreshCoachData();
-  try { await publishInvite(pair.inviteCode); }
-  catch(e){ if(e && e.code==="missing") toast("Invite stays on this phone until the shared tables are created"); }
 });
+$("ovAddCancel").onclick = () => {
+  $("ovAddForm").hidden = true;
+};
+$("ovAddForm").onsubmit = (e) => {
+  e.preventDefault();
+  run(async ()=>{
+    const input = $("ovClientName");
+    await finishNewClient(input.value);
+    input.value = "";
+    $("ovAddForm").hidden = true;
+  });
+};
 $("clJoinBtn").onclick = () => run(async ()=>{
-  const pair = await Link.joinWithCode($("clCode").value);
+  const code = normalizeCode($("clCode").value);
+  if(code.length<4) throw new Error("Enter the invite code");
+  let pair = null;
+  try { pair = await Link.joinWithCode(code); }
+  catch(e){ pair = null; }
+  const trainerId = await joinTrainerCloud(code);
+  if(!pair){
+    let trainerName = "";
+    try {
+      const rows = await sbAuth("profiles?id=eq."+encodeURIComponent(trainerId)+"&select=name");
+      trainerName = rows && rows[0] && rows[0].name ? String(rows[0].name) : "";
+    } catch(e){}
+    const bus = demoLoad();
+    pair = {
+      id:makeId(), inviteCode:code, clientName:trainerName, trainerDevice:"", clientDevice:ID.deviceId,
+      dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[], checkins:[],
+      call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
+    };
+    bus.pairs.unshift(pair);
+    demoSave(bus);
+  }
   ID.activePairId = pair.id;
   persistIdentity();
   $("clCode").value = "";
   toast("Joined "+(pair.clientName||"your trainer"));
   renderCoach();
   await refreshCoachData();
-  const joinedCode = pair.inviteCode || "";
-  try { await joinTrainerCloud(joinedCode); }
-  catch(e){ if(e && e.code==="missing") toast("Joined on this phone. Shared tables are not created yet"); }
 });
 function closeClientPage(){
   clientFileMode = false;
@@ -7322,17 +7334,17 @@ $("pairCall").onclick = () => run(async ()=>{
   let url = pair.dailyRoomUrl;
   if(!url){
     if(ID.role!=="trainer") throw new Error("Your trainer hasn't started the call yet");
-    if(!videoReady()) throw new Error("Add your Daily API key in Settings to start a live call");
+    if(!videoReady()) throw new Error("A live video call is not open on this phone yet");
     url = await Link.ensureDailyRoom(pair);
   }
   await showLiveCall(url);
 });
 $("callEnd").onclick = () => hideCall(true);
 $("callCam").onclick = () => run(async ()=>{
-  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("Camera unavailable — the simulated call still works");
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("The camera is not available on this phone");
   stopCamera();
   try { camStream = await navigator.mediaDevices.getUserMedia({video:true, audio:false}); }
-  catch(e){ throw new Error("Camera unavailable — the simulated call still works"); }
+  catch(e){ throw new Error("The camera is not available on this phone"); }
   const v = $("callPreview");
   v.hidden = false;
   v.srcObject = camStream;
@@ -7916,7 +7928,7 @@ async function paintTrainerCheckins(){
   const pairs = await Link.pairsForTrainer();
   if(!pairs.length){
     $("checkinNote").textContent = "Client answers show up here.";
-    $("checkinBody").innerHTML = '<div class="card"><p>No clients yet. Create an invite code in Coach. A client who opens the shared link can fill in this check-in.</p></div>';
+    $("checkinBody").innerHTML = '<div class="card"><p>No clients yet. Add a client and copy the invite code. They confirm their email, sign in on their own phone, open Join your trainer, and enter that code.</p></div>';
     return;
   }
   if(!checkinPairId || !pairs.some(p=>p.id===checkinPairId)) checkinPairId = pairs[0].id;
@@ -9024,7 +9036,7 @@ async function readBrowserHeart(){
   }
 }
 function devicesHtml(y){
-  const cloud = dataReady() ? "Shared keys are saved, so this account can sign in on another phone." : "No shared keys are saved, so another phone cannot see this data.";
+  const cloud = "Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.";
   const rows = y.devices.map(d=>{
     const picks = [d.steps?"Steps":"", d.heart?"Heart rate":""].filter(Boolean).join(" and ");
     return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+(picks?esc(picks)+" chosen":"Saved")+'</div><p data-devid="'+esc(d.id)+'">'+esc(deviceStatus(d))+'</p></div><button type="button" class="x" data-youdel="devices" data-id="'+esc(d.id)+'" aria-label="Remove">×</button></li>';
@@ -9279,12 +9291,12 @@ function youHtml(view){
     return '<p class="themelabel">Select Theme</p>'+row("system","System Default")+row("light","Light Theme")+row("dark","Dark Theme")+'<p class="note">Until you pick a theme, this phone uses Light Theme. System Default follows this phone’s light or dark setting. The login screen stays linen either way.</p>';
   }
   if(view==="privacy"){
-    const cloud = dataReady() ? "Shared keys are saved, so an account can sign in on another phone." : "Nothing is sent to another phone unless shared keys are saved in Settings.";
+    const cloud = "Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.";
     return '<div class="card"><p>Meals, workouts, weight, photos, and the notes in this menu are stored on this phone.</p><p>The theme you pick is stored on this phone.</p><p>'+esc(cloud)+'</p></div>';
   }
   if(view==="help") return '<div class="card"><p>Log a meal from Meals. Calories and macros are saved only when the food already has them.</p><p>Workouts are on Workout Routines in this menu.</p><p>Weight and tape measurements are under Weight &amp; Measurements.</p><p>This menu is the profile button after you are signed in. It is not on the login screen.</p></div>';
   if(view==="sync"){
-    const cloud = dataReady() ? "Shared keys are saved, so this account can sign in on another phone." : "Another phone cannot see this log until shared keys are saved.";
+    const cloud = "Confirm your email first. The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.";
     return '<div class="card"><p id="youSyncLine">'+esc(lastSaveText())+'</p><p class="note">This is the last time this phone saved your log. It is not a cloud sync.</p><p>'+esc(cloud)+'</p><button type="button" class="primary full" data-syncnow>Save now</button></div>';
   }
   return '<div class="card"><p>Open a row from the menu.</p></div>';
@@ -9550,9 +9562,7 @@ function restoreRememberedSession(){
 }
 function emailOk(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
 function accountNote(){
-  return dataReady()
-    ? "Supabase is connected. This email can log in on another phone."
-    : "This account stays on this phone until the shared keys are saved.";
+  return "A confirmation email is required. You can sign in after you confirm.";
 }
 async function passHash(pw){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pw));
@@ -9943,21 +9953,26 @@ async function pullPrivateLog(){
   }
 }
 async function publishInvite(code){
+  const clean = String(code||"").toUpperCase();
+  if(!clean) throw new Error("No invite code to save");
   const session = await authSession();
-  if(!session || !code) return;
+  if(!session) throw new Error("Sign in after confirming your email.");
   const account = accountForAuth(currentAuth());
-  if(!account || account.role!=="trainer") return;
+  if(!account || account.role!=="trainer") throw new Error("Sign in as a trainer to add a client.");
   await sbAuth("invites?on_conflict=code", {
     method: "POST",
     prefer: "resolution=merge-duplicates,return=minimal",
-    body: { code: String(code).toUpperCase(), trainer_id: session.user.id }
+    body: { code: clean, trainer_id: session.user.id }
   });
 }
 async function joinTrainerCloud(code){
+  const clean = String(code||"").toUpperCase();
+  if(!clean) throw new Error("Enter the invite code");
   const session = await authSession();
-  if(!session || !code) return;
-  await sbAuth("rpc/cgf_join_trainer", { method: "POST", body: { invite_code: String(code).toUpperCase() } });
+  if(!session) throw new Error("Sign in after confirming your email.");
+  const trainerId = await sbAuth("rpc/cgf_join_trainer", { method: "POST", body: { invite_code: clean } });
   await pushPrivateLog();
+  return trainerId;
 }
 async function loadClientLogs(){
   const account = accountForAuth(currentAuth());
@@ -9976,7 +9991,7 @@ function paintClientLogs(rows, missing){
   if(!trainer) return;
   const body = $("clientLogBody");
   if(missing){
-    body.innerHTML = '<p class="note">Shared tables are not in this Supabase project yet. Run the setup SQL once in the SQL editor.</p>';
+    body.innerHTML = '<p class="note">Client logs are not on this phone yet.</p>';
     return;
   }
   if(!rows.length){
@@ -10143,7 +10158,7 @@ async function logInAccount(email, password, remember, side){
     else if(e && e.code==="auth") throw new Error(e.message || "Could not sign in");
   }
   let account = null;
-  if(dataReady()){
+  if(typedDataReady()){
     const rows = await sbFetch("accounts?email=eq."+encodeURIComponent(email)+"&select=*");
     const list = Array.isArray(rows) ? rows : [];
     const row = list.find(r => r.role===side);
@@ -10164,9 +10179,9 @@ async function logInAccount(email, password, remember, side){
     if(!account){
       const other = localOther();
       if(other) throw new Error(otherMessage(other.role));
-      throw new Error(authMiss || dataReady() ? "That email or password does not match." : "That email or password does not match an account on this phone.");
+      throw new Error(authMiss || typedDataReady() ? "That email or password does not match." : "That email or password does not match an account on this phone.");
     }
-    if(dataReady()){
+    if(typedDataReady()){
       try {
         const rows = await sbFetch("accounts?email=eq."+encodeURIComponent(email)+"&select=id,role");
         const list = Array.isArray(rows) ? rows : [];
@@ -10286,7 +10301,7 @@ async function setStoredPassword(email, password, side){
   }
   account.passHash = await passHash(password);
   saveAccounts(accounts);
-  if(dataReady()){
+  if(typedDataReady()){
     try { await sbFetch("accounts?email=eq."+encodeURIComponent(email)+"&role=eq."+encodeURIComponent(side), {method:"PATCH", body:{pass_hash:account.passHash}}); }
     catch(e){}
   }
@@ -10381,7 +10396,7 @@ if(!clientPhone){
   persistIdentity();
 }
 const linkNote = $("clientLinkNote");
-if(linkNote) linkNote.textContent = "Clients sign up or log in from the shared link: " + location.origin + location.pathname + "?join";
+if(linkNote) linkNote.textContent = "Add a client and copy the invite code. They confirm their email, sign in on their own phone, open Join your trainer, and enter that code.";
 applyClientLock();
 document.addEventListener("visibilitychange", () => {
   if(document.hidden) markAway();
