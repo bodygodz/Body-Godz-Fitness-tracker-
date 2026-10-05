@@ -890,6 +890,20 @@ body.theme-dark:not(.welcome-on) .devpick{color:#0B0B39}
 #scanResult{margin-top:12px}
 #scanFoodName{font-weight:800;color:#0B0B39;margin:0 0 4px}
 #scanScaled{font-weight:700;color:#0B0B39;margin:8px 0}
+.wobuild h2{margin:0 0 8px;color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.02em}
+.wobuild .wolead{margin:0 0 16px;color:#0B0B39;font-size:15px;line-height:1.45}
+.wocards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px}
+.wocard{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;background:#E4E2EB;color:#0B0B39;border:1.5px solid #E4E2EB;border-radius:16px;padding:12px;min-height:128px;font-weight:500}
+.wocard b{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:16px;line-height:1.2;font-weight:700}
+.wocard span{font-size:12px;line-height:1.35;font-weight:500}
+.wocard.sel{border-color:#563DD2}
+.worow{background:#E4E2EB;border-radius:16px;padding:12px;margin:0 0 14px}
+.woclients{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.woactions{display:flex;flex-direction:column;gap:8px}
+.wodraft{margin-top:12px}
+.wodraft .wotitle{margin:0 0 6px;color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:22px;line-height:1.15;font-weight:700}
+.wodraft li{padding:8px 0;border-bottom:1px solid rgba(11,11,57,.12);color:#0B0B39;list-style:none}
+.wodraft ul{margin:0;padding:0}
 button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcome-dock button.primary,.gatebox button.primary,.setupcard button.primary,.toolplus,.tabplus,.foodplus,.eventfilters button.sel,.calgrid button.sel,.subbar button.sel,.csteps button.sel,.yesno button.sel,#clientFile .cfcount,#page-overview .ovadd,#page-overview .ovmark,.ps-btn{color:#fff}
 #page-overview .ovadd svg,#page-overview .ovmark svg{stroke:#fff}
 
@@ -1442,6 +1456,24 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
 
 <!-- ============ WORKOUT ============ -->
 <section class="page" id="page-workout">
+  <div id="woBuild" class="wobuild" style="display:none">
+    <h2>Put a session together.</h2>
+    <p class="wolead">Start from moves already in the library. Draft them here, or build the workout by hand.</p>
+    <div class="wocards" id="woIdeas">
+      <button type="button" class="wocard" data-woidea="upper"><b>Upper body</b><span>Chest, back, shoulders, and arms from the library.</span></button>
+      <button type="button" class="wocard" data-woidea="cardio"><b>Cardio</b><span>The cardio moves already saved in the library.</span></button>
+      <button type="button" class="wocard" data-woidea="body"><b>Bodyweight</b><span>Moves that do not name a machine, dumbbell, barbell, cable, or kettlebell.</span></button>
+    </div>
+    <div class="worow">
+      <div class="field"><label class="f" for="woPlanName">Workout name</label><input id="woPlanName" maxlength="60" placeholder="Name this workout"></div>
+      <div id="woClients" class="woclients"></div>
+    </div>
+    <div class="woactions">
+      <button type="button" class="primary full" id="woDraftBtn">Draft from the library</button>
+      <button type="button" class="full" id="woHandBtn">Build by hand</button>
+    </div>
+    <div class="card wodraft" id="woDraft" hidden></div>
+  </div>
   <div id="woHome">
     <div class="toolbar">
       <button class="sm" id="btnLibrary">Exercise library</button>
@@ -2068,7 +2100,7 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
     <button type="button" class="yourow" data-you="fasting"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg><span class="grow"><b>Intermittent Fasting</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 4a8 8 0 1 0 4 12 7 7 0 0 1-4-12z"/></svg><span class="grow"><b>Sleep</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="recipes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10a2 2 0 0 1 2 2v14H8a2 2 0 0 1-2-2z"/><path d="M6 4v14"/></svg><span class="grow"><b>Recipe Discovery</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6M8 7v10M16 7v10M20 9v6M8 12h8"/></svg><span class="grow"><b>Workout Routines</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="workouts"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6M8 7v10M16 7v10M20 9v6M8 12h8"/></svg><span class="grow"><b>This week's plan</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="goals"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg><span class="grow"><b>Goals</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="weight"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V10M12 19V5M19 19v-7"/></svg><span class="grow"><b>Weight &amp; Measurements</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="report"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow"><b>My Weekly Report</b></span><span class="chev" aria-hidden="true">›</span></button>
@@ -2114,6 +2146,7 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
   <button type="button" class="navitem" data-tab="today">Today</button>
   <button type="button" class="navitem" data-tab="meals">Meals</button>
   <button type="button" class="navitem" data-tab="workout">Workout</button>
+  <button type="button" class="navitem" id="menuWeekPlan" hidden>This week's plan</button>
   <button type="button" class="navitem" data-tab="events">Events</button>
   <button type="button" class="navitem" data-tab="calendar">Calendar</button>
   <div class="navsplit">
@@ -2964,6 +2997,7 @@ function syncMenu(){
   document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
     const lib = b.dataset.lib;
     let on = b.dataset.tab===currentTab;
+    if(b.dataset.tab==="workout" && signedInTrainer() && woView==="home") on = false;
     if(lib) on = currentTab==="library" && (lib==="home" ? libSection==="home" : lib===libSection);
     b.classList.toggle("active", on);
   });
@@ -3002,6 +3036,11 @@ function syncMenu(){
   }
   const syncWhen = $("youSyncWhen");
   if(syncWhen) syncWhen.textContent = lastSaveText();
+  const weekPlan = $("menuWeekPlan");
+  if(weekPlan){
+    weekPlan.hidden = !signedInTrainer();
+    weekPlan.classList.toggle("active", signedInTrainer() && currentTab==="workout" && woView==="home");
+  }
   const askBtn = document.querySelector('#tabbar [data-tabgo="ask"]');
   const trainerAsk = signedInTrainer();
   const overviewBtn = document.querySelector('#tabbar [data-tabgo="overview"]');
@@ -3046,7 +3085,14 @@ $("menuEdit").onclick = () => {
   $("menuEdit").setAttribute("aria-expanded", open ? "true" : "false");
   if(open) paintMyPage();
 };
+$("menuWeekPlan").onclick = () => {
+  editorDraft = null;
+  woView = "home";
+  closeMenu();
+  go("workout");
+};
 document.querySelectorAll("#navMenu [data-tab]").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.tab==="workout" && signedInTrainer()) woView = "build";
   if(b.dataset.tab==="library"){
     const lib = b.dataset.lib || "home";
     libSection = lib==="cookbook" || lib==="exercises" ? lib : "home";
@@ -3854,7 +3900,11 @@ document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>b.onclick=()=>{
   if(g==="overview") go("overview");
   else if(g==="today") go("today");
   else if(g==="meals") go("meals");
-  else if(g==="plan") go(tabGroup(currentTab)==="plan"?currentTab:"workout");
+  else if(g==="plan"){
+    const staying = tabGroup(currentTab)==="plan";
+    if(!staying && signedInTrainer() && woView!=="editor") woView = "build";
+    go(staying ? currentTab : "workout");
+  }
   else if(g==="progress"){
     const stay = tabGroup(currentTab)==="progress" && clientAllows(currentTab);
     go(stay ? currentTab : "checkin");
@@ -4278,7 +4328,12 @@ $("mCopyToBtn").onclick = () => {
 
 /* ---------- Workout ---------- */
 let woDate = todayStr();
-let woView = "home"; // home | editor
+let woView = "home"; // home | build | editor
+let woIdea = "";
+let woClientId = "";
+let woDraftMoves = [];
+let editorFrom = "home";
+let woClientToken = 0;
 let libSection = "home"; // home | exercises | cookbook
 let cookView = "list"; // list | detail | edit
 let cookCat = "all";
@@ -4487,13 +4542,18 @@ function patchEx(bucket, id, patch){
 }
 function showWoViews(){
   const editor=woView==="editor";
-  $("woHome").style.display = editor?"none":"";
+  const build=signedInTrainer() && woView==="build" && !editor;
+  $("woBuild").style.display = build?"":"none";
+  $("woHome").style.display = (!editor && !build)?"":"none";
   $("woEditor").style.display = editor?"":"none";
 }
 function renderWorkout(){
   if(woView==="library") woView="home";
+  if(woView==="build" && !signedInTrainer()) woView="home";
+  if(!signedInTrainer() && $("woClients")){ $("woClients").hidden = true; $("woClients").innerHTML = ""; woClientId = ""; woClientName = ""; }
   showWoViews();
   if(woView==="editor") renderEditor();
+  else if(signedInTrainer() && woView==="build") renderWoBuild();
   else renderWorkoutHome();
 }
 function renderWorkoutHome(){
@@ -4616,6 +4676,7 @@ function renderEditor(){
   $("edDelete").style.display = editorDraft.isNew ? "none" : "";
 }
 function openEditor(existing){
+  editorFrom = (woView==="build" || woView==="editor") && signedInTrainer() ? "build" : "home";
   if(existing){
     editorDraft=JSON.parse(JSON.stringify(existing));
     editorDraft.isNew=false;
@@ -4626,6 +4687,10 @@ function openEditor(existing){
   woView="editor";
   render();
   window.scrollTo(0,0);
+}
+function leaveEditor(){
+  editorDraft=null;
+  woView = editorFrom==="build" && signedInTrainer() ? "build" : "home";
 }
 function saveEditor(){
   syncEditorFromDom();
@@ -4642,7 +4707,7 @@ function saveEditor(){
   if(i>=0) S.customWorkouts[i]=wo; else S.customWorkouts.push(wo);
   save();
   editorDraft=null;
-  woView="home";
+  woView = editorFrom==="build" && signedInTrainer() ? "build" : "home";
   toast("Workout saved");
   render();
 }
@@ -4653,7 +4718,7 @@ function deleteCustom(id){
   S.customWorkouts=S.customWorkouts.filter(w=>w.id!==id);
   Object.keys(S.customLogs||{}).forEach(date=>{ if(S.customLogs[date]) delete S.customLogs[date][id]; });
   save();
-  if(editorDraft && editorDraft.id===id){ editorDraft=null; woView="home"; }
+  if(editorDraft && editorDraft.id===id) leaveEditor();
   toast("Workout deleted");
   render();
 }
@@ -4769,10 +4834,12 @@ $("planShort").onchange = () => {
   ensurePlan()[parseYmd(woDate).getDay()].short=v;
   save(); render();
 };
-$("btnLibrary").onclick = () => { returnView="workout"; libSection="exercises"; go("library"); };
+$("btnLibrary").onclick = () => { returnView = woView==="home" ? "plan" : "workout"; libSection="exercises"; go("library"); };
 $("libBack").onclick = () => {
   if(returnView==="editor" && editorDraft){ woView="editor"; go("workout"); return; }
-  if(returnView==="workout"){ woView="home"; go("workout"); return; }
+  if(returnView==="plan"){ woView="home"; go("workout"); return; }
+  if(returnView==="build" && signedInTrainer()){ woView="build"; go("workout"); return; }
+  if(returnView==="workout"){ woView = signedInTrainer() ? "build" : "home"; go("workout"); return; }
   libSection="home";
   if(currentTab!=="library") go("library"); else { render(); window.scrollTo(0,0); }
 };
@@ -4803,7 +4870,7 @@ $("libAdd").onclick = () => {
   render();
   toast("Added to library");
 };
-$("edCancel").onclick = () => { editorDraft=null; woView="home"; render(); };
+$("edCancel").onclick = () => { leaveEditor(); render(); };
 $("edSave").onclick = () => saveEditor();
 $("edAdd").onclick = () => { syncEditorFromDom(); openPicker("editor"); };
 $("edDelete").onclick = () => { if(editorDraft) deleteCustom(editorDraft.id); };
@@ -4886,6 +4953,121 @@ $("page-workout").addEventListener("click", e=>{
     renderEditor(); return;
   }
 });
+
+const WO_IDEA_NAMES = {upper:"Upper body", cardio:"Cardio", body:"Bodyweight"};
+let woClientName = "";
+function libraryMoves(idea){
+  const list = allExercises();
+  const seen = {};
+  const out = [];
+  function add(e){
+    if(!e || out.length>=6) return;
+    const key = String(e.name||"").toLowerCase();
+    if(!key || seen[key]) return;
+    seen[key] = 1;
+    out.push(e.name);
+  }
+  if(idea==="upper") ["chest","back","shoulders","arms"].forEach(group=>list.filter(e=>e.group===group).slice(0,2).forEach(add));
+  else if(idea==="cardio") list.filter(e=>e.group==="cardio").forEach(add);
+  else if(idea==="body") list.filter(e=>askGear(e.name)==="body").forEach(add);
+  return out.slice(0,6);
+}
+function renderWoBuild(){
+  $("hdrTitle").textContent = "Workout";
+  $("hdrSub").textContent = "From the library";
+  document.querySelectorAll("[data-woidea]").forEach(b=>b.classList.toggle("sel", b.dataset.woidea===woIdea));
+  const draft = $("woDraft");
+  if(!woDraftMoves.length){
+    draft.hidden = true;
+    draft.innerHTML = "";
+  } else {
+    const name = ($("woPlanName").value||"").trim() || "Library draft";
+    const forWhom = woClientName ? '<p class="note">For '+esc(woClientName)+'.</p>' : "";
+    draft.hidden = false;
+    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">Taken from the exercise library on this phone. Sets stay blank because the library does not store a set count.</p><ul>'+woDraftMoves.map(n=>'<li><b>'+esc(n)+'</b><div class="note">Sets not set</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
+    $("woDraftEdit").onclick = () => useDraftInEditor();
+  }
+  paintWoClients();
+}
+async function paintWoClients(){
+  const box = $("woClients");
+  if(!box) return;
+  if(!signedInTrainer()){
+    box.hidden = true;
+    box.innerHTML = "";
+    woClientId = "";
+    woClientName = "";
+    return;
+  }
+  box.hidden = false;
+  const token = ++woClientToken;
+  let pairs = [];
+  try { pairs = await Link.pairsForTrainer(); }
+  catch(e){ pairs = []; }
+  if(token!==woClientToken || woView!=="build" || !signedInTrainer()) return;
+  if(!pairs.length){
+    woClientId = "";
+    woClientName = "";
+    box.innerHTML = '<p class="note">No clients yet.</p>';
+    return;
+  }
+  if(woClientId && !pairs.some(p=>p.id===woClientId)){ woClientId=""; woClientName=""; }
+  box.innerHTML = pairs.map(p=>'<button type="button" class="chip'+(p.id===woClientId?" sel":"")+'" data-woclient="'+esc(p.id)+'">'+esc(p.clientName||"Client")+'</button>').join("");
+  box.querySelectorAll("[data-woclient]").forEach(b=>b.onclick=()=>{
+    const id = b.dataset.woclient;
+    if(woClientId===id){ woClientId=""; woClientName=""; }
+    else {
+      woClientId = id;
+      const pair = pairs.find(p=>p.id===id);
+      woClientName = pair ? (pair.clientName||"Client") : "";
+    }
+    renderWoBuild();
+  });
+}
+async function draftFromLibrary(){
+  if(!signedInTrainer()) return;
+  const name = $("woPlanName").value.trim();
+  if(!woIdea && !name){ toast("Name the workout or pick a suggestion"); return; }
+  let moves = [];
+  if(woIdea) moves = libraryMoves(woIdea);
+  else {
+    const answer = await buildAskAnswer(name+" workout");
+    const idea = answer && answer.draft && answer.draft.ideas && answer.draft.ideas[0];
+    const day = idea && (idea.days||[]).find(d=>d.exercises && d.exercises.length);
+    moves = day ? day.exercises.map(ex=>ex.name) : [];
+  }
+  const known = {};
+  allExercises().forEach(e=>{ known[e.name.toLowerCase()] = e.name; });
+  moves = moves.map(n=>known[String(n).toLowerCase()]).filter(Boolean);
+  if(!moves.length){ woDraftMoves = []; renderWoBuild(); toast("No library exercise matched"); return; }
+  woDraftMoves = moves.slice(0,6);
+  renderWoBuild();
+}
+function buildByHand(){
+  if(!signedInTrainer()) return;
+  const name = $("woPlanName").value.trim();
+  openEditor(null);
+  if(editorDraft && name) editorDraft.name = name;
+  render();
+}
+function useDraftInEditor(){
+  if(!signedInTrainer() || !woDraftMoves.length) return;
+  const name = $("woPlanName").value.trim();
+  openEditor(null);
+  if(!editorDraft) return;
+  if(name) editorDraft.name = name;
+  editorDraft.exercises = woDraftMoves.map(n=>({id:uid(), name:n, target:"", kind:"reps"}));
+  render();
+}
+document.querySelectorAll("[data-woidea]").forEach(b=>b.onclick=()=>{
+  woIdea = b.dataset.woidea;
+  const input = $("woPlanName");
+  if(input && !input.value.trim()) input.value = WO_IDEA_NAMES[woIdea] || "";
+  woDraftMoves = [];
+  renderWoBuild();
+});
+$("woDraftBtn").onclick = () => run(()=>draftFromLibrary());
+$("woHandBtn").onclick = () => buildByHand();
 
 /* ---------- Weight ---------- */
 let chart=null;
@@ -9457,7 +9639,7 @@ function youHtml(view){
     const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
     return '<div class="card"><p>Meals, workouts, weight, photos, and the notes in this menu are stored on this phone.</p><p>The theme you pick is stored on this phone.</p><p>'+esc(cloud)+'</p></div>';
   }
-  if(view==="help") return '<div class="card"><p>Log a meal from Meals. Calories and macros are saved only when the food already has them.</p><p>Workouts are on Workout Routines in this menu.</p><p>Weight and tape measurements are under Weight &amp; Measurements.</p><p>This menu is the profile button after you are signed in. It is not on the login screen.</p></div>';
+  if(view==="help") return '<div class="card"><p>Log a meal from Meals. Calories and macros are saved only when the food already has them.</p><p>The weekly plan is under This week\'s plan in this menu.</p><p>Weight and tape measurements are under Weight &amp; Measurements.</p><p>This menu is the profile button after you are signed in. It is not on the login screen.</p></div>';
   if(view==="sync"){
     const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
     return '<div class="card"><p id="youSyncLine">'+esc(lastSaveText())+'</p><p class="note">This is the last time this phone saved your log. It is not a cloud sync.</p><p>'+esc(cloud)+'</p><button type="button" class="primary full" data-syncnow>Save now</button></div>';
