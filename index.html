@@ -890,14 +890,17 @@ body.theme-dark:not(.welcome-on) .devpick{color:#0B0B39}
 #scanResult{margin-top:12px}
 #scanFoodName{font-weight:800;color:#0B0B39;margin:0 0 4px}
 #scanScaled{font-weight:700;color:#0B0B39;margin:8px 0}
-.wobuild h2{margin:0 0 8px;color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.02em}
-.wobuild .wolead{margin:0 0 16px;color:#0B0B39;font-size:15px;line-height:1.45}
+.wobuild h2{margin:0 0 14px;color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:32px;line-height:1.1;font-weight:700;letter-spacing:-.02em}
+.wobuild h2 span{color:#563DD2}
 .wocards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 14px}
-.wocard{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;background:#E4E2EB;color:#0B0B39;border:1.5px solid #E4E2EB;border-radius:16px;padding:12px;min-height:128px;font-weight:500}
-.wocard b{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:16px;line-height:1.2;font-weight:700}
-.wocard span{font-size:12px;line-height:1.35;font-weight:500}
-.wocard.sel{border-color:#563DD2}
+.wocard,.wotype{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;background:#E4E2EB;color:#0B0B39;border:1.5px solid #E4E2EB;border-radius:16px;padding:12px;min-height:112px;font-weight:500}
+.wocard b,.wotype b{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;font-size:16px;line-height:1.2;font-weight:700}
+.wocard span,.wotype span{font-size:12px;line-height:1.35;font-weight:500}
+.wocard.sel,.wotype.sel{border-color:#563DD2}
 .worow{background:#E4E2EB;border-radius:16px;padding:12px;margin:0 0 14px}
+.woprompt{width:100%;min-height:72px;background:#fff;border:1px solid rgba(11,11,57,.16);border-radius:12px;padding:11px 12px;color:#0B0B39;font:inherit}
+.wotypes{display:grid;grid-template-columns:1fr;gap:8px;margin:0 0 14px}
+.wotype{min-height:0}
 .woclients{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .woactions{display:flex;flex-direction:column;gap:8px}
 .wodraft{margin-top:12px}
@@ -1457,19 +1460,25 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
 <!-- ============ WORKOUT ============ -->
 <section class="page" id="page-workout">
   <div id="woBuild" class="wobuild" style="display:none">
-    <h2>Put a session together.</h2>
-    <p class="wolead">Start from moves already in the library. Draft them here, or build the workout by hand.</p>
+    <h2>Create a workout from <span>one prompt.</span></h2>
     <div class="wocards" id="woIdeas">
-      <button type="button" class="wocard" data-woidea="upper"><b>Upper body</b><span>Chest, back, shoulders, and arms from the library.</span></button>
-      <button type="button" class="wocard" data-woidea="cardio"><b>Cardio</b><span>The cardio moves already saved in the library.</span></button>
-      <button type="button" class="wocard" data-woidea="body"><b>Bodyweight</b><span>Moves that do not name a machine, dumbbell, barbell, cable, or kettlebell.</span></button>
+      <button type="button" class="wocard" data-woidea="upper"><b>Upper body strength</b><span>An upper-body strength workout from the library.</span></button>
+      <button type="button" class="wocard" data-woidea="loss"><b>Weight-loss goal</b><span>A weight-loss workout from the cardio moves already saved here.</span></button>
+      <button type="button" class="wocard" data-woidea="none"><b>No equipment</b><span>A workout from moves that do not name a machine or a weight.</span></button>
     </div>
     <div class="worow">
-      <div class="field"><label class="f" for="woPlanName">Workout name</label><input id="woPlanName" maxlength="60" placeholder="Name this workout"></div>
+      <div class="field"><label class="f" for="woPrompt">Prompt</label><textarea id="woPrompt" class="woprompt" maxlength="240" placeholder="Write one prompt"></textarea></div>
       <div id="woClients" class="woclients"></div>
     </div>
+    <div class="field"><label class="f" for="woPlanName">Workout name</label><input id="woPlanName" maxlength="60" placeholder="Name this workout"></div>
+    <p class="f">How this plan is built</p>
+    <div class="wotypes" id="woTypes">
+      <button type="button" class="wotype sel" data-wotype="regular"><b>Regular</b><span>A list of moves. Sets stay blank.</span></button>
+      <button type="button" class="wotype" data-wotype="circuit"><b>Circuit</b><span>One round of the moves. Rounds stay blank.</span></button>
+      <button type="button" class="wotype" data-wotype="interval"><b>Interval</b><span>Timed work. Times stay blank.</span></button>
+    </div>
     <div class="woactions">
-      <button type="button" class="primary full" id="woDraftBtn">Draft from the library</button>
+      <button type="button" class="primary full" id="woDraftBtn">Build with the helper</button>
       <button type="button" class="full" id="woHandBtn">Build by hand</button>
     </div>
     <div class="card wodraft" id="woDraft" hidden></div>
@@ -4330,6 +4339,7 @@ $("mCopyToBtn").onclick = () => {
 let woDate = todayStr();
 let woView = "home"; // home | build | editor
 let woIdea = "";
+let woType = "regular";
 let woClientId = "";
 let woDraftMoves = [];
 let editorFrom = "home";
@@ -4954,7 +4964,17 @@ $("page-workout").addEventListener("click", e=>{
   }
 });
 
-const WO_IDEA_NAMES = {upper:"Upper body", cardio:"Cardio", body:"Bodyweight"};
+const WO_IDEA_NAMES = {upper:"Upper body strength", loss:"Weight-loss workout", none:"No equipment"};
+const WO_PROMPTS = {
+  upper:"Upper body strength workout",
+  loss:"Weight-loss workout from the cardio list",
+  none:"No-equipment workout"
+};
+const WO_TYPE_NOTES = {
+  regular:"Regular. A list of moves. Sets are not set.",
+  circuit:"Circuit. One round. Rounds are not set.",
+  interval:"Interval. Timed work. Times are not set."
+};
 let woClientName = "";
 function libraryMoves(idea){
   const list = allExercises();
@@ -4968,23 +4988,25 @@ function libraryMoves(idea){
     out.push(e.name);
   }
   if(idea==="upper") ["chest","back","shoulders","arms"].forEach(group=>list.filter(e=>e.group===group).slice(0,2).forEach(add));
-  else if(idea==="cardio") list.filter(e=>e.group==="cardio").forEach(add);
-  else if(idea==="body") list.filter(e=>askGear(e.name)==="body").forEach(add);
+  else if(idea==="loss") list.filter(e=>e.group==="cardio").forEach(add);
+  else if(idea==="none") list.filter(e=>askGear(e.name)==="body").forEach(add);
   return out.slice(0,6);
 }
 function renderWoBuild(){
   $("hdrTitle").textContent = "Workout";
-  $("hdrSub").textContent = "From the library";
+  $("hdrSub").textContent = "From one prompt";
   document.querySelectorAll("[data-woidea]").forEach(b=>b.classList.toggle("sel", b.dataset.woidea===woIdea));
+  document.querySelectorAll("[data-wotype]").forEach(b=>b.classList.toggle("sel", b.dataset.wotype===woType));
   const draft = $("woDraft");
   if(!woDraftMoves.length){
     draft.hidden = true;
     draft.innerHTML = "";
   } else {
-    const name = ($("woPlanName").value||"").trim() || "Library draft";
+    const name = ($("woPlanName").value||"").trim() || ($("woPrompt").value||"").trim() || "Library draft";
     const forWhom = woClientName ? '<p class="note">For '+esc(woClientName)+'.</p>' : "";
+    const blank = woType==="interval" ? "Time not set" : (woType==="circuit" ? "Rounds not set" : "Sets not set");
     draft.hidden = false;
-    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">Taken from the exercise library on this phone. Sets stay blank because the library does not store a set count.</p><ul>'+woDraftMoves.map(n=>'<li><b>'+esc(n)+'</b><div class="note">Sets not set</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
+    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">'+esc(WO_TYPE_NOTES[woType]||WO_TYPE_NOTES.regular)+' Taken from the exercise library on this phone.</p><ul>'+woDraftMoves.map(n=>'<li><b>'+esc(n)+'</b><div class="note">'+blank+'</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
     $("woDraftEdit").onclick = () => useDraftInEditor();
   }
   paintWoClients();
@@ -5027,11 +5049,12 @@ async function paintWoClients(){
 async function draftFromLibrary(){
   if(!signedInTrainer()) return;
   const name = $("woPlanName").value.trim();
-  if(!woIdea && !name){ toast("Name the workout or pick a suggestion"); return; }
+  const prompt = ($("woPrompt").value||"").trim();
+  if(!woIdea && !prompt && !name){ toast("Write a prompt or pick a suggestion"); return; }
   let moves = [];
   if(woIdea) moves = libraryMoves(woIdea);
   else {
-    const answer = await buildAskAnswer(name+" workout");
+    const answer = await buildAskAnswer(prompt || (name+" workout"));
     const idea = answer && answer.draft && answer.draft.ideas && answer.draft.ideas[0];
     const day = idea && (idea.days||[]).find(d=>d.exercises && d.exercises.length);
     moves = day ? day.exercises.map(ex=>ex.name) : [];
@@ -5056,14 +5079,21 @@ function useDraftInEditor(){
   openEditor(null);
   if(!editorDraft) return;
   if(name) editorDraft.name = name;
-  editorDraft.exercises = woDraftMoves.map(n=>({id:uid(), name:n, target:"", kind:"reps"}));
+  const kind = woType==="interval" ? "time" : "reps";
+  editorDraft.exercises = woDraftMoves.map(n=>({id:uid(), name:n, target:"", kind:kind}));
   render();
 }
 document.querySelectorAll("[data-woidea]").forEach(b=>b.onclick=()=>{
   woIdea = b.dataset.woidea;
+  const prompt = $("woPrompt");
+  if(prompt) prompt.value = WO_PROMPTS[woIdea] || "";
   const input = $("woPlanName");
   if(input && !input.value.trim()) input.value = WO_IDEA_NAMES[woIdea] || "";
   woDraftMoves = [];
+  renderWoBuild();
+});
+document.querySelectorAll("[data-wotype]").forEach(b=>b.onclick=()=>{
+  woType = b.dataset.wotype || "regular";
   renderWoBuild();
 });
 $("woDraftBtn").onclick = () => run(()=>draftFromLibrary());
