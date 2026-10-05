@@ -299,19 +299,38 @@ body:not(.welcome-on) .bubbles{display:none !important}
   .d3{transform:translate3d(4vw,86vh,0)}
   .d4{transform:translate3d(calc(100vw - 78px),90vh,0)}
 }
-body.welcome-on header{background:#F4F1EA;border-bottom:1px solid rgba(43,42,39,.12);color:#2B2A27;z-index:28}
-body.welcome-on .topbar{position:relative;min-height:96px}
+body.welcome-on header{background:#2B2A27;border-bottom:none;color:#F4F1EA;z-index:28}
+body.welcome-on .topbar{position:relative;min-height:64px;display:flex;align-items:center;justify-content:space-between}
 body.welcome-on .brandline{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-body.welcome-on .loginlogo{display:block;position:absolute;left:50%;top:50%;width:min(228px,calc(100% - 112px));height:auto;transform:translate(-50%,-50%);object-fit:contain;pointer-events:none;background:transparent}
+body.welcome-on .loginlogo{display:block;position:static;width:min(168px,48vw);height:auto;transform:none;object-fit:contain;pointer-events:none;background:transparent}
 body:not(.welcome-on) .loginlogo{display:none !important}
-body.welcome-on #menuBtn,body.welcome-on #menuRoles,body.welcome-on .welcome-dock,body.welcome-on .welcome-close,body.welcome-on .bubbles,body.welcome-on #welcomeHome,body.welcome-on .welcome-only{display:none !important}
-#welcomeFront{min-height:calc(100dvh - 150px);display:flex;flex-direction:column;justify-content:center;padding:12px 2px 36px;color:#2B2A27;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+body.welcome-on #menuBtn{display:flex !important;color:#F4F1EA}
+body.welcome-on #menuBtn svg{stroke:#F4F1EA}
+body.welcome-on #menuRoles,body.welcome-on .welcome-dock,body.welcome-on .welcome-close,body.welcome-on .bubbles,body.welcome-on #welcomeHome{display:none !important}
+#welcomeFront{padding:18px 0 0;color:#2B2A27;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
 #welcomeFront[hidden]{display:none !important}
-#welcomeFront .front-rule{width:48px;height:3px;border:none;border-radius:3px;background:#8A9A86;margin:0 0 16px}
-#welcomeFront h2{margin:0 0 18px;color:#2B2A27;font-size:44px;line-height:1.02;font-weight:700;letter-spacing:-.03em;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
-#welcomeFront .front-card{background:#FAF9F6;border-radius:16px;padding:22px 20px 18px;box-shadow:0 1px 2px rgba(43,42,39,.08)}
-#welcomeFront .front-card p{margin:0;color:#2B2A27;font-size:22px;line-height:1.4;font-weight:600}
-#welcomeFront .front-sign{display:block;height:18px;width:auto;margin:16px 0 0;background:transparent;filter:brightness(0) saturate(100%) invert(14%) sepia(8%) saturate(420%) hue-rotate(8deg)}
+#welcomeFront h2{margin:0 0 14px;color:#2B2A27;font-size:40px;line-height:1.05;font-weight:700;letter-spacing:-.03em;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+#welcomeFront p,#welcomeFront li{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+#welcomeFront p{margin:0 0 16px;color:#2B2A27;font-size:16px;line-height:1.5}
+.front-hero,.front-trust,.front-block,.front-brand,.front-meals{padding:22px 2px 8px}
+.front-start{display:flex;margin:4px 0 8px;border:1.5px solid #2B2A27;border-radius:10px;overflow:hidden;background:#FAF9F6}
+.front-start input{flex:1;min-width:0;border:none;background:transparent;padding:14px 12px;color:#2B2A27;font:inherit;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-start input:focus{outline:none}
+.front-start button{flex:none;border:none;border-radius:0;background:#8A9A86;color:#2B2A27;font-weight:800;padding:14px 14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-photo{margin:18px -22px 4px}
+.front-photo img{display:block;width:100%;height:340px;object-fit:cover;object-position:center 22%;background:#E7EBE4}
+.front-view{display:inline-flex;align-items:center;justify-content:center;margin:0 0 16px;background:transparent;color:#2B2A27;border:1.5px solid #2B2A27;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:700;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-list{margin:0 0 8px;padding-left:18px}
+.front-list li{margin:0 0 8px;color:#2B2A27;font-size:15px;line-height:1.45}
+.front-draw{width:180px;height:132px;display:block;margin:8px auto 12px}
+.front-draw svg{width:180px;height:132px;display:block}
+.front-dark{background:#2B2A27;color:#F4F1EA;margin:32px -22px 0;padding:32px 24px 8px}
+.front-dark h2,.front-dark p{color:#F4F1EA}
+.front-link{display:inline-block;margin:0 0 26px;padding:0;border:none;background:transparent;color:#8A9A86;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-close{background:#2B2A27;color:#F4F1EA;margin:0 -22px;padding:8px 22px 40px}
+.front-close h2{color:#F4F1EA;font-size:32px}
+.front-close p{color:#F4F1EA}
+#frontPrograms,#frontReturn,#frontWork,#frontMeals{scroll-margin-top:76px}
 body.welcome-on #welcomeFront,body.welcome-on #welcomeSignup,body.welcome-on #welcomeLogin{position:relative;z-index:1}
 body.welcome-on .mhero h2,body.welcome-on .mhero p,body.welcome-on .mfeat h2,body.welcome-on .mfeat p,body.welcome-on .welcome-quote,body.welcome-on button.outline,body.welcome-on button.featlink,body.welcome-on button.learnmore{background:#F4F1EA}
 body.welcome-on .topgap{flex:none;width:0}
@@ -924,12 +943,82 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 </header>
 <div id="welcome" class="welcome">
   <div id="welcomeFront">
-    <hr class="front-rule">
-    <h2>Welcome home.</h2>
-    <div class="front-card">
-      <p>Curly Gurl Fitness is a family, and a place to train.</p>
-      <img class="front-sign" src="images/marquita-foster.png" alt="Marquita Foster">
-    </div>
+    <section class="front-hero">
+      <h2>Train here, and come home to it.</h2>
+      <p>Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.</p>
+      <form class="front-start" id="frontStart">
+        <label class="f" for="frontEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
+        <input id="frontEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email">
+        <button type="submit">Get started</button>
+      </form>
+    </section>
+    <section class="front-photo" aria-label="Marquita Foster">
+      <img src="images/header-portrait.jpg" alt="Marquita Foster">
+    </section>
+    <section class="front-trust">
+      <h2>For the people who train here.</h2>
+      <p>Curly Gurl Fitness is this family's app. This page does not borrow another gym's name, and it does not invent a headcount.</p>
+    </section>
+    <section class="front-block" id="frontPrograms">
+      <h2>The session goes on their phone.</h2>
+      <p>A trainer writes the workout, sends a video that stays with that person, and puts the next class on the calendar.</p>
+      <button type="button" class="front-view" data-scroll="frontWork">View features</button>
+      <ul class="front-list" id="frontWork">
+        <li>Workouts are built in the app and kept on the phone.</li>
+        <li>A video can be sent to one client.</li>
+        <li>Classes and bookings sit on the calendar.</li>
+      </ul>
+    </section>
+    <section class="front-block" id="frontReturn">
+      <h2>A reason to open the app again.</h2>
+      <p>Today holds the workout, the meals, and the water. A check-in holds photos and weight. A points feed and a comment thread are not open.</p>
+      <button type="button" class="front-view" data-scroll="frontBack">View features</button>
+      <ul class="front-list" id="frontBack">
+        <li>Today shows calories, the workout, and water.</li>
+        <li>Check-in stores photos and weight for that person.</li>
+        <li>Badges stay empty. There is no community feed.</li>
+      </ul>
+    </section>
+    <section class="front-block" id="frontBusiness">
+      <h2>The trainer's day, in one app.</h2>
+      <p>Add a client, copy the invite code, and follow that person's weigh-ins and photos from the trainer overview. Selling products is not open. Payments are not open.</p>
+    </section>
+    <section class="front-brand" id="frontBrand">
+      <div class="front-draw" aria-hidden="true">
+        <svg viewBox="0 0 180 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M34 48c0-12 9-20 22-20s22 8 22 20" stroke="#2B2A27" stroke-width="2.6"/>
+          <path d="M28 54h52c6 0 10 8 10 18 0 22-12 40-36 40S18 94 18 72c0-10 4-18 10-18z" stroke="#2B2A27" stroke-width="2.6"/>
+          <rect x="108" y="16" width="52" height="96" rx="8" stroke="#2B2A27" stroke-width="2.6"/>
+          <path d="M126 28h16" stroke="#8A9A86" stroke-width="2.4"/>
+          <rect x="118" y="40" width="14" height="14" rx="2" stroke="#8A9A86" stroke-width="2"/>
+          <rect x="136" y="40" width="14" height="14" rx="2" stroke="#8A9A86" stroke-width="2"/>
+        </svg>
+      </div>
+      <h2>CGFitness, on the phone they already open.</h2>
+      <p>The wordmark at the top is the one already in the app. The drawing is a kettlebell and a phone for this page, in the linen ink and sage.</p>
+    </section>
+    <section class="front-meals" id="frontMeals">
+      <h2>Meals and macros.</h2>
+      <p>Log breakfast through snacks. The day shows calories, carbs, fat, and protein. Search a food, scan a barcode, or open the cookbook. That is the meal planner.</p>
+      <p>Payments are not open. This page has nothing for sale and no price list.</p>
+    </section>
+    <section class="front-dark">
+      <h2>Independent trainers</h2>
+      <p>For a coach training on their own. Sign up as a trainer, add a client, and copy the invite code. They sign in on their own phone and join with that code.</p>
+      <button type="button" class="front-link" id="frontTrainer">Sign up</button>
+      <h2>Studios</h2>
+      <p>For a room that runs classes. A group session, a training session, and the calendar are open. A separate multi-location studio tool is not.</p>
+      <button type="button" class="front-link" id="frontStudio">Sign up</button>
+    </section>
+    <section class="front-close">
+      <h2>Start with your email.</h2>
+      <p>Get started opens sign-up. Trainer and client need two different emails. This is not a free trial, and there is no price list to download.</p>
+      <form class="front-start" id="frontStartEnd">
+        <label class="f" for="frontEmailEnd" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
+        <input id="frontEmailEnd" type="email" inputmode="email" autocomplete="email" placeholder="Email">
+        <button type="submit">Get started</button>
+      </form>
+    </section>
   </div>
   <div class="bubbles" id="welcomeBubbles" aria-hidden="true" hidden>
     <img class="picbubble d1" src="images/work/lower-body.jpg" alt="">
@@ -10351,8 +10440,33 @@ function applyClientLock(){
 }
 function scrollFeatures(){
   showWelcome("home");
-  $("welcomeMore").scrollIntoView({behavior:"smooth", block:"start"});
+  const el = $("frontPrograms") || $("welcomeMore");
+  if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
 }
+function openSignupFromEmail(value){
+  showWelcome("signup");
+  const email = String(value||"").trim();
+  if($("signupEmail") && email) $("signupEmail").value = email;
+  if($("signupName")) $("signupName").focus();
+}
+function bindFrontStart(formId, inputId){
+  const form = $(formId);
+  if(!form) return;
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    openSignupFromEmail($(inputId) && $(inputId).value);
+  };
+}
+bindFrontStart("frontStart", "frontEmail");
+bindFrontStart("frontStartEnd", "frontEmailEnd");
+document.querySelectorAll("#welcomeFront [data-scroll]").forEach(btn=>{
+  btn.onclick = () => {
+    const el = document.getElementById(btn.dataset.scroll);
+    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  };
+});
+if($("frontTrainer")) $("frontTrainer").onclick = () => showWelcome("signup");
+if($("frontStudio")) $("frontStudio").onclick = () => showWelcome("signup");
 $("learnMore").onclick = scrollFeatures;
 $("learnMoreB").onclick = scrollFeatures;
 $("menuLearn").onclick = () => $("learnMore").click();
