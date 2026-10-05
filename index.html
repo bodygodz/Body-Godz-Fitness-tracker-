@@ -306,30 +306,33 @@ body.welcome-on .loginlogo{display:block;position:static;width:min(168px,48vw);h
 body:not(.welcome-on) .loginlogo{display:none !important}
 body.welcome-on #menuBtn{display:flex !important;color:#F4F1EA}
 body.welcome-on #menuBtn svg{stroke:#F4F1EA}
+body.welcome-on.front-on,html:has(body.front-on){background:#fff;background-color:#fff}
+body.welcome-on.front-on header{background:#fff;color:#1C1B22;border-bottom:1px solid #E6E2EA}
+body.welcome-on.front-on #menuBtn,body.welcome-on.front-on #menuBtn svg{color:#1C1B22;stroke:#1C1B22}
 body.welcome-on #menuRoles,body.welcome-on .welcome-dock,body.welcome-on .welcome-close,body.welcome-on .bubbles,body.welcome-on #welcomeHome{display:none !important}
-#welcomeFront{padding:18px 0 0;color:#2B2A27;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+#welcomeFront{padding:18px 0 0;background:#fff;color:#1C1B22;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
 #welcomeFront[hidden]{display:none !important}
-#welcomeFront h2{margin:0 0 14px;color:#2B2A27;font-size:40px;line-height:1.05;font-weight:700;letter-spacing:-.03em;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+#welcomeFront h2{margin:0 0 14px;color:#1C1B22;font-size:40px;line-height:1.05;font-weight:700;letter-spacing:-.03em;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
 #welcomeFront p,#welcomeFront li{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-#welcomeFront p{margin:0 0 16px;color:#2B2A27;font-size:16px;line-height:1.5}
+#welcomeFront p{margin:0 0 16px;color:#1C1B22;font-size:16px;line-height:1.5}
 .front-hero,.front-trust,.front-block,.front-brand,.front-meals{padding:22px 2px 8px}
-.front-start{display:flex;margin:4px 0 8px;border:1.5px solid #2B2A27;border-radius:10px;overflow:hidden;background:#FAF9F6}
-.front-start input{flex:1;min-width:0;border:none;background:transparent;padding:14px 12px;color:#2B2A27;font:inherit;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-start{display:flex;margin:4px 0 8px;border:1.5px solid #E6E2EA;border-radius:10px;overflow:hidden;background:#fff}
+.front-start input{flex:1;min-width:0;border:none;background:#fff;padding:14px 12px;color:#1C1B22;font:inherit;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .front-start input:focus{outline:none}
-.front-start button{flex:none;border:none;border-radius:0;background:#8A9A86;color:#2B2A27;font-weight:800;padding:14px 14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-start button{flex:none;border:none;border-radius:0;background:#7B68A6;color:#fff;font-weight:800;padding:14px 14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .front-photo{margin:18px -22px 4px}
-.front-photo img{display:block;width:100%;height:340px;object-fit:cover;object-position:center 22%;background:#E7EBE4}
-.front-view{display:inline-flex;align-items:center;justify-content:center;margin:0 0 16px;background:transparent;color:#2B2A27;border:1.5px solid #2B2A27;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:700;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-photo img{display:block;width:100%;height:340px;object-fit:cover;object-position:center 22%;background:#fff}
+.front-view{display:inline-flex;align-items:center;justify-content:center;margin:0 0 16px;background:#fff;color:#7B68A6;border:1.5px solid #7B68A6;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:700;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .front-list{margin:0 0 8px;padding-left:18px}
-.front-list li{margin:0 0 8px;color:#2B2A27;font-size:15px;line-height:1.45}
+.front-list li{margin:0 0 8px;color:#1C1B22;font-size:15px;line-height:1.45}
 .front-draw{width:180px;height:132px;display:block;margin:8px auto 12px}
 .front-draw svg{width:180px;height:132px;display:block}
-.front-dark{background:#2B2A27;color:#F4F1EA;margin:32px -22px 0;padding:32px 24px 8px}
-.front-dark h2,.front-dark p{color:#F4F1EA}
-.front-link{display:inline-block;margin:0 0 26px;padding:0;border:none;background:transparent;color:#8A9A86;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.front-close{background:#2B2A27;color:#F4F1EA;margin:0 -22px;padding:8px 22px 40px}
-.front-close h2{color:#F4F1EA;font-size:32px}
-.front-close p{color:#F4F1EA}
+.front-dark{background:#fff;color:#1C1B22;margin:32px -22px 0;padding:32px 24px 8px}
+.front-dark h2,.front-dark p{color:#1C1B22}
+.front-link{display:inline-block;margin:0 0 26px;padding:0;border:none;background:transparent;color:#7B68A6;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:13px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.front-close{background:#fff;color:#1C1B22;margin:0 -22px;padding:8px 22px 40px}
+.front-close h2{color:#1C1B22;font-size:32px}
+.front-close p{color:#1C1B22}
 #frontPrograms,#frontReturn,#frontWork,#frontMeals{scroll-margin-top:76px}
 body.welcome-on #welcomeFront,body.welcome-on #welcomeSignup,body.welcome-on #welcomeLogin{position:relative;z-index:1}
 body.welcome-on .mhero h2,body.welcome-on .mhero p,body.welcome-on .mfeat h2,body.welcome-on .mfeat p,body.welcome-on .welcome-quote,body.welcome-on button.outline,body.welcome-on button.featlink,body.welcome-on button.learnmore{background:#F4F1EA}
@@ -890,7 +893,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
 
 </style>
 </head>
-<body class="welcome-on">
+<body class="welcome-on front-on">
 <script>
 (function(){
   /* Welcome stays up until someone logs in or signs up. */
@@ -986,16 +989,16 @@ body.theme-dark:not(.welcome-on) .devpick{color:#F4F1EA}
     <section class="front-brand" id="frontBrand">
       <div class="front-draw" aria-hidden="true">
         <svg viewBox="0 0 180 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M34 48c0-12 9-20 22-20s22 8 22 20" stroke="#2B2A27" stroke-width="2.6"/>
-          <path d="M28 54h52c6 0 10 8 10 18 0 22-12 40-36 40S18 94 18 72c0-10 4-18 10-18z" stroke="#2B2A27" stroke-width="2.6"/>
-          <rect x="108" y="16" width="52" height="96" rx="8" stroke="#2B2A27" stroke-width="2.6"/>
-          <path d="M126 28h16" stroke="#8A9A86" stroke-width="2.4"/>
-          <rect x="118" y="40" width="14" height="14" rx="2" stroke="#8A9A86" stroke-width="2"/>
-          <rect x="136" y="40" width="14" height="14" rx="2" stroke="#8A9A86" stroke-width="2"/>
+          <path d="M34 48c0-12 9-20 22-20s22 8 22 20" stroke="#1C1B22" stroke-width="2.6"/>
+          <path d="M28 54h52c6 0 10 8 10 18 0 22-12 40-36 40S18 94 18 72c0-10 4-18 10-18z" stroke="#1C1B22" stroke-width="2.6"/>
+          <rect x="108" y="16" width="52" height="96" rx="8" stroke="#1C1B22" stroke-width="2.6"/>
+          <path d="M126 28h16" stroke="#7B68A6" stroke-width="2.4"/>
+          <rect x="118" y="40" width="14" height="14" rx="2" stroke="#7B68A6" stroke-width="2"/>
+          <rect x="136" y="40" width="14" height="14" rx="2" stroke="#7B68A6" stroke-width="2"/>
         </svg>
       </div>
       <h2>CGFitness, on the phone they already open.</h2>
-      <p>The wordmark at the top is the one already in the app. The drawing is a kettlebell and a phone for this page, in the linen ink and sage.</p>
+      <p>The wordmark at the top is the one already in the app. The drawing is a kettlebell and a phone for this page.</p>
     </section>
     <section class="front-meals" id="frontMeals">
       <h2>Meals and macros.</h2>
@@ -9803,7 +9806,9 @@ function paintChrome(){
 function showWelcome(view){
   applyClientLock();
   document.body.classList.add("welcome-on");
+  document.body.classList.toggle("front-on", view==="home");
   paintChrome(true);
+  document.documentElement.style.backgroundColor = view==="home" ? "#ffffff" : "#F4F1EA";
   $("welcome").hidden = false;
   $("welcomeHome").hidden = true;
   if($("welcomeFront")) $("welcomeFront").hidden = view!=="home";
@@ -9827,7 +9832,7 @@ function showWelcome(view){
   if(location.hash) history.replaceState(null, "", location.pathname+location.search);
 }
 function showApp(){
-  document.body.classList.remove("welcome-on");
+  document.body.classList.remove("welcome-on","front-on");
   paintChrome(false);
   $("welcome").hidden = true;
 }
