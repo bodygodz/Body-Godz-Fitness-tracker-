@@ -294,6 +294,41 @@ button:active{transform:scale(.98)}
 .mlrow .grow{flex:1;min-width:0}
 .mlrow .chev{margin-left:auto;color:#563DD2}
 .mlrow.sel{background:#E4E2EB}
+#trainerMealStart,#trainerQuick,#trainerPdfPlan{color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+.tmlead{margin:8px 0 18px;text-align:center;font-size:22px;font-weight:600;line-height:1.35;color:#0B0B39}
+#tmPick{display:flex;flex-direction:column;gap:8px;margin:0 0 16px}
+#tmPick[hidden]{display:none !important}
+#tmPick button{width:100%;text-align:left;background:#FFFFFF;color:#0B0B39;border:1px solid #E4E2EB;border-radius:12px;font:inherit;font-size:18px}
+.tmpdf{position:relative;display:flex;align-items:center;gap:14px;width:100%;background:#FFFFFF;border:1px solid #E4E2EB;border-radius:12px;padding:16px;color:#0B0B39;cursor:pointer}
+.tmpdf input{position:absolute;width:1px;height:1px;padding:0;border:0;opacity:0}
+.tmpdf svg{width:28px;height:28px;stroke:#563DD2;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tmpdf b{display:block;font-size:16px}
+.tmpdf small{display:block;font-weight:500;font-size:14px;margin-top:2px}
+.tmdiv{display:flex;align-items:center;gap:12px;margin:18px 0;color:#0B0B39;font-size:14px}
+.tmdiv::before,.tmdiv::after{content:"";flex:1;height:1px;background:#E4E2EB}
+.tmcards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tmcard{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;background:#FFFFFF;color:#0B0B39;border:1px solid #E4E2EB;border-radius:12px;padding:14px;font:inherit}
+.tmcard b{font-size:16px}
+.tmcard span{font-size:14px;line-height:1.35}
+.tmcard img{width:100%;height:110px;object-fit:cover;border-radius:8px;background:#E4E2EB}
+.tmcard.sel{border-color:#563DD2;background:#E4E2EB}
+#tmStart{display:block;margin:18px auto 0;min-width:180px;background:#563DD2;color:#fff;border:none;border-radius:999px;padding:12px 28px;font:inherit;font-weight:700;letter-spacing:.04em}
+#tmStart:disabled{background:#E4E2EB;color:#0B0B39;opacity:1}
+.tmhit{display:flex;align-items:center;gap:10px;background:#FFFFFF;border:1px solid #E4E2EB;border-radius:12px;padding:10px 12px;margin:0 0 8px}
+.tmhit .grow{flex:1;min-width:0}
+.tmhit b{display:block}
+.tmhit small{display:block;font-size:13px}
+#trainerQuick .tmback{margin:0 0 12px}
+body.theme-dark:not(.welcome-on) #trainerMealStart .tmcard,
+body.theme-dark:not(.welcome-on) #tmPick button{background:#FFFFFF;color:#0B0B39;border-color:#E4E2EB}
+body.theme-dark:not(.welcome-on) #trainerMealStart .tmcard.sel{background:#E4E2EB;border-color:#563DD2}
+body.theme-dark:not(.welcome-on) #tmStart:disabled{background:#E4E2EB;color:#0B0B39;border-color:#E4E2EB;opacity:1}
+body.theme-dark:not(.welcome-on) #tmStart:not(:disabled){background:#563DD2;color:#fff;border-color:#563DD2}
+#clientMealPdf[hidden],#trainerMealStart[hidden],#trainerQuick[hidden],#trainerPdfPlan[hidden]{display:none !important}
+.tmpdffile{margin:0 0 8px}
+.tmpdffile button,#clientMealPdf button[data-mealpdf]{background:transparent;border:none;color:#563DD2;font-weight:700;padding:0;text-align:left}
+body.theme-dark:not(.welcome-on) #page-meals .tmpdffile button,
+body.theme-dark:not(.welcome-on) #clientMealPdf button[data-mealpdf]{background:transparent;border:none;color:#563DD2}
 body.theme-dark:not(.welcome-on) #masterLib .mlrow,
 body.theme-dark:not(.welcome-on) #menuFind .findhits button{background:transparent;border-color:transparent;color:#0B0B39}
 body.theme-dark:not(.welcome-on) #masterLib .mlrow.sel{background:#E4E2EB}
@@ -1437,7 +1472,42 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
 
 <!-- ============ MEALS ============ -->
 <section class="page" id="page-meals">
-  <div class="datenav">
+  <div id="clientMealPdf" hidden>
+    <div class="card">
+      <h2>Meal plan</h2>
+      <div id="clientMealPdfBody"></div>
+    </div>
+  </div>
+  <div id="trainerMealStart" hidden>
+    <p class="tmlead" id="tmLead">Pick a client</p>
+    <div id="tmPick" hidden></div>
+    <label class="tmpdf">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></svg>
+      <span><b>Attach a meal plan PDF</b><small>Select a PDF to upload.</small></span>
+      <input id="tmPdf" type="file" accept="application/pdf,.pdf">
+    </label>
+    <div class="tmdiv">Or build one here</div>
+    <div class="tmcards">
+      <button type="button" class="tmcard" data-tmkind="quick" aria-pressed="false"><b>Quick plan</b><span>A draft from foods already saved, or from USDA and Open Food Facts.</span><img src="images/food/salad.jpg" alt=""></button>
+      <button type="button" class="tmcard" data-tmkind="flex" aria-pressed="false"><b>Flexible plan</b><span>Build it meal by meal in the planner.</span><img src="images/food/salmon.jpg" alt=""></button>
+    </div>
+    <button type="button" id="tmStart" disabled>Let's start</button>
+  </div>
+  <div id="trainerQuick" hidden>
+    <button type="button" class="sm tmback" id="tmQuickBack">‹ Meal plan</button>
+    <p class="tmlead" id="tmQuickLead"></p>
+    <div class="field"><label class="f" for="tmFoodSearch">Search foods</label><input id="tmFoodSearch" type="search" placeholder="Search foods" autocomplete="off"></div>
+    <p class="note">Saved foods on this phone, then USDA and Open Food Facts. A food is listed only when that source already has a calorie.</p>
+    <div id="tmFoodHits"></div>
+    <h2 class="sec">Draft</h2>
+    <div id="tmDraft"></div>
+    <button type="button" class="primary full" id="tmSaveDraft">Save this draft</button>
+  </div>
+  <div id="trainerPdfPlan" hidden>
+    <p class="tmlead" id="tmPdfLead"></p>
+    <div id="tmPdfFile"></div>
+  </div>
+  <div class="datenav" id="mealDiaryNav">
     <button class="sm" id="mPrev">‹ Prev</button>
     <b id="mDate"></b>
     <button class="sm" id="mNext">Next ›</button>
@@ -1815,6 +1885,7 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
   <div id="clientFile" hidden>
     <div class="toolbar">
       <button class="sm" id="clientFileBack" type="button">‹ Clients</button>
+      <button class="sm" id="cfMealPlan" type="button">Meal plan</button>
       <button class="sm" id="cfTools" type="button">Messages, photos, and calls</button>
     </div>
     <div class="cftabs" id="clientFileTabs" role="tablist">
@@ -2974,9 +3045,57 @@ function defaultMealType(){ const h=new Date().getHours(); return h<11?"breakfas
 function mealsOn(date){ return S.meals.filter(m=>m.date===date); }
 function totals(date){ return mealsOn(date).reduce((a,m)=>({cal:a.cal+(+m.cal||0), protein:a.protein+(+m.protein||0), carbs:a.carbs+(+m.carbs||0), fat:a.fat+(+m.fat||0)}),{cal:0,protein:0,carbs:0,fat:0}); }
 function ensureMealPlans(){ if(!S.mealPlans || typeof S.mealPlans!=="object" || Array.isArray(S.mealPlans)) S.mealPlans={}; }
-function plansOn(date){ ensureMealPlans(); return Array.isArray(S.mealPlans[date]) ? S.mealPlans[date] : []; }
+const CLIENT_PLANS_KEY = "curlyGirlFitness.clientMealPlans.v1";
+let trainerMealMode = "";
+let trainerMealPick = "";
+let trainerMealKind = "";
+let trainerDraft = [];
+let trainerFoodHits = [];
+let trainerFoodQuery = "";
+let trainerFoodSeq = 0;
+let trainerFoodTimer = null;
+let trainerMealPairs = [];
+let trainerMealPaint = 0;
+function trainerMealPairId(){
+  if(trainerMealPick) return trainerMealPick;
+  if(signedInTrainer() && ID.activePairId && (clientFileMode || pairOpen)) return ID.activePairId;
+  return "";
+}
+function trainerPlanning(){
+  return signedInTrainer() && currentTab==="meals" && trainerMealMode==="plan" && !!trainerMealPairId();
+}
+function clientPlanBucket(){
+  const raw = readStore(localStorage, CLIENT_PLANS_KEY);
+  return raw && typeof raw==="object" && !Array.isArray(raw) ? raw : {};
+}
+function clientHasMealItems(pairId){
+  const days = clientPlanBucket()[pairId] || {};
+  return Object.keys(days).some(date => Array.isArray(days[date]) && days[date].length);
+}
+function plansOn(date){
+  if(trainerPlanning()){
+    const days = clientPlanBucket()[trainerMealPairId()] || {};
+    return Array.isArray(days[date]) ? days[date] : [];
+  }
+  ensureMealPlans();
+  return Array.isArray(S.mealPlans[date]) ? S.mealPlans[date] : [];
+}
 function planTotals(date){ return plansOn(date).reduce((a,m)=>({cal:a.cal+(+m.cal||0), protein:a.protein+(+m.protein||0)}),{cal:0,protein:0}); }
-function setPlans(date, items){ ensureMealPlans(); if(!items || !items.length) delete S.mealPlans[date]; else S.mealPlans[date]=items; }
+function setPlans(date, items){
+  if(trainerPlanning()){
+    const all = clientPlanBucket();
+    const id = trainerMealPairId();
+    const days = Object.assign({}, all[id] || {});
+    if(!items || !items.length) delete days[date];
+    else days[date] = items;
+    all[id] = days;
+    localStorage.setItem(CLIENT_PLANS_KEY, JSON.stringify(all));
+    return;
+  }
+  ensureMealPlans();
+  if(!items || !items.length) delete S.mealPlans[date];
+  else S.mealPlans[date]=items;
+}
 function clonePlanItem(it){ return {id:uid(), name:it.name, cal:Math.round(+it.cal||0), protein:r1(+it.protein||0), type:MEAL_TYPES.includes(it.type)?it.type:"snack"}; }
 function sortedWeights(){ return [...S.weights].sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0); }
 function woEntry(date){ return S.workouts[date] || {done:false, exercises:{}, notes:""}; }
@@ -3338,7 +3457,7 @@ function openMaster(kind){
   }
   if(kind==="meals"){
     closeMenu();
-    go("meals");
+    openTrainerMeals();
     return;
   }
   if(kind==="foods"){
@@ -3397,11 +3516,20 @@ $("masterLib").addEventListener("click", (e)=>{
   if(!row) return;
   openMaster(row.dataset.ml);
 });
+function openTrainerMeals(){
+  if(!signedInTrainer()) return;
+  if(pairOpen && ID.activePairId) trainerMealPick = ID.activePairId;
+  else trainerMealPick = "";
+  trainerMealMode = "";
+  trainerMealKind = "";
+  go("meals");
+}
 $("menuMeals").addEventListener("click", (e)=>{
   const row = e.target.closest("[data-menu-meal]");
   if(!row || !signedInTrainer()) return;
   closeMenu();
-  go(row.dataset.menuMeal);
+  if(row.dataset.menuMeal==="meals") openTrainerMeals();
+  else go(row.dataset.menuMeal);
 });
 $("menuFindInput").addEventListener("input", paintMenuFind);
 $("menuFindInput").addEventListener("keydown", (e)=>{
@@ -4267,6 +4395,7 @@ function mealDayKind(){
   return "today";
 }
 function effectiveAddMode(){
+  if(trainerPlanning()) return "plan";
   const k=mealDayKind();
   if(k==="past") return "log";
   if(k==="future") return "plan";
@@ -4319,7 +4448,481 @@ function renderMealLogList(){
     S.meals = S.meals.filter(m=>m.id!==b.dataset.delmeal); save(); render(); toast("Removed");
   });
 }
+function knownMealClient(pairId){
+  if(!pairId) return null;
+  return trainerMealPairs.find(p=>p.id===pairId) || menuClients.find(p=>p.id===pairId) || null;
+}
+function noPlanLead(pair){
+  const name = String(pair && pair.clientName || "").trim();
+  return (name || "This client")+" has no meal plan yet. Time to add one.";
+}
+function showMealParts(on){
+  ["clientMealPdf","trainerMealStart","trainerQuick","trainerPdfPlan","mealDiaryNav","mModeNote","mTypeStrip","mealPlanSection","mealAddCard","mealLogSection"].forEach(id=>{
+    const el = $(id);
+    if(!el) return;
+    const show = !!on[id];
+    el.hidden = !show;
+    if(id==="mModeNote" || id==="mTypeStrip" || id==="mealPlanSection" || id==="mealAddCard" || id==="mealLogSection") el.style.display = show ? "" : "none";
+  });
+}
+function savedFoodsWithCalories(){
+  const seen = new Set();
+  const out = [];
+  (S.meals||[]).slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).forEach(meal=>{
+    const name = String(meal && meal.name || "").trim();
+    if(!name || meal.cal==null || meal.cal==="") return;
+    const cal = Number(meal.cal);
+    if(!Number.isFinite(cal) || cal<0) return;
+    const key = foodKey(name);
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    out.push({
+      name:name,
+      cal:Math.round(cal),
+      protein:listedMacro(meal.protein),
+      carbs:listedMacro(meal.carbs),
+      fat:listedMacro(meal.fat),
+      amount:"",
+      source:"Saved",
+      type:MEAL_TYPES.includes(meal.type) ? meal.type : defaultMealType()
+    });
+  });
+  return out;
+}
+function foodLine(food){
+  const bits = [];
+  if(food && food.cal!=null && Number.isFinite(Number(food.cal))) bits.push(Math.round(Number(food.cal))+" cal");
+  if(food && food.amount) bits.push(food.amount);
+  if(food && food.protein!=null && food.protein!=="") bits.push(r1(food.protein)+"g protein");
+  if(food && food.carbs!=null && food.carbs!=="") bits.push(r1(food.carbs)+"g carbs");
+  if(food && food.fat!=null && food.fat!=="") bits.push(r1(food.fat)+"g fat");
+  if(food && food.source) bits.push(food.source);
+  return bits.join(" · ");
+}
+function mealPdfRows(pairId){
+  if(!pairId) return [];
+  return loadUploadRows().filter(row => row.label==="mealplan" && row.kind==="pdf" && row.pairId===pairId);
+}
+function upsertMealPdf(row){
+  const list = loadUploadRows().filter(item => item.id!==row.id);
+  list.unshift(row);
+  localStorage.setItem(SESSION_UPLOAD_KEY, JSON.stringify(list));
+}
+async function mealPdfRowsFor(pairId){
+  const rows = mealPdfRows(pairId);
+  if(!pairId || !authKeyReady()) return rows;
+  try {
+    const remote = await loadSharedSessions();
+    (Array.isArray(remote) ? remote : []).forEach(item=>{
+      const path = String(item && item.storage_path || "");
+      if(path.indexOf("mealplan-"+pairId+"-")<0) return;
+      if(rows.some(row => row.id===item.id || row.storage_path===path)) return;
+      rows.push({
+        id:item.id,
+        label:"mealplan",
+        kind:"pdf",
+        pairId:pairId,
+        name:"Meal plan.pdf",
+        mime:item.mime || "application/pdf",
+        storage_path:path,
+        createdAt:Date.parse(item.created_at)||Date.now()
+      });
+    });
+  } catch(e){}
+  return rows;
+}
+function paintMealPdfLinks(el, rows){
+  if(!el) return;
+  el.innerHTML = (rows||[]).map(row=>`<p class="tmpdffile"><button type="button" data-mealpdf="${esc(row.id)}">${esc(row.name||"Meal plan.pdf")}</button></p>`).join("");
+  el.querySelectorAll("[data-mealpdf]").forEach(btn=>{
+    btn.onclick = async () => {
+      const row = rows.find(item => item.id===btn.dataset.mealpdf);
+      if(!row) return;
+      let url = "";
+      try { url = await blobUrlForSession(row.id); } catch(e){ url = ""; }
+      if(!url && row.storage_path){
+        try { url = await remoteSessionUrl(row.storage_path); } catch(e){ url = ""; }
+      }
+      if(!url){ toast("Could not open that PDF"); return; }
+      window.open(url, "_blank", "noopener");
+    };
+  });
+}
+async function shareMealPlanPdf(row, file){
+  const session = await authSession();
+  if(!session) return "local";
+  const path = session.user.id+"/mealplan-"+row.pairId+"-"+row.id;
+  const up = await fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/storage/v1/object/session-media/"+path, {
+    method:"POST",
+    headers:{
+      apikey:AUTH_PUBLISHABLE_KEY,
+      Authorization:"Bearer "+session.access_token,
+      "Content-Type":file.type || "application/pdf",
+      "x-upsert":"true"
+    },
+    body:file
+  });
+  if(!up.ok) return "local";
+  row.storage_path = path;
+  upsertMealPdf(row);
+  try {
+    await sbAuth("session_uploads", {
+      method:"POST",
+      prefer:"return=minimal",
+      body:{
+        id:row.id,
+        trainer_id:session.user.id,
+        label:"mealplan",
+        kind:"pdf",
+        storage_path:path,
+        mime:file.type || "application/pdf",
+        created_at:new Date(row.createdAt).toISOString()
+      }
+    });
+  } catch(e){
+    return "local";
+  }
+  return "shared";
+}
+async function storeMealPlanPdf(pairId, file){
+  if(!signedInTrainer()) return;
+  if(!pairId){ toast("Pick a client"); return; }
+  if(!file) return;
+  const type = String(file.type||"").toLowerCase();
+  const fname = String(file.name||"");
+  if(type!=="application/pdf" && !/\.pdf$/i.test(fname)){ toast("Choose a PDF"); return; }
+  if(file.size > 15*1024*1024){ toast("That PDF is over 15 MB"); return; }
+  const row = {
+    id:uid(),
+    label:"mealplan",
+    kind:"pdf",
+    pairId:pairId,
+    name:fname || "Meal plan.pdf",
+    mime:type || "application/pdf",
+    createdAt:Date.now(),
+    storage_path:""
+  };
+  try {
+    await idbPutSession(row.id, file);
+  } catch(e){
+    toast(e && e.message ? e.message : "Could not store that on this phone");
+    return;
+  }
+  upsertMealPdf(row);
+  trainerMealMode = "pdf";
+  render();
+  toast("Meal plan saved");
+  shareMealPlanPdf(row, file).catch(()=>{});
+}
+function paintTrainerDraft(){
+  const box = $("tmDraft");
+  if(!box) return;
+  if(!trainerDraft.length){
+    const msg = savedFoodsWithCalories().length ? "Nothing in this draft yet. Search to add one." : "No saved foods with a calorie yet. Search to add one.";
+    box.innerHTML = '<p class="empty">'+msg+'</p>';
+    return;
+  }
+  box.innerHTML = trainerDraft.map((food,i)=>`<div class="tmhit"><div class="grow"><b>${esc(food.name)}</b><small>${esc(foodLine(food))}</small></div><button type="button" data-tmdel="${i}" aria-label="Remove ${esc(food.name)}">×</button></div>`).join("");
+  box.querySelectorAll("[data-tmdel]").forEach(btn=>{
+    btn.onclick = () => {
+      trainerDraft.splice(+btn.dataset.tmdel, 1);
+      render();
+    };
+  });
+}
+function paintTrainerHits(offline){
+  const box = $("tmFoodHits");
+  if(!box) return;
+  if(!trainerFoodHits.length){
+    box.innerHTML = trainerFoodQuery.length>=2
+      ? '<p class="empty">'+(offline ? "USDA and Open Food Facts did not answer. Try again." : "No foods with a calorie matched.")+'</p>'
+      : "";
+    return;
+  }
+  box.innerHTML = trainerFoodHits.map((food,i)=>`<div class="tmhit"><div class="grow"><b>${esc(food.name)}</b><small>${esc(foodLine(food))}</small></div><button type="button" data-tmadd="${i}">Add</button></div>`).join("");
+  box.querySelectorAll("[data-tmadd]").forEach(btn=>{
+    btn.onclick = () => addTrainerDraft(trainerFoodHits[+btn.dataset.tmadd]);
+  });
+}
+function addTrainerDraft(food){
+  if(!food || !Number.isFinite(Number(food.cal))) return;
+  const name = String(food.amount ? food.name+" · "+food.amount : food.name || "").trim();
+  if(!name) return;
+  const item = {
+    name:name,
+    cal:Math.round(Number(food.cal)),
+    protein:listedMacro(food.protein),
+    carbs:listedMacro(food.carbs),
+    fat:listedMacro(food.fat),
+    type:MEAL_TYPES.includes(food.type) ? food.type : defaultMealType()
+  };
+  if(trainerDraft.some(row => foodKey(row.name)===foodKey(item.name) && row.cal===item.cal)){
+    toast("Already in the draft");
+    return;
+  }
+  trainerDraft.push(item);
+  render();
+  toast("Added "+item.name);
+}
+function seedTrainerDraft(){
+  trainerDraft = savedFoodsWithCalories().slice(0, 6).map(food=>({
+    name:food.name,
+    cal:food.cal,
+    protein:food.protein,
+    carbs:food.carbs,
+    fat:food.fat,
+    type:food.type
+  }));
+}
+function saveTrainerDraft(){
+  const pairId = trainerMealPairId();
+  if(!pairId){ toast("Pick a client"); return; }
+  const items = trainerDraft.filter(row => row && row.name && Number.isFinite(Number(row.cal)));
+  if(!items.length){ toast("Add a food with a calorie first"); return; }
+  trainerMealMode = "plan";
+  mealAddMode = "plan";
+  const list = plansOn(mealDate).slice();
+  items.forEach(row=>{
+    list.push({
+      id:uid(),
+      name:row.name,
+      cal:Math.round(Number(row.cal)),
+      protein:listedMacro(row.protein),
+      carbs:listedMacro(row.carbs),
+      fat:listedMacro(row.fat),
+      type:MEAL_TYPES.includes(row.type) ? row.type : defaultMealType()
+    });
+  });
+  setPlans(mealDate, list);
+  trainerDraft = [];
+  render();
+  toast("Meal plan saved");
+}
+function scheduleTrainerFoodSearch(){
+  clearTimeout(trainerFoodTimer);
+  trainerFoodQuery = ($("tmFoodSearch").value||"").trim();
+  trainerFoodTimer = setTimeout(() => runTrainerFoodSearch(trainerFoodQuery), 280);
+}
+async function runTrainerFoodSearch(query){
+  const seq = ++trainerFoodSeq;
+  const local = query.length>=2 ? savedFoodsWithCalories().filter(food => foodQueryMatch(query, food.name)) : [];
+  if(query.length<2){
+    trainerFoodHits = [];
+    if(currentTab==="meals" && trainerMealMode==="quick") paintTrainerHits();
+    return;
+  }
+  trainerFoodHits = local.slice();
+  paintTrainerHits();
+  const jobs = [
+    usdaFoodPages(query, "Branded", 1),
+    usdaFoodPages(query, "SR Legacy", 1),
+    usdaFoodPages(query, "Survey (FNDDS)", 1),
+    openFoodPages(query, 1)
+  ];
+  const settled = await Promise.all(jobs.map(job => job.then(rows=>rows).catch(()=>null)));
+  if(seq!==trainerFoodSeq || trainerMealMode!=="quick" || currentTab!=="meals") return;
+  const remote = settled.reduce((all, rows)=>all.concat(rows||[]), []);
+  const failed = settled.every(rows => rows==null);
+  trainerFoodHits = takeFoodHits(local.concat(remote), query).filter(food => food && Number.isFinite(Number(food.cal)));
+  paintTrainerHits(failed && !trainerFoodHits.length);
+}
+function paintPresetChips(){
+  $("presetChips").innerHTML = S.presets.map((p,i)=>`<button class="chip photochip" data-preset="${i}">${photoTag(foodFileForMeal(p),"","mini")}<span>${esc(p.name)} <small>~${p.cal} · ${p.protein}g</small></span></button>`).join("");
+  document.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{
+    const p=S.presets[+b.dataset.preset];
+    $("fName").value=p.name; $("fCal").value=p.cal; $("fPro").value=p.protein;
+    $("fAdd").scrollIntoView({behavior:"smooth",block:"center"}); toast("Filled — adjust if needed, then Add");
+  });
+}
+function refreshMealNames(seq, apply){
+  if(knownMealClient(trainerMealPairId())){ apply(); return; }
+  Link.pairsForTrainer().then(pairs=>{
+    if(seq!==trainerMealPaint || currentTab!=="meals") return;
+    trainerMealPairs = pairs || [];
+    apply();
+  }).catch(()=>{});
+}
+function showTrainerPlan(pdfs){
+  showMealParts({
+    trainerPdfPlan:pdfs.length>0,
+    mealDiaryNav:true,
+    mealPlanSection:true,
+    mealAddCard:true
+  });
+  $("hdrSub").textContent = "Meal plan";
+  if(pdfs.length){
+    const pair = knownMealClient(trainerMealPairId());
+    const name = String(pair && pair.clientName || "").trim();
+    $("tmPdfLead").textContent = name ? name+"'s meal plan PDF" : "Meal plan PDF";
+    paintMealPdfLinks($("tmPdfFile"), pdfs);
+  }
+  const t = todayStr();
+  $("mDate").textContent = mealDate===t ? "Today" : mealDate===addDays(t,-1) ? "Yesterday" : mealDate===addDays(t,1) ? "Tomorrow" : fmtDate(mealDate);
+  $("mNext").disabled = false;
+  $("mNext").style.opacity = 1;
+  $("mealAddModeWrap").style.display = "none";
+  mealAddMode = "plan";
+  syncAddModeChips();
+  paintPresetChips();
+  renderMealPlanList();
+  if(!$("mCopyFromDate").value) $("mCopyFromDate").value = t;
+  if(!$("mCopyToDate").value) $("mCopyToDate").value = addDays(t,1);
+}
+function showTrainerQuick(pairId){
+  showMealParts({trainerQuick:true});
+  $("hdrSub").textContent = "Quick plan";
+  const write = () => {
+    const pair = knownMealClient(pairId);
+    const name = String(pair && pair.clientName || "").trim();
+    $("tmQuickLead").textContent = (name || "This client")+" — a draft from foods that already have a calorie.";
+  };
+  write();
+  refreshMealNames(trainerMealPaint, write);
+  paintTrainerDraft();
+  paintTrainerHits();
+}
+function showTrainerPdf(pairId, pdfs){
+  showMealParts({trainerPdfPlan:true});
+  $("hdrSub").textContent = "Meal plan";
+  const write = () => {
+    const pair = knownMealClient(pairId);
+    const name = String(pair && pair.clientName || "").trim();
+    $("tmPdfLead").textContent = name ? name+"'s meal plan" : "Meal plan";
+    paintMealPdfLinks($("tmPdfFile"), pdfs);
+  };
+  write();
+  refreshMealNames(trainerMealPaint, write);
+}
+function showTrainerStart(){
+  showMealParts({trainerMealStart:true});
+  $("hdrSub").textContent = "";
+  const box = $("tmPick");
+  const picked = knownMealClient(trainerMealPairId());
+  if(picked){
+    $("tmLead").textContent = noPlanLead(picked);
+    box.hidden = true;
+    box.innerHTML = "";
+  } else if(trainerMealPairId()){
+    $("tmLead").textContent = "";
+    box.hidden = true;
+  } else if(trainerMealPairs.length){
+    paintTrainerPick(trainerMealPairs);
+  } else {
+    $("tmLead").textContent = "Pick a client";
+    box.hidden = true;
+  }
+  document.querySelectorAll("#trainerMealStart [data-tmkind]").forEach(btn=>{
+    const on = btn.dataset.tmkind===trainerMealKind;
+    btn.classList.toggle("sel", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  $("tmStart").disabled = trainerMealKind!=="quick" && trainerMealKind!=="flex";
+}
+function paintTrainerPick(pairs){
+  const pairId = trainerMealPairId();
+  const pair = (pairs||[]).find(p=>p.id===pairId) || knownMealClient(pairId);
+  const box = $("tmPick");
+  if(pairId && !pair){
+    $("tmLead").textContent = "";
+    box.hidden = true;
+    box.innerHTML = "";
+    return;
+  }
+  if(!pair){
+    $("tmLead").textContent = "Pick a client";
+    if(!pairs.length){
+      box.hidden = true;
+      box.innerHTML = "";
+      return;
+    }
+    box.hidden = false;
+    box.innerHTML = pairs.map(p=>`<button type="button" data-tmpick="${esc(p.id)}">${esc(String(p.clientName||"").trim() || "Client")}</button>`).join("");
+    return;
+  }
+  $("tmLead").textContent = noPlanLead(pair);
+  box.hidden = true;
+  box.innerHTML = "";
+}
+async function paintTrainerStart(seq){
+  let pairs = trainerMealPairs.slice();
+  try { pairs = await Link.pairsForTrainer(); }
+  catch(e){ pairs = trainerMealPairs.slice(); }
+  if(seq!==trainerMealPaint || currentTab!=="meals" || !signedInTrainer() || trainerMealMode) return;
+  trainerMealPairs = pairs;
+  paintTrainerPick(pairs);
+}
+function renderTrainerMeals(){
+  const seq = ++trainerMealPaint;
+  const pairId = trainerMealPairId();
+  const pdfs = mealPdfRows(pairId);
+  const hasItems = !!(pairId && clientHasMealItems(pairId));
+  $("hdrTitle").textContent = "Meals";
+  $("clientMealPdf").hidden = true;
+  if(hasItems || (pairId && trainerMealMode==="plan")){
+    trainerMealMode = "plan";
+    mealAddMode = "plan";
+    showTrainerPlan(pdfs);
+    if(!knownMealClient(pairId)){
+      Link.pairsForTrainer().then(pairs=>{
+        if(seq!==trainerMealPaint || trainerMealMode!=="plan") return;
+        trainerMealPairs = pairs || [];
+        if(pdfs.length) showTrainerPlan(pdfs);
+      }).catch(()=>{});
+    }
+    return;
+  }
+  if(pairId && (pdfs.length || trainerMealMode==="pdf")){
+    trainerMealMode = "pdf";
+    showTrainerPdf(pairId, pdfs);
+    return;
+  }
+  if(pairId && trainerMealMode==="quick"){
+    showTrainerQuick(pairId);
+    return;
+  }
+  trainerMealMode = "";
+  showTrainerStart();
+  paintTrainerStart(seq);
+}
+function paintClientMealPdf(){
+  const box = $("clientMealPdf");
+  const body = $("clientMealPdfBody");
+  if(!box || !body) return;
+  box.hidden = true;
+  body.innerHTML = "";
+  if(!clientView()) return;
+  const pairId = ID.activePairId || "";
+  const seq = ++trainerMealPaint;
+  const local = mealPdfRows(pairId);
+  if(local.length){
+    box.hidden = false;
+    paintMealPdfLinks(body, local);
+  }
+  mealPdfRowsFor(pairId).then(rows=>{
+    if(seq!==trainerMealPaint || currentTab!=="meals" || signedInTrainer() || !clientView()) return;
+    if(!rows.length){
+      box.hidden = true;
+      body.innerHTML = "";
+      return;
+    }
+    box.hidden = false;
+    paintMealPdfLinks(body, rows);
+  }).catch(()=>{});
+}
 function renderMeals(){
+  if(signedInTrainer()){
+    renderTrainerMeals();
+    return;
+  }
+  showMealParts({
+    mealDiaryNav:true,
+    mModeNote:true,
+    mTypeStrip:true,
+    mealPlanSection:true,
+    mealAddCard:true,
+    mealLogSection:true
+  });
+  paintClientMealPdf();
   const t=todayStr();
   const kind=mealDayKind();
   ensureMealPlans();
@@ -4388,6 +4991,54 @@ function addMealOrPlan(){
   }
 }
 $("fAdd").onclick = addMealOrPlan;
+$("trainerMealStart").addEventListener("click", (e)=>{
+  const card = e.target.closest("[data-tmkind]");
+  if(!card || !signedInTrainer()) return;
+  trainerMealKind = card.dataset.tmkind==="flex" ? "flex" : "quick";
+  document.querySelectorAll("#trainerMealStart [data-tmkind]").forEach(btn=>{
+    const on = btn.dataset.tmkind===trainerMealKind;
+    btn.classList.toggle("sel", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  $("tmStart").disabled = false;
+});
+$("tmPick").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-tmpick]");
+  if(!btn || !signedInTrainer()) return;
+  trainerMealPick = btn.dataset.tmpick;
+  trainerMealMode = "";
+  render();
+});
+$("tmStart").onclick = () => {
+  if(!signedInTrainer()) return;
+  if(trainerMealKind!=="quick" && trainerMealKind!=="flex") return;
+  if(!trainerMealPairId()){ toast("Pick a client"); return; }
+  if(trainerMealKind==="quick"){
+    trainerMealMode = "quick";
+    trainerFoodHits = [];
+    trainerFoodQuery = "";
+    trainerFoodSeq++;
+    if($("tmFoodSearch")) $("tmFoodSearch").value = "";
+    seedTrainerDraft();
+  } else {
+    trainerMealMode = "plan";
+    mealAddMode = "plan";
+  }
+  render();
+};
+$("tmQuickBack").onclick = () => {
+  trainerMealMode = "";
+  trainerDraft = [];
+  render();
+};
+$("tmFoodSearch").addEventListener("input", scheduleTrainerFoodSearch);
+$("tmSaveDraft").onclick = saveTrainerDraft;
+$("tmPdf").addEventListener("change", ()=>{
+  const file = $("tmPdf").files && $("tmPdf").files[0];
+  $("tmPdf").value = "";
+  if(!file) return;
+  storeMealPlanPdf(trainerMealPairId(), file);
+});
 
 let scanControls = null;
 let scanHit = null;
@@ -5862,12 +6513,16 @@ const SETUP_SQL = [
 "create table if not exists public.session_uploads (",
 "  id text primary key,",
 "  trainer_id uuid not null references public.profiles(id) on delete cascade,",
-"  label text not null check (label in ('group','training')),",
-"  kind text not null check (kind in ('photo','video')),",
+"  label text not null check (label in ('group','training','mealplan')),",
+"  kind text not null check (kind in ('photo','video','pdf')),",
 "  storage_path text not null,",
 "  mime text not null default '',",
 "  created_at timestamptz not null default now()",
 ");",
+"alter table public.session_uploads drop constraint if exists session_uploads_label_check;",
+"alter table public.session_uploads add constraint session_uploads_label_check check (label in ('group','training','mealplan'));",
+"alter table public.session_uploads drop constraint if exists session_uploads_kind_check;",
+"alter table public.session_uploads add constraint session_uploads_kind_check check (kind in ('photo','video','pdf'));",
 "create table if not exists public.private_logs (",
 "  owner_id uuid primary key references public.profiles(id) on delete cascade,",
 "  trainer_id uuid references public.profiles(id) on delete set null,",
@@ -8026,6 +8681,13 @@ $("cfTools").onclick = () => {
   renderCoach();
   refreshCoachData().catch(()=>{});
 };
+$("cfMealPlan").onclick = () => {
+  if(!signedInTrainer() || !ID.activePairId) return;
+  trainerMealPick = ID.activePairId;
+  trainerMealMode = "";
+  trainerMealKind = "";
+  go("meals");
+};
 $("cfEdit").onclick = () => {
   cfEditing = true;
   $("cfNameInput").value = $("cfName").textContent || "";
@@ -9030,8 +9692,14 @@ function loadSessionRows(){
   const list = readStore(localStorage, SESSION_UPLOAD_KEY);
   return Array.isArray(list) ? list.filter(row => row && (row.label==="group" || row.label==="training") && row.id) : [];
 }
+function loadUploadRows(){
+  const list = readStore(localStorage, SESSION_UPLOAD_KEY);
+  return Array.isArray(list) ? list.filter(row => row && row.id) : [];
+}
 function saveSessionRows(list){
-  localStorage.setItem(SESSION_UPLOAD_KEY, JSON.stringify(list));
+  const incoming = Array.isArray(list) ? list.filter(row => row && row.id && row.label!=="mealplan") : [];
+  const mealplans = loadUploadRows().filter(row => row.label==="mealplan");
+  localStorage.setItem(SESSION_UPLOAD_KEY, JSON.stringify(mealplans.concat(incoming)));
 }
 function openSessionDb(){
   return new Promise((resolve, reject)=>{
