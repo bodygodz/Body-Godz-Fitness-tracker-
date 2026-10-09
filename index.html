@@ -37,13 +37,23 @@ if ("serviceWorker" in navigator) {
   --accent:#563DD2; --accent2:#563DD2; --warn:#b45309; --danger:#e11d48; --radius:18px;
   --safe-b:env(safe-area-inset-bottom,0px);
   --s1:8px; --s2:16px; --s3:24px; --s4:32px;
-  --sans:-apple-system,"SF Pro Text",system-ui,sans-serif;
-  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --sans:var(--font);
+  --serif:var(--font);
+  --navy:#0B0B39; --white:#FFFFFF; --lav:#E4E2EB;
+  --text-2:rgba(11,11,57,.70); --text-3:rgba(11,11,57,.55);
+  --field-border:rgba(11,11,57,.48);
+  --accent-08:rgba(86,61,210,.08); --accent-16:rgba(86,61,210,.16);
+  --focus:0 0 0 3px #FFFFFF,0 0 0 5px #563DD2;
+  --r-sm:8px; --r-md:12px; --r-lg:20px; --r-pill:999px;
+  --e-1:0 1px 2px rgba(11,11,57,.06),0 1px 1px rgba(11,11,57,.04);
+  --e-2:0 2px 4px rgba(11,11,57,.06),0 8px 24px rgba(11,11,57,.08);
+  --sp-5:24px; --sp-6:32px; --sp-8:64px; --sp-9:96px;
   --shadow:0 1px 2px rgba(11,11,57,.05),0 10px 28px rgba(11,11,57,.05);
   --hair:rgba(11,11,57,.12);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:14px;line-height:1.45}
+html,body,button,input,select,textarea{margin:0;font-family:var(--font);font-size:15px;line-height:22px}
 html{background-color:#FFFFFF}
 body{padding-bottom:calc(108px + var(--safe-b));min-height:100vh;background-color:#FFFFFF;color:#0B0B39;background-image:none}
 body.welcome-on{background-color:#FFFFFF;color:#0B0B39;padding-bottom:0}
@@ -1163,6 +1173,106 @@ body.theme-dark #clientFile,
 body.theme-dark #clientFile .card,
 body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-color:#E4E2EB}
 
+/* Polish: one type stack, form contrast, buttons, landing rhythm. */
+html,body,button,input,select,textarea{font-family:var(--font)}
+#welcomeFront h1,#welcomeFront h2,#welcomeFront h3,.welcome .card h2,header h1,#clientFile .cfname,.wobuild h2,.wodraft .wotitle,.todaypick,.asktitle,.mhero h2{font-family:var(--font)}
+input::placeholder,textarea::placeholder,.welcome .card input::placeholder,.findbox input::placeholder{color:var(--text-3);opacity:1}
+:where(a,button,[tabindex]):focus-visible{outline:none;box-shadow:var(--focus)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-16)}
+.front-start:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-16)}
+input:not([type=checkbox]):not([type=radio]):not([type=file]),select,textarea{border:1px solid var(--field-border);border-radius:var(--r-md);min-height:48px;padding:12px 14px;font-size:16px;line-height:22px}
+button:not(.primary):not(.btn-primary):not(.chip):not(.toolplus):not(.tabplus):not(.menubtn):not(.ovicon):not(.toolicon):not(.eye):not(.iconback):not(.btn-ghost):not(.forgot):not(.navitem):not(.mlrow):not(.yourow){border:1.5px solid rgba(11,11,57,.48)}
+.btn,.btn-primary,.btn-secondary,.btn-ghost,button.primary,button.full,.menuaction,#tmStart:not(:disabled){display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:var(--r-md);font:600 15px/20px var(--font);letter-spacing:0;text-transform:none}
+.btn-primary,button.primary,.menuaction,#tmStart:not(:disabled){background:var(--accent);color:#fff;border:none;box-shadow:0 1px 2px rgba(11,11,57,.12)}
+.btn-primary:hover,button.primary:hover{background-image:linear-gradient(rgba(11,11,57,.14),rgba(11,11,57,.14))}
+.btn-primary:active,button.primary:active{transform:translateY(1px) scale(.99)}
+.btn-primary:disabled,button.primary:disabled{background:rgba(86,61,210,.40);cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--navy);border:1.5px solid rgba(11,11,57,.48)}
+.btn-secondary:hover{background:rgba(11,11,57,.04)}
+.btn-ghost,button.forgot{background:transparent;color:var(--accent);border:none;min-height:44px;padding:0 12px;border-radius:var(--r-md)}
+.btn-ghost:hover,button.forgot:hover{background:var(--accent-08)}
+button.sm,.front-link,.cflink{min-height:44px;border-radius:var(--r-md)}
+.eye{width:44px;height:44px}
+.iconback{width:44px;height:44px;min-height:44px;padding:0;border-radius:var(--r-md);border:1.5px solid rgba(11,11,57,.48);background:#fff;color:var(--navy);display:inline-flex;align-items:center;justify-content:center}
+.iconback svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.segment{display:grid;grid-template-columns:1fr 1fr;background:rgba(11,11,57,.06);border-radius:var(--r-md);padding:4px;min-height:52px;gap:0}
+.segment button,.welcome .card .segment button{min-height:44px;height:44px;border:none;border-radius:8px;background:transparent;color:var(--navy);font:600 15px/20px var(--font);box-shadow:none}
+.segment button.sel,.welcome .card .segment button.sel{background:#fff;color:var(--navy);border:none;box-shadow:var(--e-1)}
+.tabpill button,.subbar button,.rolepick button,.calgrid button,.eventfilters button{border-width:1px}
+#signupLocalNote:empty,#loginLocalNote:empty{display:none}
+.fieldhelp{margin:6px 0 0;font:500 13px/18px var(--font);color:var(--text-2)}
+.fielderr{display:flex;align-items:flex-start;gap:6px;margin:6px 0 0;font:500 13px/18px var(--font);color:var(--navy)}
+.fielderr[hidden]{display:none !important}
+.fielderr svg{width:16px;height:16px;flex:none;margin-top:1px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--navy)}
+label.f{font-size:14px;line-height:20px;font-weight:600;color:var(--navy)}
+.note{font-size:13px;line-height:18px;color:var(--text-2)}
+.chev{display:inline-block;width:20px;height:20px;font-size:0;line-height:0;flex:none;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B0B39' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center/20px 20px no-repeat}
+button svg, .navitem svg, .mlrow svg, .yourow svg, .toolicon svg, .menubtn svg, .ovicon svg, .tileico svg{stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.tileico{width:48px;height:48px;border-radius:12px;background:var(--accent-08);color:var(--navy);display:inline-flex;align-items:center;justify-content:center}
+.tileico svg{width:24px;height:24px}
+.eyebrow{margin:0 0 8px;font:700 12px/16px var(--font);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+#welcomeFront .phonehero-copy h1{margin:0 0 16px;color:var(--navy);font-size:36px;line-height:40px;font-weight:800;letter-spacing:-.02em}
+#welcomeFront h2{margin:0 0 12px;color:var(--navy);font-size:28px;line-height:34px;font-weight:700;letter-spacing:-.015em}
+#welcomeFront h3{margin:12px 0 4px;font-size:18px;line-height:24px;font-weight:600}
+#welcomeFront .phonehero-copy p{font-size:17px;line-height:26px;color:var(--text-2);max-width:36ch}
+#welcomeFront p{font-size:15px;line-height:22px;max-width:60ch}
+#welcomeFront .front-hero{padding:64px 0}
+#welcomeFront .band{margin-left:-22px;margin-right:-22px;padding:64px 22px}
+#welcomeFront .band.lav,#welcomeFront .front-meals.band{background:var(--lav)}
+#welcomeFront .front-block,#welcomeFront .front-dark{padding:64px 0}
+.front-features{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
+.featcard{background:#fff;border:1px solid rgba(11,11,57,.12);border-radius:var(--r-lg);padding:24px;box-shadow:var(--e-1)}
+.featcard p{margin:0}
+.front-split{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
+.front-split img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 20%;border-radius:var(--r-lg);background:var(--lav)}
+#welcomeFront .front-dark .btn-secondary{margin:0 0 24px}
+#welcomeFront .front-creator .creator-frame{border-radius:var(--r-lg)}
+#welcomeFront .front-creator .creator-frame img{object-position:50% 20%}
+.welcome .card{border-radius:var(--r-lg);padding:32px 24px;box-shadow:var(--e-2);border:1px solid rgba(11,11,57,.12)}
+.welcome .card .field{margin-bottom:16px}
+.welcome .card button.primary{margin-top:8px}
+body.welcome-on header{min-height:56px;padding:env(safe-area-inset-top,0px) 16px 0;border-bottom:1px solid rgba(11,11,57,.12)}
+body.welcome-on .topbar{min-height:56px}
+body.welcome-on .loginlogo{height:28px;width:auto;max-width:none}
+.nav-inline,.headlogin{display:none}
+body.welcome-on .headlogin{display:inline-flex}
+.coachmedia{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 16px}
+.coachmedia video,.coachmedia img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 20%;border-radius:var(--r-lg);display:block;background:var(--lav)}
+.coachposter{display:none}
+.sheetlogo{max-height:28px}
+@media (max-width:430px){
+  #welcomeFront .front-start input{border:1px solid var(--field-border);min-height:48px;font-size:16px}
+  #welcomeFront .front-start button{min-height:48px;border-radius:var(--r-md)}
+}
+@media (min-width:1024px){
+  header{padding-left:0;padding-right:0}
+  .welcome,main{max-width:1200px}
+  header .topbar{max-width:1200px;margin:0 auto;padding:0 24px;width:100%}
+  body.welcome-on .loginlogo{height:32px}
+  body.welcome-on .nav-inline{display:flex;gap:8px;align-items:center}
+  body.welcome-on .headlogin,body.welcome-on #menuBtn{display:none !important}
+  #welcomeFront .front-hero{padding:96px 0}
+  #welcomeFront .phonehero{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+  #welcomeFront .loginphone{width:260px;flex-basis:260px;justify-self:center}
+  #welcomeFront .loginphone-screen{height:480px}
+  #welcomeFront .band{padding:96px 24px;margin-left:-24px;margin-right:-24px}
+  #welcomeFront .front-block,#welcomeFront .front-dark{padding:96px 0}
+  #welcomeFront h2{font-size:40px;line-height:46px}
+  #welcomeFront .phonehero-copy h1{font-size:56px;line-height:60px}
+  .front-features{grid-template-columns:repeat(3,1fr);gap:24px}
+  .front-split{grid-template-columns:1.1fr .9fr;gap:48px}
+  #welcomeSignup .card,#welcomeLogin .card{max-width:440px;margin:64px auto;padding:40px}
+  .welcome{padding-left:24px;padding-right:24px}
+}
+@media (prefers-reduced-motion:reduce){
+  .coachmedia video{display:none}
+  .coachposter{display:block}
+}
+@media (max-width:700px){
+  .coachmedia{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body class="welcome-on front-on">
@@ -1174,7 +1284,7 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
 <header>
   <div class="topbar">
     <h1 class="brandline"><span class="drop">C</span>urly Gurl Fitness</h1>
-    <img class="loginlogo" src="images/login-logo.png" alt="Curly Gurl Fitness">
+    <img class="loginlogo" src="images/cgfitness_logo_400w.webp" srcset="images/cgfitness_logo_400w.webp 1x, images/cgfitness_logo.webp 2x" alt="Curly Gurl Fitness" width="164" height="28">
     <button type="button" class="todaypick" id="todayPick" aria-expanded="false" aria-controls="dayMenu">
       <span id="todayPickLabel">Today</span>
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
@@ -1183,7 +1293,12 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
     <div class="topgap"></div>
     <div class="streak" id="streak" aria-label="Streak"><span id="streakCount">0</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
     <div class="headside">
-      <img class="profilepic" id="profilePic" src="images/header-portrait.jpg" alt="">
+      <img class="profilepic" id="profilePic" src="images/real_keyta_gym_portrait_4x5_1080w.webp" alt="">
+      <button type="button" class="btn-ghost headlogin" id="headLogin">Log in</button>
+      <nav class="nav-inline" id="frontNav" aria-label="Account">
+        <button type="button" class="btn-ghost" id="deskLogin">Log in</button>
+        <button type="button" class="btn-primary" id="deskSignup">Sign up</button>
+      </nav>
       <button type="button" class="menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><svg class="ham" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     </div>
   </div>
@@ -1221,12 +1336,12 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
     <section class="front-hero">
       <div class="phonehero">
         <div class="phonehero-copy">
-          <h2>Train here, and come home to it.</h2>
-          <p>Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.</p>
+          <h1>Train here, and come home to it.</h1>
+          <p>Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home.</p>
           <form class="front-start" id="frontStart">
             <label class="f" for="frontEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
             <input id="frontEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email">
-            <button type="submit">Get started</button>
+            <button type="submit" class="btn-primary">Get started</button>
           </form>
         </div>
         <div class="loginphone">
@@ -1258,77 +1373,65 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
       syncPhone();
     })();
     </script>
-    <section class="front-trust">
-      <h2>For the people who train here.</h2>
-      <p>Curly Gurl Fitness is this family's app. This page does not borrow another gym's name, and it does not invent a headcount.</p>
+    <section class="front-trust band lav">
+      <p class="eyebrow">Welcome</p>
+      <h2>Built for the people who train with Curly Gurl Fitness.</h2>
+      <p>Your workouts, meals, and check-ins in one place, set up by your coach.</p>
     </section>
     <section class="front-block" id="frontPrograms">
+      <p class="eyebrow">In the app</p>
       <h2>The session goes on their phone.</h2>
       <p>A trainer writes the workout, sends a video that stays with that person, and puts the next class on the calendar.</p>
-      <button type="button" class="front-view" data-scroll="frontWork">View features</button>
-      <ul class="front-list" id="frontWork">
-        <li>Workouts are built in the app and kept on the phone.</li>
-        <li>A video can be sent to one client.</li>
-        <li>Classes and bookings sit on the calendar.</li>
-      </ul>
-    </section>
-    <section class="front-block" id="frontReturn">
-      <h2>A reason to open the app again.</h2>
-      <p>Today holds the workout, the meals, and the water. A check-in holds photos and weight. A points feed and a comment thread are not open.</p>
-      <button type="button" class="front-view" data-scroll="frontBack">View features</button>
-      <ul class="front-list" id="frontBack">
-        <li>Today shows calories, the workout, and water.</li>
-        <li>Check-in stores photos and weight for that person.</li>
-        <li>Badges stay empty. There is no community feed.</li>
-      </ul>
+      <div class="front-features" id="frontWork">
+        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9v6M18 9v6M6 12h12M3 8v8M21 8v8"/></svg></span><h3>Workouts</h3><p>Built in the app and kept on the phone.</p></article>
+        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></span><h3>Video</h3><p>A video can be sent to one client.</p></article>
+        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span><h3>Calendar</h3><p>Classes and bookings sit on the calendar.</p></article>
+        <article class="featcard" id="frontBack"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></span><h3>Today's workout</h3><p>Today shows the workout, meals, and water.</p></article>
+        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 3v6M11 3v6"/><path d="M5 11h10a5 5 0 0 1-10 0z"/><path d="M10 16v4"/></svg></span><h3>Meals and macros</h3><p>Calories, carbs, fat, and protein for the day.</p></article>
+        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span><h3>Check-in</h3><p>Photos and weight stay with that person.</p></article>
+      </div>
     </section>
     <section class="front-block" id="frontBusiness">
+      <p class="eyebrow">For trainers</p>
       <h2>The trainer's day, in one app.</h2>
-      <p>Add a client, copy the invite code, and follow that person's weigh-ins and photos from the trainer overview. Selling products is not open. Payments are not open.</p>
+      <p>Add a client, copy the invite code, and follow that person's weigh-ins and photos from the trainer overview.</p>
     </section>
-    <section class="front-brand" id="frontBrand">
-      <div class="front-draw" aria-hidden="true">
-        <svg viewBox="0 0 180 130" fill="none" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M34 48c0-12 9-20 22-20s22 8 22 20" stroke="#0B0B39" stroke-width="2.6"/>
-          <path d="M28 54h52c6 0 10 8 10 18 0 22-12 40-36 40S18 94 18 72c0-10 4-18 10-18z" stroke="#0B0B39" stroke-width="2.6"/>
-          <rect x="108" y="16" width="52" height="96" rx="8" stroke="#0B0B39" stroke-width="2.6"/>
-          <path d="M126 28h16" stroke="#563DD2" stroke-width="2.4"/>
-          <rect x="118" y="40" width="14" height="14" rx="2" stroke="#563DD2" stroke-width="2"/>
-          <rect x="136" y="40" width="14" height="14" rx="2" stroke="#563DD2" stroke-width="2"/>
-        </svg>
-      </div>
-      <h2>CGFitness, on the phone they already open.</h2>
-      <p>The wordmark at the top is the one already in the app. The drawing is a kettlebell and a phone for this page.</p>
-    </section>
-    <section class="front-meals" id="frontMeals">
+    <section class="front-meals band lav" id="frontMeals">
+      <p class="eyebrow">Nutrition</p>
       <h2>Meals and macros.</h2>
-      <p>Log breakfast through snacks. The day shows calories, carbs, fat, and protein. Search a food, scan a barcode, or open the cookbook. That is the meal planner.</p>
-      <p>Payments are not open. This page has nothing for sale and no price list.</p>
+      <p>Log breakfast through snacks. The day shows calories, carbs, fat, and protein. Search a food, scan a barcode, or open the cookbook.</p>
     </section>
-    <section class="front-dark">
-      <h2>Independent trainers</h2>
-      <p>For a coach training on their own. Sign up as a trainer, add a client, and copy the invite code. They sign in on their own phone and join with that code.</p>
-      <button type="button" class="front-link" id="frontTrainer">Sign up</button>
-      <h2>Studios</h2>
-      <p>For a room that runs classes. A group session, a training session, and the calendar are open. A separate multi-location studio tool is not.</p>
-      <button type="button" class="front-link" id="frontStudio">Sign up</button>
+    <section class="front-dark" id="frontTrainers">
+      <div class="front-split">
+        <div>
+          <p class="eyebrow">For trainers</p>
+          <h2>Independent trainers</h2>
+          <p>For a coach training on their own. Sign up as a trainer, add a client, and copy the invite code. They sign in on their own phone and join with that code.</p>
+          <button type="button" class="btn-secondary" id="frontTrainer">Sign up as a trainer</button>
+          <h2>Studios</h2>
+          <p>For a room that runs classes. A group session, a training session, and the calendar are on the phone.</p>
+          <button type="button" class="btn-secondary" id="frontStudio">Sign up as a studio</button>
+        </div>
+        <img src="images/real_keyta_dumbbell_row_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)" width="1080" height="1350">
+      </div>
     </section>
-    <section class="front-close">
+    <section class="front-close band lav">
+      <p class="eyebrow">Get started</p>
       <h2>Start with your email.</h2>
-      <p>Get started opens sign-up. Trainer and client need two different emails. This is not a free trial, and there is no price list to download.</p>
+      <p>Get started opens sign-up.</p>
       <form class="front-start" id="frontStartEnd">
         <label class="f" for="frontEmailEnd" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
         <input id="frontEmailEnd" type="email" inputmode="email" autocomplete="email" placeholder="Email">
-        <button type="submit">Get started</button>
+        <button type="submit" class="btn-primary">Get started</button>
       </form>
     </section>
-    <section class="front-creator" aria-label="Marquita Foster">
+    <section class="front-creator" aria-label="Coach Keyta (Marquita Foster)">
       <div class="creator-frame">
-        <img src="images/header-portrait.jpg" alt="Marquita Foster">
+        <img src="images/real_keyta_gym_portrait_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)" width="1080" height="1350">
       </div>
       <div class="welcome-quote">
         <img class="script" src="images/welcome-script.png" alt="Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.">
-        <img class="welcome-sign" src="images/marquita-foster.png" alt="Marquita Foster">
+        <img class="welcome-sign" src="images/marquita-foster.png" alt="Coach Keyta (Marquita Foster)">
       </div>
     </section>
   </div>
@@ -1358,7 +1461,6 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
                   <div class="ps-h">Recently logged</div>
                   <div class="ps-row"><img src="images/food/salmon.jpg" alt=""><div><b>Salmon</b><small>100 cal, 4 ounce</small></div></div>
                   <div class="ps-row"><img src="images/food/oatmeal.jpg" alt=""><div><b>Oatmeal, cooked</b><small>154 cal, 1 cup</small></div></div>
-                  <div class="ps-row"><img src="images/food/yogurt.jpg" alt=""><div><b>Greek Yogurt, Vanilla, Fat Free</b><small>209 cal, 1 cup, Great Value</small></div></div>
                 </div>
                 <div class="loginphone-slide">
                   <div class="ps-title">Weight</div>
@@ -1481,18 +1583,18 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
     </section>
   </div>
   <div id="welcomeSignup" hidden>
-    <button type="button" class="learnmore welcome-back" id="signupBack">Back</button>
+    <button type="button" class="iconback" id="signupBack" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     <form class="card" id="signupForm">
       <h2>Sign up</h2>
       <p class="note" id="signupLocalNote" style="margin-bottom:10px"></p>
-      <div class="field"><label class="f" for="signupName">Name</label><input id="signupName" maxlength="60" autocomplete="name" placeholder="Your name"></div>
-      <div class="field"><label class="f" for="signupEmail">Email</label><input id="signupEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
-      <div class="field"><label class="f" for="signupPass">Password</label><input id="signupPass" type="password" autocomplete="new-password" placeholder="At least 6 characters"></div>
+      <div class="field"><label class="f" for="signupName">Name</label><input id="signupName" maxlength="60" autocomplete="name" placeholder="Your name"><p class="fielderr" id="signupNameErr" hidden></p></div>
+      <div class="field"><label class="f" for="signupEmail">Email</label><input id="signupEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"><p class="fieldhelp" id="signupEmailHelp" hidden>Trainer and client need two different emails.</p><p class="fielderr" id="signupEmailErr" hidden></p></div>
+      <div class="field"><label class="f" for="signupPass">Password</label><input id="signupPass" type="password" autocomplete="new-password" placeholder="Password"><p class="fieldhelp">At least 6 characters.</p><p class="fielderr" id="signupPassErr" hidden></p></div>
       <div class="field">
-        <label class="f">I am a</label>
-        <div class="chips" id="signupRoles">
-          <button type="button" class="chip sel" data-role="trainer">Trainer</button>
-          <button type="button" class="chip" data-role="client">Client</button>
+        <label class="f" id="signupRoleLabel">I am a</label>
+        <div class="segment" id="signupRoles" role="radiogroup" aria-labelledby="signupRoleLabel">
+          <button type="button" class="chip sel" role="radio" data-role="trainer" aria-checked="true">Trainer</button>
+          <button type="button" class="chip" role="radio" data-role="client" aria-checked="false">Client</button>
         </div>
       </div>
       <div class="field" id="signupCodeWrap" hidden>
@@ -1504,20 +1606,20 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
     </form>
   </div>
   <div id="welcomeLogin" hidden>
-    <button type="button" class="learnmore welcome-back" id="loginBack">Back</button>
+    <button type="button" class="iconback" id="loginBack" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     <div class="card" id="loginCard">
       <h2 id="loginHeading">Log in</h2>
       <p class="note" id="loginLocalNote" style="margin-bottom:10px"></p>
       <form id="loginForm">
         <div class="field">
-          <label class="f">I am a</label>
-          <div class="chips" id="loginRoles">
-            <button type="button" class="chip sel" data-loginrole="trainer">Trainer</button>
-            <button type="button" class="chip" data-loginrole="client">Client</button>
+          <label class="f" id="loginRoleLabel">I am a</label>
+          <div class="segment" id="loginRoles" role="radiogroup" aria-labelledby="loginRoleLabel">
+            <button type="button" class="chip sel" role="radio" data-loginrole="trainer" aria-checked="true">Trainer</button>
+            <button type="button" class="chip" role="radio" data-loginrole="client" aria-checked="false">Client</button>
           </div>
         </div>
-        <div class="field"><label class="f" for="loginEmail">Email</label><input id="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
-        <div class="field"><label class="f" for="loginPass">Password</label><div class="passwrap"><input id="loginPass" type="password" autocomplete="current-password" placeholder="Password"><button type="button" class="eye" id="loginEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div></div>
+        <div class="field"><label class="f" for="loginEmail">Email</label><input id="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"><p class="fielderr" id="loginEmailErr" hidden></p></div>
+        <div class="field"><label class="f" for="loginPass">Password</label><div class="passwrap"><input id="loginPass" type="password" autocomplete="current-password" placeholder="Password"><button type="button" class="eye" id="loginEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.75"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div><p class="fielderr" id="loginPassErr" hidden></p></div>
         <button type="button" class="forgot" id="forgotOpen">Forgot password</button>
         <label class="remember" for="loginRemember"><input id="loginRemember" type="checkbox"> Remember me</label>
         <button class="primary full" type="submit">Log in</button>
@@ -1525,9 +1627,9 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
       </form>
       <form id="forgotForm" hidden>
         <p class="note" id="forgotNote" style="margin-bottom:10px">Set a new password for the account already on this phone.</p>
-        <div class="field"><label class="f" for="forgotEmail">Email</label><input id="forgotEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
-        <div class="field"><label class="f" for="forgotNew">New password</label><div class="passwrap"><input id="forgotNew" type="password" autocomplete="new-password" placeholder="At least 6 characters"><button type="button" class="eye" id="forgotEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div></div>
-        <div class="field"><label class="f" for="forgotNew2">Confirm password</label><input id="forgotNew2" type="password" autocomplete="new-password" placeholder="Repeat the new password"></div>
+        <div class="field"><label class="f" for="forgotEmail">Email</label><input id="forgotEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"><p class="fielderr" id="forgotEmailErr" hidden></p></div>
+        <div class="field"><label class="f" for="forgotNew">New password</label><div class="passwrap"><input id="forgotNew" type="password" autocomplete="new-password" placeholder="Password"><button type="button" class="eye" id="forgotEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.75"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div><p class="fieldhelp">At least 6 characters.</p><p class="fielderr" id="forgotNewErr" hidden></p></div>
+        <div class="field"><label class="f" for="forgotNew2">Confirm password</label><input id="forgotNew2" type="password" autocomplete="new-password" placeholder="Repeat the new password"><p class="fielderr" id="forgotNew2Err" hidden></p></div>
         <button class="primary full" type="submit">Save new password</button>
         <button type="button" class="full" id="forgotCancel" style="margin-top:8px">Back to log in</button>
       </form>
@@ -1535,11 +1637,11 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
   </div>
   <div class="welcome-close">
     <div class="creator-frame">
-      <img class="creator" src="images/creator.jpg" alt="Curly Gurl Fitness creator">
+      <img class="creator" src="images/real_keyta_gym_portrait_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)">
     </div>
     <div class="welcome-quote">
       <img class="script" src="images/welcome-script.png" alt="Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.">
-      <img class="welcome-sign" src="images/marquita-foster.png" alt="Marquita Foster">
+      <img class="welcome-sign" src="images/marquita-foster.png" alt="Coach Keyta (Marquita Foster)">
     </div>
   </div>
   <div class="welcome-dock" id="welcomeDock" hidden>
@@ -2055,9 +2157,14 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
 
 <!-- ============ COACH ============ -->
 <section class="page" id="page-coach">
+  <div class="coachmedia">
+    <video class="coachloop" src="videos/real_keyta_dumbbell_loop.mp4" poster="images/real_keyta_dumbbell_loop_poster.jpg" muted playsinline loop autoplay preload="metadata" aria-label="Coach Keyta (Marquita Foster)"></video>
+    <img class="coachposter" src="images/real_keyta_dumbbell_loop_poster.jpg" alt="Coach Keyta (Marquita Foster)" width="720" height="900">
+    <img class="coachstill" src="images/real_keyta_dumbbell_row_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)" width="1080" height="1350">
+  </div>
   <div class="card setupcard" id="coachDemoCard" hidden>
     <h2>How a client joins</h2>
-    <p>The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.</p>
+    <p>The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
   </div>
   <div id="coachSolo">
     <div class="card">
@@ -2456,7 +2563,7 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
 <nav class="navmenu" id="navMenu" hidden>
   <div class="navscroll">
   <div class="sheetbar">
-    <img class="sheetlogo" src="images/login-logo.png" alt="">
+    <img class="sheetlogo" src="images/cgfitness_logo_400w.webp" srcset="images/cgfitness_logo_400w.webp 1x, images/cgfitness_logo.webp 2x" alt="Curly Gurl Fitness" width="164" height="28">
     <p class="menubrand">Curly Gurl Fitness</p>
     <button type="button" class="menubtn" id="menuClose" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
@@ -2471,7 +2578,7 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
     <button type="button" data-menurole="trainer" aria-pressed="false">Trainer</button>
     <button type="button" data-menurole="client" aria-pressed="false">Client</button>
   </div>
-  <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
+  <button type="button" class="navitem welcome-only" id="menuLearn" hidden>Learn more</button>
   <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
   <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
   <section class="menugroup">
@@ -2572,7 +2679,7 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
       <button type="button" data-look="night" aria-pressed="false"><span class="lookswatch" style="background:#FFFFFF"></span>Night</button>
     </div>
     <div class="bubbleedit">
-      <img id="bubblePreview" src="images/header-portrait.jpg" alt="">
+      <img id="bubblePreview" src="images/real_keyta_gym_portrait_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)">
       <div class="grow">
         <button type="button" id="bubbleCamBtn">Take photo</button>
         <button type="button" id="bubbleLibBtn">Choose photo</button>
@@ -11360,7 +11467,7 @@ async function passHash(pw){
 }
 const MEMBER_LOOK_KEY = "curlyGirlFitness.memberLook.v1";
 const MEMBER_LOOKS = {purple:"#FFFFFF", plum:"#FFFFFF", rose:"#FFFFFF", night:"#FFFFFF"};
-const BUBBLE_FALLBACK = "images/header-portrait.jpg";
+const BUBBLE_FALLBACK = "images/real_keyta_gym_portrait_4x5_1080w.webp";
 function memberCanStyle(){
   return !document.body.classList.contains("welcome-on") && (ID.role==="client" || ID.role==="solo");
 }
@@ -11439,8 +11546,8 @@ function showWelcome(view){
   $("welcomeDock").hidden = true;
   $("roleGate").style.display = "none";
   $("signupForm").hidden = false;
-  $("signupLocalNote").textContent = "Trainer and client need two different emails.";
-  $("loginLocalNote").textContent = "Trainer and client need two different emails.";
+  $("signupLocalNote").textContent = "";
+  $("loginLocalNote").textContent = "";
   if(view==="signup" || view==="login"){
     const side = sideFromMenu();
     if(side){ signupRole = side; loginRole = side; }
@@ -12046,14 +12153,36 @@ function sideFromMenu(){
 }
 function paintSignupRole(){
   document.querySelectorAll("#signupRoles [data-role]").forEach(btn=>{
-    btn.classList.toggle("sel", btn.dataset.role===signupRole);
+    const on = btn.dataset.role===signupRole;
+    btn.classList.toggle("sel", on);
+    btn.setAttribute("aria-checked", on ? "true" : "false");
   });
   $("signupCodeWrap").hidden = signupRole!=="client";
+  if($("signupEmailHelp")) $("signupEmailHelp").hidden = signupRole!=="client";
 }
 function paintLoginRole(){
   document.querySelectorAll("#loginRoles [data-loginrole]").forEach(btn=>{
-    btn.classList.toggle("sel", btn.dataset.loginrole===loginRole);
+    const on = btn.dataset.loginrole===loginRole;
+    btn.classList.toggle("sel", on);
+    btn.setAttribute("aria-checked", on ? "true" : "false");
   });
+}
+function clearFieldError(input){
+  if(!input) return;
+  input.removeAttribute("aria-invalid");
+  input.removeAttribute("aria-describedby");
+  const err = document.getElementById(input.id+"Err");
+  if(err){ err.hidden = true; err.textContent = ""; }
+}
+function showFieldError(input, message){
+  if(!input) return;
+  const err = document.getElementById(input.id+"Err");
+  input.setAttribute("aria-invalid", "true");
+  if(!err) return;
+  err.hidden = false;
+  err.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5M12 16.5h.01"/></svg><span></span>';
+  err.querySelector("span").textContent = message;
+  input.setAttribute("aria-describedby", err.id);
 }
 function applyClientLock(){
   if(currentAuth()) return;
@@ -12068,7 +12197,9 @@ function applyClientLock(){
 function scrollFeatures(){
   showWelcome("home");
   const el = $("frontPrograms") || $("welcomeMore");
-  if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  if(!el) return;
+  const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"});
 }
 function openSignupFromEmail(value){
   showWelcome("signup");
@@ -12089,9 +12220,14 @@ bindFrontStart("frontStartEnd", "frontEmailEnd");
 document.querySelectorAll("#welcomeFront [data-scroll]").forEach(btn=>{
   btn.onclick = () => {
     const el = document.getElementById(btn.dataset.scroll);
-    if(el) el.scrollIntoView({behavior:"smooth", block:"start"});
+    if(!el) return;
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"start"});
   };
 });
+if($("headLogin")) $("headLogin").onclick = () => showWelcome("login");
+if($("deskLogin")) $("deskLogin").onclick = () => showWelcome("login");
+if($("deskSignup")) $("deskSignup").onclick = () => showWelcome("signup");
 if($("frontTrainer")) $("frontTrainer").onclick = () => showWelcome("signup");
 if($("frontStudio")) $("frontStudio").onclick = () => showWelcome("signup");
 $("learnMore").onclick = scrollFeatures;
@@ -12122,6 +12258,12 @@ $("signupForm").onsubmit = (e) => {
   const email = $("signupEmail").value.trim().toLowerCase();
   const password = $("signupPass").value;
   const invite = $("signupCode").value.trim();
+  ["signupName","signupEmail","signupPass"].forEach(id => clearFieldError($(id)));
+  let bad = null;
+  if(!name){ showFieldError($("signupName"), "Enter your name"); bad = $("signupName"); }
+  if(!emailOk(email)){ showFieldError($("signupEmail"), "Enter a valid email"); if(!bad) bad = $("signupEmail"); }
+  if(password.length<6){ showFieldError($("signupPass"), "Use at least 6 characters"); if(!bad) bad = $("signupPass"); }
+  if(bad){ bad.focus(); return; }
   run(async () => {
     await signUpAccount(name, email, password, signupRole, invite);
     $("signupPass").value = "";
@@ -12179,6 +12321,11 @@ $("loginForm").onsubmit = (e) => {
   const email = $("loginEmail").value.trim().toLowerCase();
   const password = $("loginPass").value;
   const remember = $("loginRemember").checked;
+  ["loginEmail","loginPass"].forEach(id => clearFieldError($(id)));
+  let bad = null;
+  if(!emailOk(email)){ showFieldError($("loginEmail"), "Enter a valid email"); bad = $("loginEmail"); }
+  if(!password){ showFieldError($("loginPass"), "Enter your password"); if(!bad) bad = $("loginPass"); }
+  if(bad){ bad.focus(); return; }
   run(async () => {
     await logInAccount(email, password, remember, loginRole);
     $("loginPass").value = "";
@@ -12189,8 +12336,13 @@ $("forgotForm").onsubmit = (e) => {
   const email = $("forgotEmail").value.trim().toLowerCase();
   const password = $("forgotNew").value;
   const again = $("forgotNew2").value;
+  ["forgotEmail","forgotNew","forgotNew2"].forEach(id => clearFieldError($(id)));
+  let bad = null;
+  if(!emailOk(email)){ showFieldError($("forgotEmail"), "Enter a valid email"); bad = $("forgotEmail"); }
+  if(password.length<6){ showFieldError($("forgotNew"), "Use at least 6 characters"); if(!bad) bad = $("forgotNew"); }
+  if(password!==again){ showFieldError($("forgotNew2"), "Those passwords do not match."); if(!bad) bad = $("forgotNew2"); }
+  if(bad){ bad.focus(); return; }
   run(async () => {
-    if(password!==again) throw new Error("Those passwords do not match.");
     await setStoredPassword(email, password, loginRole);
     $("loginEmail").value = email;
     $("loginPass").value = "";
@@ -12243,6 +12395,22 @@ $("bubbleClear").onclick = () => {
 })();
 paintSignupRole();
 paintLoginRole();
+(function(){
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+  var clip = document.querySelector(".coachloop");
+  function syncCoach(){
+    if(!clip) return;
+    if(reduce.matches){
+      clip.pause();
+      clip.removeAttribute("autoplay");
+    } else {
+      var play = clip.play();
+      if(play && play.catch) play.catch(function(){});
+    }
+  }
+  if(reduce.addEventListener) reduce.addEventListener("change", syncCoach);
+  syncCoach();
+})();
 if(window.matchMedia){
   const scheme = window.matchMedia("(prefers-color-scheme: dark)");
   const onScheme = () => { if(themeChoice()==="system") applyTheme(); };
