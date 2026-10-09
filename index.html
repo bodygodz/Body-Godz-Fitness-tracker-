@@ -1408,9 +1408,11 @@ body:not(.welcome-on) #todayPick svg{width:16px; height:16px}
 #clientFile .cffoot button{text-transform:none !important; letter-spacing:0 !important; font:600 14px/20px var(--font) !important; min-height:40px; border-radius:8px !important; color:var(--text-2) !important}
 #clientFile .cffoot button.sel{background:#fff !important; color:#0B0B39 !important; box-shadow:var(--e-1)}
 #clientFile,#page-overview,#page-clients{font-family:var(--font) !important}
-#clientFile .cftabs{display:flex; gap:24px; overflow-x:auto; margin:0 0 12px; padding:0 4px; border-bottom:1px solid var(--line); scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}
-#clientFile .cftabs button{min-height:48px; font:600 14px/20px var(--font); text-transform:none; border:0 !important; border-bottom:2px solid transparent !important; border-radius:0 !important; background:transparent !important; color:var(--text-2) !important}
-#clientFile .cftabs button.sel{color:#0B0B39 !important; border-bottom-color:#563DD2 !important}
+#clientFile .cftabs{display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:12px 0; padding:4px; background:var(--fill-1); border-radius:12px; border-bottom:0; overflow:visible; -webkit-mask-image:none}
+#clientFile .cftabs button{min-height:44px; font:600 14px/20px var(--font); text-transform:none; border:0 !important; border-radius:8px !important; background:transparent !important; color:var(--text-2) !important; white-space:nowrap}
+#clientFile .cftabs button.sel{color:#0B0B39 !important; background:#fff !important; box-shadow:var(--e-1)}
+#clientFile > .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+#clientFile > .toolbar .sm{flex:1 1 120px; min-width:0}
 .scrim{position:fixed; inset:0; background:rgba(11,11,57,.48); z-index:40}
 .scrim[hidden]{display:none !important}
 .toolpanel:not([hidden]){
@@ -2371,7 +2373,7 @@ details summary::-webkit-details-marker{display:none}
     <div class="bmihead">
       <div class="bminum">
         <div class="big" id="bmiValue">—</div>
-        <div class="small" id="bmiBand">from height and weight</div>
+        <div class="small" id="bmiBand">—</div>
       </div>
       <div class="bmishots">
         <figure>
@@ -8969,8 +8971,7 @@ async function paintClientFile(){
     $("cfNameForm").hidden = true;
     $("cfName").textContent = pair.clientName || "Client";
   }
-  const joined = pair.clientDevice ? "Joined on their phone." : "Waiting for them to enter the code.";
-  $("cfInvite").textContent = pair.inviteCode ? pair.inviteCode+" · "+joined : joined;
+  $("cfInvite").textContent = pair.clientDevice ? "Joined" : "Waiting to join";
   const groupNow = clientGroup(pair);
   if($("cfGroupNow")) $("cfGroupNow").textContent = CLIENT_GROUP_LABEL[groupNow] || "Pending";
   const groupChip = document.querySelector('#cfGroups [data-cfgroup=""]');
@@ -9023,7 +9024,7 @@ async function paintClientFile(){
 async function paintTrainerList(){
   const pairs = await Link.pairsForTrainer();
   if(!pairs.length){
-    $("trList").innerHTML = '<div class="empty">No clients yet. Add a client to get an invite code.</div>';
+    $("trList").innerHTML = '<div class="empty">No clients yet.</div>';
     return;
   }
   $("trList").innerHTML = '<ul class="list">'+pairs.map(p=>'<li><div class="grow"><div class="name">'+esc(p.clientName)+'</div><div class="meta">'+esc(p.inviteCode)+(p.clientDevice?' · joined':' · waiting to join')+'</div></div><button class="sm" type="button" data-open="'+esc(p.id)+'">Open</button><button class="sm danger" type="button" data-del="'+esc(p.id)+'" data-name="'+esc(p.clientName||"this client")+'">Delete</button></li>').join("")+'</ul>';
@@ -9271,6 +9272,7 @@ if($("inviteDone")) $("inviteDone").onclick = () => {
   if($("inviteView")) $("inviteView").hidden = true;
   if($("clientFile")) $("clientFile").hidden = false;
   if($("clientFileTabs")) $("clientFileTabs").hidden = false;
+  if($("hdrTitle")) $("hdrTitle").textContent = ($("cfName") && $("cfName").textContent.trim()) || "Client";
   render();
 };
 if($("inviteCopy")) $("inviteCopy").onclick = () => {
@@ -10270,7 +10272,7 @@ function paintBmiRanges(b){
     [b!=null && b>=30, "30 and over", "Obesity"]
   ];
   $("bmiRanges").innerHTML = bands.map(([on, range, name])=>'<span class="'+(on?"on":"")+'"><small>'+name+'</small>'+range+'</span>').join("");
-  $("bmiBand").textContent = b==null ? "from height and weight" : bmiBandName(b)+" · from height and weight";
+  $("bmiBand").textContent = b==null ? "\u2014" : bmiBandName(b);
 }
 function latestWeightLb(){
   const rows = (S.weights||[]).filter(w=>num(w.weight)>0).slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0);
