@@ -411,8 +411,12 @@ body.welcome-on #menuRoles,body.welcome-on .welcome-dock,body.welcome-on .welcom
 .front-start input{flex:1;min-width:0;border:none;background:#fff;padding:14px 12px;color:#0B0B39;font:inherit;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .front-start input:focus{outline:none}
 .front-start button{flex:none;border:none;border-radius:0;background:#563DD2;color:#fff;font-weight:800;padding:14px 14px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.front-photo{margin:18px -22px 4px}
-.front-photo img{display:block;width:100%;height:340px;object-fit:cover;object-position:center 22%;background:#fff}
+#welcomeFront .front-creator{display:flex;align-items:center;gap:10px;margin:12px 0 36px;padding:0}
+#welcomeFront .front-creator .creator-frame{width:112px;height:112px;border-radius:22px;overflow:hidden;flex:none;background:#FFFFFF;border:1px solid #E4E2EB}
+#welcomeFront .front-creator .creator-frame img{width:100%;height:100%;object-fit:cover;object-position:center 22%;display:block}
+#welcomeFront .front-creator .welcome-quote{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+#welcomeFront .front-creator img.script{width:auto;height:84px;max-width:100%;object-fit:contain;object-position:left center;background:transparent;border-radius:0;filter:brightness(0) saturate(100%) invert(14%) sepia(8%) saturate(420%) hue-rotate(8deg)}
+#welcomeFront .front-creator .welcome-sign{display:block;height:22px;width:auto;max-width:70%;margin:0;background:transparent;filter:brightness(0) saturate(100%) invert(14%) sepia(8%) saturate(420%) hue-rotate(8deg)}
 .front-view{display:inline-flex;align-items:center;justify-content:center;margin:0 0 16px;background:#fff;color:#563DD2;border:1.5px solid #563DD2;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:700;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .front-list{margin:0 0 8px;padding-left:18px}
 .front-list li{margin:0 0 8px;color:#0B0B39;font-size:15px;line-height:1.45}
@@ -1254,9 +1258,6 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
       syncPhone();
     })();
     </script>
-    <section class="front-photo" aria-label="Marquita Foster">
-      <img src="images/header-portrait.jpg" alt="Marquita Foster">
-    </section>
     <section class="front-trust">
       <h2>For the people who train here.</h2>
       <p>Curly Gurl Fitness is this family's app. This page does not borrow another gym's name, and it does not invent a headcount.</p>
@@ -1320,6 +1321,15 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
         <input id="frontEmailEnd" type="email" inputmode="email" autocomplete="email" placeholder="Email">
         <button type="submit">Get started</button>
       </form>
+    </section>
+    <section class="front-creator" aria-label="Marquita Foster">
+      <div class="creator-frame">
+        <img src="images/header-portrait.jpg" alt="Marquita Foster">
+      </div>
+      <div class="welcome-quote">
+        <img class="script" src="images/welcome-script.png" alt="Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.">
+        <img class="welcome-sign" src="images/marquita-foster.png" alt="Marquita Foster">
+      </div>
     </section>
   </div>
   <div class="bubbles" id="welcomeBubbles" aria-hidden="true" hidden>
