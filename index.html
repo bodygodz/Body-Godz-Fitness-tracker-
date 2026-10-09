@@ -1325,6 +1325,219 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   .tmcards,.grid2,.tapelist{grid-template-columns:1fr}
 }
 
+/* Round 2 layout */
+:root{
+  --fill-1:rgba(11,11,57,.06);
+  --line:rgba(11,11,57,.12);
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-7:48px;
+}
+body:not(.welcome-on){padding-bottom:calc(64px + 48px + var(--safe-b)) !important}
+body:not(.welcome-on) main{padding-bottom:calc(64px + 48px + var(--safe-b))}
+body:not(.welcome-on) header{
+  position:sticky !important; top:0 !important; z-index:28;
+  background:#fff !important; border-bottom:1px solid var(--line) !important;
+  padding:0 !important; margin:0 !important;
+}
+body.ov-home header{position:sticky !important; top:0 !important; background:#fff !important; border-bottom:1px solid var(--line) !important; padding:0 !important}
+body.ov-home header .topbar,body.ov-home header #hdrSub,body.ov-home header #subbar{display:flex !important}
+body.ov-home header #hdrSub[hidden],body.ov-home header #subbar[hidden],body.ov-home header #dayMenu[hidden]{display:none !important}
+body:not(.welcome-on) .topbar{
+  display:flex !important; align-items:center; gap:8px; flex-wrap:nowrap;
+  height:56px; min-height:56px; max-width:1200px; margin:0 auto; padding:0 8px 0 12px; width:100%;
+  box-sizing:border-box; overflow:hidden;
+}
+body:not(.welcome-on) #hdrTitle,body:not(.welcome-on) header .screentitle{
+  display:block !important; flex:1 1 auto; min-width:0;
+  font:700 18px/24px var(--font) !important; color:#0B0B39 !important;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0 !important; letter-spacing:0 !important;
+}
+body:not(.welcome-on) .topgap{display:none !important}
+body:not(.welcome-on) .streak,body:not(.welcome-on) .headside{flex:none}
+body:not(.welcome-on) #todayPick{
+  display:inline-flex; align-items:center; gap:4px; height:36px; margin:8px 16px 4px;
+  padding:0 12px; border:0; border-radius:999px; background:var(--fill-1);
+  font:600 14px/20px var(--font) !important; color:#0B0B39; letter-spacing:0 !important;
+}
+body:not(.welcome-on) #todayPick[hidden]{display:none !important}
+body:not(.welcome-on) #todayPick svg{width:16px; height:16px}
+.icon-btn{width:44px; height:44px; display:inline-grid; place-items:center; border-radius:999px; border:0 !important; background:transparent; color:#0B0B39; padding:0}
+.icon-btn svg{width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round}
+.icon-btn:hover{background:var(--fill-1)}
+.icon-btn:focus-visible,.chip:focus-visible,.tabs a:focus-visible,.seg button:focus-visible,.sheet-row:focus-visible,.tabbar a:focus-visible,.tabbar button:focus-visible,.btn:focus-visible,button:focus-visible,a:focus-visible{
+  outline:none; box-shadow:var(--focus);
+}
+#page-overview .ovbar{display:none !important}
+#page-overview.active{display:flex; flex-direction:column}
+#page-overview .ovsections{order:-1; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px; padding:4px; margin:16px 16px 0; background:var(--fill-1); border-radius:12px; height:48px}
+#page-overview .ovsections button{border:0 !important; border-radius:8px; background:transparent; font:600 14px/20px var(--font); color:var(--text-2); text-transform:none; min-height:40px}
+#page-overview .ovsections button.sel{background:#fff; color:#0B0B39; box-shadow:var(--e-1)}
+#page-overview .ovlead{font:600 18px/24px var(--font); margin:0 0 4px}
+#subbar:not([hidden]){
+  display:grid !important; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px;
+  padding:4px; margin:12px 16px 8px; background:var(--fill-1); border-radius:12px; height:48px;
+}
+#subbar button{background:transparent !important; color:var(--text-2) !important; border-radius:8px !important; text-transform:none !important; font:600 14px/20px var(--font) !important; min-height:40px !important; border:0 !important}
+#subbar button.sel{background:#fff !important; color:#0B0B39 !important; box-shadow:var(--e-1)}
+.tabbar{
+  position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important; z-index:30 !important;
+  display:block !important; width:100% !important; max-width:none !important; margin:0 !important;
+  height:auto !important; padding:0 !important; background:#fff !important;
+  border-top:1px solid var(--line) !important; box-shadow:none !important;
+  padding-bottom:env(safe-area-inset-bottom) !important;
+}
+.tabpill{display:flex !important; width:100%; height:64px; background:transparent !important; border:0 !important; border-radius:0 !important; padding:0 !important; gap:0 !important; box-shadow:none !important}
+.tabpill button{flex:1 1 0; min-width:0; display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:48px; background:transparent !important; border:0 !important; border-radius:0 !important; color:var(--text-2) !important; font:600 12px/16px var(--font) !important; padding:0 !important}
+.tabpill button svg{width:24px; height:24px}
+.tabpill button.sel{color:#563DD2 !important; background:transparent !important}
+.tabpill button.sel svg{background:var(--accent-16); border-radius:999px; padding:2px 10px; box-sizing:content-box}
+.tabplus,#tabPlus{
+  position:fixed !important; right:16px; bottom:calc(72px + 16px + var(--safe-b));
+  width:56px !important; height:56px !important; border-radius:999px !important;
+  background:#563DD2 !important; color:#fff !important; border:0 !important;
+  box-shadow:0 8px 16px rgba(11,11,57,.10),0 24px 48px rgba(11,11,57,.14);
+  font-size:28px; z-index:31;
+}
+#clientFile .cffoot{
+  position:static !important; bottom:auto !important; margin:0 0 12px !important;
+  display:grid !important; grid-template-columns:repeat(3,1fr); gap:4px;
+  padding:4px !important; background:var(--fill-1) !important; border:0 !important; border-radius:12px !important; box-shadow:none !important;
+}
+#cfPaneSummary:not([hidden]){display:flex; flex-direction:column}
+#cfFoot{order:-1}
+#clientFile .cffoot button{text-transform:none !important; letter-spacing:0 !important; font:600 14px/20px var(--font) !important; min-height:40px; border-radius:8px !important; color:var(--text-2) !important}
+#clientFile .cffoot button.sel{background:#fff !important; color:#0B0B39 !important; box-shadow:var(--e-1)}
+#clientFile,#page-overview,#page-clients{font-family:var(--font) !important}
+#clientFile .cftabs{display:flex; gap:24px; overflow-x:auto; margin:0 0 12px; padding:0 4px; border-bottom:1px solid var(--line); scrollbar-width:none; -webkit-mask-image:linear-gradient(90deg,#000 85%,transparent)}
+#clientFile .cftabs button{min-height:48px; font:600 14px/20px var(--font); text-transform:none; border:0 !important; border-bottom:2px solid transparent !important; border-radius:0 !important; background:transparent !important; color:var(--text-2) !important}
+#clientFile .cftabs button.sel{color:#0B0B39 !important; border-bottom-color:#563DD2 !important}
+.scrim{position:fixed; inset:0; background:rgba(11,11,57,.48); z-index:40}
+.scrim[hidden]{display:none !important}
+.toolpanel:not([hidden]){
+  position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
+  z-index:41; max-height:85vh; overflow:auto; border-radius:20px 20px 0 0 !important;
+  padding:8px 16px calc(24px + var(--safe-b)) !important; box-shadow:0 8px 16px rgba(11,11,57,.10),0 24px 48px rgba(11,11,57,.14) !important;
+}
+.toolpanel:not([hidden])::before,.modalbox::before,#dayMenu:not([hidden])::before,#ovAddForm:not([hidden])::before{
+  content:""; display:block; width:36px; height:4px; border-radius:999px; background:rgba(11,11,57,.20); margin:4px auto 12px;
+}
+#dayMenu:not([hidden]){
+  position:fixed; left:0; right:0; bottom:0; top:auto; z-index:41; background:#fff;
+  border-radius:20px 20px 0 0; padding:8px 16px calc(24px + var(--safe-b)); max-height:85vh; overflow:auto;
+  box-shadow:0 8px 16px rgba(11,11,57,.10),0 24px 48px rgba(11,11,57,.14);
+}
+#dayMenu[hidden]{display:none !important}
+#ovAddForm:not([hidden]){
+  position:fixed; left:0; right:0; bottom:0; z-index:41; background:#fff; margin:0;
+  border-radius:20px 20px 0 0; padding:8px 16px calc(24px + var(--safe-b)); max-height:85vh; overflow:auto;
+}
+.modalback{z-index:40; background:rgba(11,11,57,.48); align-items:flex-end}
+.modalbox{width:100%; max-width:560px; border-radius:20px 20px 0 0; position:relative; padding-top:8px}
+.toolpanel h3,.sheet__title{font:700 18px/24px var(--font); margin:0 0 12px}
+.toolpanel .addpick{
+  display:grid !important; grid-template-columns:40px 1fr 20px; align-items:center; gap:12px;
+  min-height:56px; padding:0 12px !important; border:0 !important; border-bottom:1px solid var(--line) !important;
+  border-radius:12px !important; background:#fff !important; font:600 15px/22px var(--font) !important; text-align:left;
+}
+.toolpanel .addpick:hover{background:var(--fill-1) !important}
+.addpick .sheet-ico{width:40px; height:40px; border-radius:12px; background:var(--accent-08); color:#563DD2; display:grid; place-items:center}
+.addpick .sheet-ico svg{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.75}
+body:not(.welcome-on) .card,body:not(.welcome-on) .ovcard,body:not(.welcome-on) .dcard,body:not(.welcome-on) .stat{
+  background:#fff !important; border:1px solid var(--line) !important; border-radius:20px !important; box-shadow:var(--e-1); padding:16px !important;
+}
+body:not(.welcome-on) .card h2{font:600 18px/24px var(--font) !important; text-transform:none !important; letter-spacing:0 !important; color:#0B0B39 !important}
+.card__title{font:600 18px/24px var(--font); color:#0B0B39; margin:0 0 4px}
+.card__meta,.note{font:500 13px/18px var(--font); color:var(--text-2)}
+.empty{display:grid; justify-items:center; text-align:center; gap:8px; padding:32px 16px}
+.empty__icon{width:48px; height:48px; border-radius:12px; background:var(--accent-08); color:#563DD2; display:grid; place-items:center}
+.empty__icon svg{width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.75}
+.empty__body{font:400 15px/22px var(--font); color:var(--text-2); max-width:32ch; margin:0}
+.chip,button.chip{
+  display:inline-flex; align-items:center; gap:4px; min-height:36px; padding:0 12px;
+  border-radius:999px; border:1px solid var(--field-border) !important; background:#fff !important;
+  font:600 14px/20px var(--font) !important; color:#0B0B39 !important;
+}
+.chip.sel,button.chip.sel,.chip[aria-pressed="true"]{background:#563DD2 !important; border-color:#563DD2 !important; color:#fff !important}
+.segment button.chip,.segment button.chip.sel{border-color:transparent !important; min-height:44px}
+.segment button.chip.sel{background:#fff !important; color:#0B0B39 !important}
+.pill.ok,.badge--done{background:var(--accent-16) !important; color:#563DD2 !important}
+.pill.no,.badge--todo{background:var(--fill-1) !important; color:var(--text-2) !important}
+.foodrow .mark{display:none !important}
+input[type=checkbox]{appearance:none; width:22px; height:22px; border:1.5px solid var(--field-border); border-radius:6px; display:inline-grid; place-items:center; margin:11px; background:#fff; vertical-align:middle}
+input[type=checkbox]:checked{background:#563DD2; border-color:#563DD2}
+input[type=checkbox]:checked::after{content:""; width:6px; height:11px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px)}
+input[type=checkbox]:focus-visible{box-shadow:var(--focus); outline:none}
+select{appearance:none; height:48px; padding:0 44px 0 16px; border:1.5px solid var(--field-border); border-radius:12px; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%230B0B39' stroke-width='1.75'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E") right 14px center/20px no-repeat; font:400 15px/22px var(--font); color:#0B0B39}
+textarea{resize:none; min-height:96px; border:1.5px solid var(--field-border); border-radius:12px; padding:12px; font:400 15px/22px var(--font)}
+#videoFile,#sessionFile,#tmPdf,#cinPhoto{position:absolute; width:1px; height:1px; opacity:0; overflow:hidden}
+.dropzone{display:grid; place-items:center; gap:4px; min-height:96px; border:1.5px dashed var(--field-border); border-radius:12px; color:var(--text-2); font:600 14px/20px var(--font); position:relative}
+.dropzone:focus-within{box-shadow:var(--focus)}
+.btn,.primary,button.primary,button.full{border-radius:12px; min-height:48px; font:600 15px/20px var(--font)}
+button:disabled,button[aria-disabled="true"],.btn:disabled{background:var(--fill-1) !important; color:rgba(11,11,57,.38) !important; border-color:transparent !important; cursor:not-allowed}
+#menuLogout,#logOutBtn{
+  display:block; width:calc(100% - 32px); margin:8px 16px 16px; min-height:48px;
+  background:transparent !important; border:0 !important; border-top:1px solid var(--line) !important;
+  border-radius:12px !important; color:#563DD2 !important; font:600 15px/20px var(--font) !important; box-shadow:none !important;
+}
+#accountCard #logOutBtn{width:100%; margin:16px 0 0}
+body.login-open .headlogin{display:none !important}
+#loginHeading,#signupHeading{margin-bottom:24px}
+#loginBack,#signupBack{margin-bottom:16px}
+.forgotrow{display:flex; justify-content:space-between; align-items:center; min-height:44px; margin-top:8px; gap:8px}
+.fieldhelp,#forgotNote{font:500 13px/18px var(--font) !important; color:var(--text-2) !important}
+.fielderr{color:#0B0B39; font:500 13px/18px var(--font)}
+.ex-thumb{width:64px; height:64px; border-radius:12px; background:var(--accent-08); color:#563DD2; display:grid; place-items:center; flex:none}
+.ex-thumb svg{width:28px; height:28px; stroke:currentColor; fill:none; stroke-width:1.75}
+.ex-thumb.mini{width:28px; height:28px}
+.ex-thumb.mini svg{width:16px; height:16px}
+.video-grid,.coachmedia{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.video-tile{position:relative; aspect-ratio:4/5; border-radius:12px; overflow:hidden; background:#0B0B39}
+.video-tile img,.video-tile video{width:100%; height:100%; object-fit:cover; object-position:50% 20%; display:block}
+.video-tile__label{position:absolute; left:12px; right:12px; bottom:12px; z-index:1; color:#fff; font:600 14px/20px var(--font)}
+.video-tile__dur{position:absolute; top:8px; right:8px; z-index:1; background:rgba(11,11,57,.72); color:#fff; font:600 12px/16px var(--font); padding:2px 6px; border-radius:8px}
+#youTitle,.asktitle,#edHeading,#libraryNoteTitle{display:none !important}
+#trHome > .card:first-child,#videoDemoNote,#keysCard{display:none !important}
+#csteps{display:grid !important; grid-template-columns:1fr 1fr; gap:8px; overflow:visible; margin:0 0 12px}
+#csteps button{min-height:44px; white-space:normal; border:1px solid var(--field-border) !important; border-radius:12px !important; text-transform:none !important; background:#fff !important; color:#0B0B39 !important; font:600 14px/20px var(--font) !important}
+#csteps button.sel{background:var(--accent-08) !important; border-color:#563DD2 !important}
+.calgrid button{width:44px; height:44px; border-radius:999px; font:500 15px/22px var(--font)}
+.calgrid button.today{box-shadow:inset 0 0 0 1.5px #563DD2; color:#563DD2; background:transparent !important}
+.calgrid button.sel{background:#563DD2 !important; color:#fff !important}
+#edDays{display:grid !important; grid-template-columns:repeat(7,1fr); gap:4px}
+#edDays .chip{min-height:44px; justify-content:center; padding:0 2px; border-radius:12px}
+.stepper{display:grid; grid-template-columns:44px 1fr 44px; align-items:center; gap:12px}
+.stepper output{display:block; text-align:center; font:700 28px/34px var(--font)}
+.stepper button{width:44px; height:44px; border-radius:999px; border:1.5px solid var(--field-border); background:#fff}
+.invitecode{font:700 28px/34px ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.12em; text-align:center; margin:16px 0}
+.invitesteps{margin:16px 0 0; padding-left:20px; color:var(--text-2); font:500 13px/18px var(--font)}
+.invitesteps li{margin:8px 0}
+#inviteView{padding:8px 0 24px}
+.cfinitials{width:72px; height:72px; border-radius:50%; background:var(--accent-16); color:#563DD2; display:grid; place-items:center; font:700 20px/1 var(--font)}
+#cfNoteInput{min-height:120px; resize:none}
+.weekdots .dot{width:6px; height:6px; border-radius:50%; background:transparent; display:block; margin:4px auto 0; border:0}
+.weekdots .dot.on{background:#563DD2}
+.promptcard .chev{font-size:0 !important; width:24px; height:24px; color:var(--text-3)}
+.logplus{color:#563DD2 !important}
+#edSave{position:sticky; bottom:calc(80px + var(--safe-b)); z-index:2}
+.fasttime{text-align:center; font:700 36px/40px var(--font)}
+.fastclock .chips,.fastmarks{text-align:left}
+.dash{color:var(--text-3)}
+#modePicks{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px; padding:4px; background:var(--fill-1); border-radius:12px}
+#modePicks button{border:0 !important; background:transparent !important; color:var(--text-2) !important; border-radius:8px !important; min-height:40px}
+#modePicks button.sel{background:#fff !important; color:#0B0B39 !important; box-shadow:var(--e-1)}
+.eventfilters{display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px; padding:4px; background:var(--fill-1); border-radius:12px; margin:0 0 12px}
+.eventfilters button{text-transform:none !important; background:transparent !important; color:var(--text-2) !important; border:0 !important; border-radius:8px !important; min-height:40px; font:600 14px/20px var(--font) !important; white-space:nowrap}
+.eventfilters button.sel{background:#fff !important; color:#0B0B39 !important}
+body:not(.welcome-on) .cgadd{background:transparent !important; color:#563DD2 !important; border:0 !important}
+details summary{list-style:none; cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+.howto{width:44px; height:44px; display:inline-grid; place-items:center; color:#563DD2}
+.howto svg{width:24px; height:24px; stroke:currentColor; fill:none; stroke-width:1.75}
+#libGroups{padding-bottom:8px}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.stat .label{font:500 13px/18px var(--font); color:var(--text-2); text-transform:none}
+.stat .big{font:700 22px/28px var(--font)}
+@media (prefers-reduced-motion:reduce){.scrim,.toolpanel,.modalbox{animation:none}}
+
 </style>
 </head>
 <body class="welcome-on front-on">
@@ -1337,11 +1550,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   <div class="topbar">
     <h1 class="brandline"><span class="drop">C</span>urly Gurl Fitness</h1>
     <img class="loginlogo" src="images/cgfitness_logo_400w.webp" srcset="images/cgfitness_logo_400w.webp 1x, images/cgfitness_logo.webp 2x" alt="Curly Gurl Fitness" width="164" height="28">
-    <button type="button" class="todaypick" id="todayPick" aria-expanded="false" aria-controls="dayMenu">
-      <span id="todayPickLabel">Today</span>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-    </button>
-    <div class="screentitle" id="hdrTitle" hidden>Today</div>
+    <div class="screentitle" id="hdrTitle">Today</div>
     <div class="topgap"></div>
     <div class="streak" id="streak" aria-label="Streak"><span id="streakCount">0</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
     <div class="headside">
@@ -1354,6 +1563,10 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       <button type="button" class="menubtn" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu"><svg class="ham" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     </div>
   </div>
+  <button type="button" class="todaypick" id="todayPick" aria-expanded="false" aria-controls="dayMenu" hidden>
+    <span id="todayPickLabel">Today</span>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
   <div class="daymenu" id="dayMenu" hidden>
     <button type="button" data-shift="0">Today</button>
     <button type="button" data-shift="-1">Yesterday</button>
@@ -1367,22 +1580,24 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <button type="button" class="toolplus" id="toolPlus" aria-label="Add" aria-expanded="false" aria-controls="addPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     <button type="button" class="toolicon" id="toolCheck" aria-label="Today's workout checklist" aria-expanded="false" aria-controls="checkPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6.5l1.2 1.2L7.5 5.5M4 12.5l1.2 1.2L7.5 11.5M4 18.5l1.2 1.2L7.5 17.5"/></svg></button>
     <button type="button" class="toolicon" id="toolBell" aria-label="Notifications" aria-expanded="false" aria-controls="bellPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span class="tooldot" id="toolDot" hidden></span></button>
-    <div class="toolpanel" id="addPanel" hidden>
-      <button type="button" class="addpick" data-add="meals">Log a meal</button>
-      <button type="button" class="addpick" data-add="weight">Log weight</button>
-      <button type="button" class="addpick" data-add="workout">Add a workout</button>
-      <button type="button" class="addpick" data-add="event">Create an event</button>
+    <div class="toolpanel" id="addPanel" hidden role="dialog" aria-modal="true" aria-label="Add">
+      <h3 class="sheet__title">Add</h3>
+      <button type="button" class="addpick" data-add="meals"><span class="sheet-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v6M5 3v4.5a2 2 0 0 0 4 0V3M7 9.5V21M17 3v18"/></svg></span><span>Log a meal</span></button>
+      <button type="button" class="addpick" data-add="weight"><span class="sheet-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V10M10 19V5M16 19v-7M22 19H2"/></svg></span><span>Log weight</span></button>
+      <button type="button" class="addpick" data-add="workout"><span class="sheet-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9v6M18 9v6M6 12h12M3 8v8M21 8v8"/></svg></span><span>Add a workout</span></button>
+      <button type="button" class="addpick" data-add="event"><span class="sheet-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span><span>Create an event</span></button>
     </div>
-    <div class="toolpanel" id="checkPanel" hidden>
+    <div class="toolpanel" id="checkPanel" hidden role="dialog" aria-modal="true" aria-label="Checklist">
       <h3 id="checkTitle">Today's workout</h3>
       <div id="checkList"></div>
     </div>
-    <div class="toolpanel" id="bellPanel" hidden>
+    <div class="toolpanel" id="bellPanel" hidden role="dialog" aria-modal="true" aria-label="Notifications">
       <h3>Notifications</h3>
       <div id="bellList"></div>
     </div>
   </div>
 </header>
+<div class="scrim" id="toolScrim" hidden></div>
 <div id="welcome" class="welcome">
   <div id="welcomeFront">
     <section class="front-hero">
@@ -1511,7 +1726,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
                   <div class="ps-search">Search foods</div>
                   <div class="ps-acts"><span>Barcode scan</span><span>Voice log</span></div>
                   <div class="ps-h">Recently logged</div>
-                  <div class="ps-row"><img src="images/food/salmon.jpg" alt=""><div><b>Salmon</b><small>100 cal, 4 ounce</small></div></div>
+                  <div class="ps-row"><span class="ex-thumb" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M7 8c2 2 8 2 10 0M7 16c2-2 8-2 10 0"/></svg></span><div><b>Salmon</b><small>100 cal, 4 ounce</small></div></div>
                   <div class="ps-row"><img src="images/food/oatmeal.jpg" alt=""><div><b>Oatmeal, cooked</b><small>154 cal, 1 cup</small></div></div>
                 </div>
                 <div class="loginphone-slide">
@@ -1672,15 +1887,17 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
         </div>
         <div class="field"><label class="f" for="loginEmail">Email</label><input id="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"><p class="fielderr" id="loginEmailErr" hidden></p></div>
         <div class="field"><label class="f" for="loginPass">Password</label><div class="passwrap"><input id="loginPass" type="password" autocomplete="current-password" placeholder="Password"><button type="button" class="eye" id="loginEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.75"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div><p class="fielderr" id="loginPassErr" hidden></p></div>
-        <button type="button" class="forgot" id="forgotOpen">Forgot password</button>
-        <label class="remember" for="loginRemember"><input id="loginRemember" type="checkbox"> Remember me</label>
+        <div class="forgotrow">
+          <button type="button" class="forgot" id="forgotOpen">Forgot password</button>
+          <label class="remember" for="loginRemember"><input id="loginRemember" type="checkbox"> Remember me</label>
+        </div>
         <button class="primary full" type="submit">Log in</button>
         <button type="button" class="full" id="loginToSignup" style="margin-top:8px">Need an account? Sign up</button>
       </form>
       <form id="forgotForm" hidden>
-        <p class="note" id="forgotNote" style="margin-bottom:10px">Set a new password for the account already on this phone.</p>
+        <p class="note" id="forgotNote" style="margin-bottom:10px">Set a new password for this account.</p>
         <div class="field"><label class="f" for="forgotEmail">Email</label><input id="forgotEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"><p class="fielderr" id="forgotEmailErr" hidden></p></div>
-        <div class="field"><label class="f" for="forgotNew">New password</label><div class="passwrap"><input id="forgotNew" type="password" autocomplete="new-password" placeholder="Password"><button type="button" class="eye" id="forgotEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.75"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div><p class="fieldhelp">At least 6 characters.</p><p class="fielderr" id="forgotNewErr" hidden></p></div>
+        <div class="field"><label class="f" for="forgotNew">New password</label><div class="passwrap"><input id="forgotNew" type="password" autocomplete="new-password"><button type="button" class="eye" id="forgotEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><circle cx="12" cy="12" r="2.6" fill="none" stroke="currentColor" stroke-width="1.75"/><path class="shut" d="M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button></div><p class="fieldhelp">At least 6 characters.</p><p class="fielderr" id="forgotNewErr" hidden></p></div>
         <div class="field"><label class="f" for="forgotNew2">Confirm password</label><input id="forgotNew2" type="password" autocomplete="new-password" placeholder="Repeat the new password"><p class="fielderr" id="forgotNew2Err" hidden></p></div>
         <button class="primary full" type="submit">Save new password</button>
         <button type="button" class="full" id="forgotCancel" style="margin-top:8px">Back to log in</button>
@@ -1716,26 +1933,27 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   <form class="ovcard" id="ovAddForm" hidden>
     <p class="ovneed">New client</p>
     <div class="field"><label class="f" for="ovClientName">Client name</label><input id="ovClientName" maxlength="40" placeholder="Name" autocomplete="name"></div>
-    <button class="primary full" type="submit">Add client</button>
+    <p class="fielderr" id="ovClientErr" hidden></p>
+    <button class="primary full" type="submit">Create and copy invite</button>
     <button type="button" class="full" id="ovAddCancel">Cancel</button>
   </form>
   <div class="ovfilter" id="ovFilterMenu" hidden>
     <button type="button" data-ovfilter="all">All needs</button>
     <button type="button" data-ovfilter="phase">Need a new training phase</button>
-    <button type="button" data-ovfilter="best">New exercise personal bests</button>
+    <button type="button" data-ovfilter="best" hidden>New exercise personal bests</button>
     <button type="button" data-ovfilter="quiet">Not messaged lately</button>
   </div>
   <div class="ovcard">
-    <p class="ovlead">Clients grouped by what they need.</p>
+    <h2 class="card__title">Clients</h2><p class="card__meta">Grouped by what they need.</p>
     <div id="ovGroups"></div>
     <form id="ovAutoForm" hidden>
-      <p class="ovempty">Saved on this phone. Nothing is sent from here.</p>
-      <div class="field"><label class="f" for="ovAutoText">Message</label><textarea id="ovAutoText" maxlength="500" placeholder="Write a message to keep on this phone"></textarea></div>
+      <p class="ovempty">This note stays with you.</p>
+      <div class="field"><label class="f" for="ovAutoText">Message</label><textarea id="ovAutoText" maxlength="500" placeholder="Write a message"></textarea></div>
       <p class="ovneed">Use this note for</p>
       <label class="ovcheck"><input type="checkbox" id="ovAutoPhase"> Need a new training phase</label>
       <label class="ovcheck"><input type="checkbox" id="ovAutoBest"> New exercise personal bests</label>
       <label class="ovcheck"><input type="checkbox" id="ovAutoQuiet"> Not messaged lately</label>
-      <button class="primary full" type="submit">Save on this phone</button>
+      <button class="primary full" type="submit">Save</button>
       <button type="button" class="full" id="ovAutoBack">Back</button>
     </form>
     <div class="ovfoot">
@@ -1761,10 +1979,10 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   <div class="weekdots" id="weekDots"></div>
   <button type="button" class="promptcard" id="weightPrompt">
     <div class="grow">
-      <b id="weightPromptTitle">Weight log Wednesday <span class="heart" aria-hidden="true">♥</span></b>
-      <span>Track your progress today, judgment-free.</span>
+      <b id="weightPromptTitle">Log weight</b>
+      <span class="card__meta" id="weightPromptMeta">Today</span>
     </div>
-    <span class="chev" aria-hidden="true">›</span>
+    <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
   </button>
   <div class="dcard">
     <div class="k">Calories</div>
@@ -1847,7 +2065,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     </label>
     <div class="tmdiv">Or build one here</div>
     <div class="tmcards">
-      <button type="button" class="tmcard" data-tmkind="quick" aria-pressed="false"><b>Quick plan</b><span>A draft from foods already saved, or from USDA and Open Food Facts.</span><img src="images/food/salad.jpg" alt=""></button>
+      <button type="button" class="tmcard" data-tmkind="quick" aria-pressed="false"><b>Quick plan</b><span>A draft from foods already saved, or from USDA and Open Food Facts.</span><span class="ex-thumb" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 3v6M5 3v4.5a2 2 0 0 0 4 0V3M7 9.5V21M17 3v18"/></svg></span></button>
       <button type="button" class="tmcard" data-tmkind="flex" aria-pressed="false"><b>Flexible plan</b><span>Build it meal by meal in the planner.</span><img src="images/food/salmon.jpg" alt=""></button>
     </div>
     <button type="button" id="tmStart" disabled>Let's start</button>
@@ -1856,7 +2074,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <button type="button" class="sm tmback" id="tmQuickBack">‹ Meal plan</button>
     <p class="tmlead" id="tmQuickLead"></p>
     <div class="field"><label class="f" for="tmFoodSearch">Search foods</label><input id="tmFoodSearch" type="search" placeholder="Search foods" autocomplete="off"></div>
-    <p class="note">Saved foods on this phone, then USDA and Open Food Facts. A food is listed only when that source already has a calorie.</p>
+    <p class="note">Foods you have logged, then a public food database when a calorie is already listed.</p>
     <div id="tmFoodHits"></div>
     <h2 class="sec">Draft</h2>
     <div id="tmDraft"></div>
@@ -1867,9 +2085,9 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <div id="tmPdfFile"></div>
   </div>
   <div class="datenav" id="mealDiaryNav">
-    <button class="sm" id="mPrev">‹ Prev</button>
+    <button type="button" class="icon-btn" id="mPrev" aria-label="Previous day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
     <b id="mDate"></b>
-    <button class="sm" id="mNext">Next ›</button>
+    <button type="button" class="icon-btn" id="mNext" aria-label="Next day"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
   </div>
   <div class="note" id="mModeNote" style="margin-bottom:12px;text-align:center"></div>
   <div class="photostrip" id="mTypeStrip"></div>
@@ -1879,7 +2097,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       <h2>Meal plan <span id="mPlanTotals" style="text-transform:none;letter-spacing:0;float:right"></span></h2>
       <div id="mealPlanList"></div>
       <details style="margin-top:10px">
-        <summary>Copy plan</summary>
+        <summary class="btn-ghost"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style="stroke:currentColor;fill:none;stroke-width:1.75"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V4h12"/></svg> Copy plan</summary>
         <div class="field" style="margin-top:8px"><label class="f">Copy another day's plan here</label>
           <div class="row"><input type="date" id="mCopyFromDate"><button class="sm" id="mCopyFromBtn">Copy here</button></div>
         </div>
@@ -1896,8 +2114,8 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       <button type="button" class="chip sel" data-addmode="log" id="addModeLog">Log (eaten)</button>
       <button type="button" class="chip" data-addmode="plan" id="addModePlan">Plan ahead</button>
     </div>
+    <p class="card__meta">Estimates</p>
     <div class="chips" id="presetChips"></div>
-    <div class="note" style="margin-top:8px">Preset macros are <b>rough estimates</b>. Tapping one fills the form below so you can adjust before adding. Edit the defaults in Settings.</div>
     <button class="full" id="mealsCook" style="margin-top:10px">Browse cookbook</button>
     <button type="button" class="full" id="scanFood" style="margin-top:8px">Scan barcode</button>
     <span id="scanHomeMark" hidden></span>
@@ -1945,11 +2163,11 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 <!-- ============ WORKOUT ============ -->
 <section class="page" id="page-workout">
   <div id="woBuild" class="wobuild" style="display:none">
-    <h2>Create a workout from <span>one prompt.</span></h2>
-    <div class="wocards" id="woIdeas">
-      <button type="button" class="wocard" data-woidea="upper"><b>Upper body strength</b><span>An upper-body strength workout from the library.</span></button>
-      <button type="button" class="wocard" data-woidea="loss"><b>Weight-loss goal</b><span>A weight-loss workout from the cardio moves already saved here.</span></button>
-      <button type="button" class="wocard" data-woidea="none"><b>No equipment</b><span>A workout from moves that do not name a machine or a weight.</span></button>
+    <h2>Build a workout</h2>
+    <div class="chips" id="woIdeas">
+      <button type="button" class="chip" data-woidea="upper">Upper body strength</button>
+      <button type="button" class="chip" data-woidea="loss">Weight-loss goal</button>
+      <button type="button" class="chip" data-woidea="none">No equipment</button>
     </div>
     <div class="worow">
       <div class="field"><label class="f" for="woPrompt">Prompt</label><textarea id="woPrompt" class="woprompt" maxlength="240" placeholder="Write one prompt"></textarea></div>
@@ -2008,8 +2226,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 
   <div id="woEditor" style="display:none">
     <div class="toolbar">
-      <button class="sm" id="edCancel">Cancel</button>
-      <button class="sm primary" id="edSave">Save workout</button>
+      <button type="button" class="icon-btn" id="edCancel" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div class="card">
       <h2 id="edHeading">New workout</h2>
@@ -2021,8 +2238,9 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       </div>
       <h2 style="margin-top:4px">Exercises</h2>
       <div id="edList"></div>
-      <button class="sm" id="edAdd" style="margin-top:8px">+ Add exercise</button>
+      <button class="btn-secondary full" id="edAdd" style="margin-top:8px">Add exercise</button>
     </div>
+    <button class="primary full" id="edSave">Save workout</button>
     <button class="danger full" id="edDelete" style="display:none">Delete workout</button>
   </div>
 </section>
@@ -2040,14 +2258,14 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   </div>
   <div id="woLibrary" style="display:none">
     <div class="toolbar">
-      <button class="sm" id="libBack">‹ Back</button>
+      <button type="button" class="icon-btn" id="libBack" aria-label="Back"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button type="button" class="btn-secondary" id="libAddOpen">Add exercise</button>
     </div>
-    <div class="card">
-      <h2>Add your own</h2>
-      <div class="field"><label class="f">Name</label><input id="libName" placeholder="e.g. Zercher squat" maxlength="80"></div>
+    <div class="card" id="libAddCard" hidden>
+      <div class="field"><label class="f">Name</label><input id="libName" placeholder="Exercise name" maxlength="80"></div>
       <div class="field"><label class="f">Muscle group</label><select id="libGroup"></select></div>
       <div class="field"><label class="f">How-to cue (optional)</label><input id="libCue" placeholder="Short form reminder" maxlength="180"></div>
-      <div class="field"><label class="f">Video URL (optional)</label><input id="libVideo" placeholder="https://…  — blank uses a YouTube search" inputmode="url"></div>
+      <div class="field"><label class="f">Video URL (optional)</label><input id="libVideo" placeholder="Paste a video link" inputmode="url"></div>
       <button class="primary full" id="libAdd">Add to library</button>
     </div>
     <div class="card">
@@ -2116,7 +2334,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 <!-- ============ WEIGHT ============ -->
 <section class="page" id="page-weight">
   <div class="grid2">
-    <div class="stat"><div class="label">Total lost</div><div class="big hl" id="wLost">—</div><div class="small" id="wLostSub"></div></div>
+    <div class="stat"><div class="label">Change</div><div class="big hl" id="wLost">—</div><div class="small" id="wLostSub"></div></div>
     <div class="stat"><div class="label">To goal</div><div class="big" id="wToGoal">—</div><div class="small" id="wGoalSub">set goal in Settings</div></div>
   </div>
   <div class="card" style="margin-top:12px">
@@ -2128,7 +2346,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <h2>Log weight</h2>
     <div class="row">
       <div class="field"><label class="f">Date</label><input type="date" id="wDate"></div>
-      <div class="field"><label class="f">Weight (lb)</label><input type="number" inputmode="decimal" step="0.1" id="wVal" placeholder="e.g. 205.4"></div>
+      <div class="field"><label class="f">Weight (lb)</label><input type="number" inputmode="decimal" step="0.1" id="wVal" placeholder="0.0"></div>
     </div>
     <button class="primary full" id="wAdd">Save weight</button>
   </div>
@@ -2141,9 +2359,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 <!-- ============ PHOTOS ============ -->
 <section class="page" id="page-photos">
   <div class="card">
-    <h2>Photos</h2>
-    <p>Progress photos stay with your trainer in Coach. Front, side, and back are saved on this phone and sent when you are connected.</p>
-    <button class="primary full" id="photosToCoach" type="button">Open Coach photos</button>
+    <div class="empty"><div class="empty__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 8h3l2-2h6l2 2h3v10H4z"/><circle cx="12" cy="13" r="3"/></svg></div><p class="empty__body">Progress photos will show here.</p><button class="primary" id="photosToCoach" type="button">Add photos</button></div>
   </div>
 </section>
 
@@ -2170,10 +2386,10 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <div class="bmiranges" id="bmiRanges"></div>
     <div class="taperead" id="bmiTapeRead"></div>
     <p class="note" id="bmiWhen"></p>
-    <p class="note">BMI uses height and weight.</p>
+    
   </div>
   <div class="card">
-    <h2>Last few</h2>
+    <h2>History</h2>
     <div id="bmiList"></div>
   </div>
   <div class="card">
@@ -2192,7 +2408,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   </div>
   <div class="card">
     <h2>Front and side photos</h2>
-    <p class="note">Take a photo with the phone camera or choose one already on the phone. It stays on this phone with the date.</p>
+    <p class="note">Add a front photo and a side photo.</p>
     <div class="toolbar">
       <button type="button" class="sm" id="bmiFrontCam">Take front</button>
       <button type="button" class="sm" id="bmiSideCam">Take side</button>
@@ -2200,7 +2416,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       <button type="button" class="sm" id="bmiSidePick">Choose side</button>
     </div>
   </div>
-  <button class="primary full" type="button" id="bmiSave">Save on this phone</button>
+  <button class="primary full" type="button" id="bmiSave">Save</button>
   <input type="file" id="bmiFrontCamFile" accept="image/*" capture="environment" hidden data-angle="front">
   <input type="file" id="bmiSideCamFile" accept="image/*" capture="environment" hidden data-angle="side">
   <input type="file" id="bmiFrontFile" accept="image/*" hidden data-angle="front">
@@ -2209,19 +2425,18 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 
 <!-- ============ COACH ============ -->
 <section class="page" id="page-coach">
-  <div class="coachmedia">
-    <video class="coachloop" src="videos/real_keyta_dumbbell_loop.mp4" poster="images/real_keyta_dumbbell_loop_poster.jpg" muted playsinline loop autoplay preload="metadata" aria-label="Coach Keyta (Marquita Foster)"></video>
-    <img class="coachposter" src="images/real_keyta_dumbbell_loop_poster.jpg" alt="Coach Keyta (Marquita Foster)" width="720" height="900">
-    <img class="coachstill" src="images/real_keyta_dumbbell_row_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)" width="1080" height="1350">
+  <div class="coachmedia video-grid">
+    <div class="video-tile"><video class="coachloop" src="videos/real_keyta_dumbbell_loop.mp4" poster="images/real_keyta_dumbbell_loop_poster.jpg" muted playsinline loop autoplay preload="metadata" aria-label="Coach Keyta (Marquita Foster) dumbbell set"></video><span class="video-tile__dur">0:08</span><span class="video-tile__label">Dumbbell set</span></div>
+    <div class="video-tile"><img src="images/real_keyta_dumbbell_row_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster) dumbbell row" width="1080" height="1350"><span class="video-tile__label">Dumbbell row</span></div>
   </div>
   <div class="card setupcard" id="coachDemoCard" hidden>
     <h2>How a client joins</h2>
-    <p>The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code.</p>
+    <p>Add a client to share an invite code.</p>
   </div>
   <div id="coachSolo">
     <div class="card">
       <h2>On your own</h2>
-      <p>Workouts, meals, the cookbook, the exercise library, and weight all stay on this phone.</p>
+      <p>Workouts, meals, the cookbook, the exercise library, and weight.</p>
       <p class="note">Switch to Trainer or Client in Settings when you want to connect with someone.</p>
       <button class="full" id="soloSettings" type="button">Open Settings</button>
     </div>
@@ -2246,9 +2461,23 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       </div>
     </div>
   </div>
+  <div id="inviteView" hidden>
+    <div class="card">
+      <h2 class="card__title">Invite</h2>
+      <p class="invitecode" id="inviteCodeText"></p>
+      <button class="btn-primary full" type="button" id="inviteCopy">Copy code</button>
+      <button class="btn-secondary full" type="button" id="inviteShare">Share</button>
+      <ol class="invitesteps">
+        <li>Copy this code.</li>
+        <li>Send it to your client.</li>
+        <li>They enter it under Join your trainer.</li>
+      </ol>
+      <button type="button" class="btn-ghost" id="inviteDone">Done</button>
+    </div>
+  </div>
   <div id="clientFile" hidden>
     <div class="toolbar">
-      <button class="sm" id="clientFileBack" type="button">‹ Clients</button>
+      <button type="button" class="icon-btn" id="clientFileBack" aria-label="Back to clients"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
       <button class="sm" id="cfMealPlan" type="button">Meal plan</button>
       <button class="sm" id="cfTools" type="button">Messages, photos, and calls</button>
     </div>
@@ -2256,15 +2485,13 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
       <button type="button" role="tab" data-cf="summary" class="sel">Summary</button>
       <button type="button" role="tab" data-cf="consultation">Consultation</button>
       <button type="button" role="tab" data-cf="attachments">Attachments <span class="cfcount" id="cfAttachCount">0</span></button>
-      <button type="button" role="tab" data-cf="sales">Sales</button>
-      <button type="button" role="tab" data-cf="invoices">Invoices</button>
       <button type="button" role="tab" data-cf="forms">Forms</button>
     </div>
     <div id="cfPaneSummary">
       <div id="cfProfile">
         <section class="card">
           <div class="cfwho">
-            <div class="cfphoto" id="cfPhoto"><span class="cfnophoto">No photo</span></div>
+            <div class="cfphoto" id="cfPhoto"><span class="cfinitials" id="cfInitials">C</span></div>
             <div class="grow">
               <div class="cfname"><span id="cfName">Client</span> <button type="button" class="sm" id="cfEdit">Edit</button></div>
               <form id="cfNameForm" hidden>
@@ -2279,7 +2506,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
               <p class="f">Client group</p>
               <p class="note" id="cfGroupNow"></p>
               <div class="chips" id="cfGroups">
-                <button type="button" class="chip" data-cfgroup="">Pending or Coaching</button>
+                <button type="button" class="chip" data-cfgroup="">Pending</button>
                 <button type="button" class="chip" data-cfgroup="prospects">Prospects</button>
                 <button type="button" class="chip" data-cfgroup="basic">Basic</button>
                 <button type="button" class="chip" data-cfgroup="deactivated">Deactivated</button>
@@ -2305,7 +2532,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
           <ul class="cflines">
             <li><span>Threshold alerts</span><button type="button" class="cflink" id="cfAlerts">Set up alerts</button></li>
           </ul>
-          <p class="note" id="cfAlertsNote" hidden>Alerts stay on this phone.</p>
+          <p class="note" id="cfAlertsNote" hidden>Alerts are saved with this client.</p>
         </section>
         <section class="card">
           <ul class="cflines">
@@ -2415,11 +2642,10 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   <div class="card" id="accountCard">
     <h2>Account</h2>
     <p id="accountWho"></p>
-    <button class="full" id="logOutBtn" type="button">Log out</button>
   </div>
   <div class="card">
     <h2>Mode</h2>
-    <div class="note" style="margin-bottom:8px">Trainer and client are separate accounts. Just me stays on this phone.</div>
+    <div class="note" id="modeCaption" style="margin-bottom:8px">Pick how you use this app.</div>
     <div class="chips" id="modePicks">
       <button type="button" class="chip" data-mode="trainer">Trainer</button>
       <button type="button" class="chip" data-mode="client">Client</button>
@@ -2427,14 +2653,10 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     </div>
     <div class="note" id="modeNote" style="margin-top:8px"></div>
   </div>
-  <div class="card" id="keysCard">
-    <h2>Clients</h2>
-    <p class="note">The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.</p>
-  </div>
   <div class="card">
     <h2>Targets</h2>
-    <div class="field"><label class="f">Daily calorie target (kcal)</label><input type="number" inputmode="numeric" id="sCal" placeholder="Not set — e.g. 2000"></div>
-    <div class="field"><label class="f">Daily protein target (g)</label><input type="number" inputmode="numeric" id="sPro" placeholder="Not set — e.g. 180"></div>
+    <div class="field"><label class="f">Daily calorie target (kcal)</label><input type="number" inputmode="numeric" id="sCal" placeholder="Not set"></div>
+    <div class="field"><label class="f">Daily protein target (g)</label><input type="number" inputmode="numeric" id="sPro" placeholder="Not set"></div>
     <div class="field"><label class="f">Goal weight (lb)</label><input type="number" inputmode="decimal" step="0.1" id="sGoal" placeholder="Not set"></div>
     <button class="primary full" id="sSave">Save targets</button>
   </div>
@@ -2445,8 +2667,8 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <div class="row"><button class="sm" id="presetAddRow">+ Add preset</button><button class="sm" id="presetReset">Reset defaults</button><button class="sm primary" id="presetSave" style="margin-left:auto">Save presets</button></div>
   </div>
   <div class="card">
-    <h2>Backup</h2>
-    <div class="note" style="margin-bottom:10px">Data lives only in this browser on this device. Export regularly to keep a backup or move to another device.</div>
+    <h2>Privacy</h2>
+    <div class="note" style="margin-bottom:10px">Your data is stored on this device.</div>
     <div class="row">
       <button class="full" id="exportBtn">Export JSON</button>
       <button class="full" id="importBtn">Import JSON</button>
@@ -2456,22 +2678,22 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   <div class="card">
     <h2>Danger zone</h2>
     <button class="danger full" id="wipeBtn">Erase all data</button>
+    <button class="btn-ghost" id="logOutBtn" type="button">Log out</button>
   </div>
 </section>
 
 <!-- ============ EVENTS ============ -->
 <section class="page" id="page-events">
   <div class="card">
-    <h2>Events</h2>
-    <p>Schedule a group class, a one-on-one session, or an open booking. Everything here stays on this phone.</p>
+    <h2>Upcoming</h2>
   </div>
   <div class="eventfilters" id="eventFilters">
-    <button type="button" class="sel" data-ekind="group">Groups / Classes</button>
+    <button type="button" class="sel" data-ekind="group">Groups</button>
     <button type="button" data-ekind="one">1 on 1</button>
     <button type="button" data-ekind="open">Open booking</button>
   </div>
   <div class="toolbar">
-    <button type="button" class="primary" id="eventNew">New</button>
+    <button type="button" class="btn-secondary" id="eventNew">New event</button>
   </div>
   <form class="card" id="eventForm" hidden>
     <h2>New event</h2>
@@ -2507,9 +2729,9 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 <section class="page" id="page-calendar">
   <div class="card">
     <div class="calnav">
-      <button type="button" class="sm" id="calPrev" aria-label="Previous month">‹</button>
+      <button type="button" class="icon-btn" id="calPrev" aria-label="Previous month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
       <b id="calTitle"></b>
-      <button type="button" class="sm" id="calNext" aria-label="Next month">›</button>
+      <button type="button" class="icon-btn" id="calNext" aria-label="Next month"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
     </div>
     <div class="calgrid" id="calGrid"></div>
   </div>
@@ -2536,15 +2758,12 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
         <label class="f" for="videoClient">Client</label>
         <select id="videoClient"></select>
       </div>
-      <p class="note" id="videoClientNote" hidden>Create a client in Coach, then pick them here.</p>
+      <p class="note" id="videoClientNote" hidden>Add a client first. <button type="button" class="btn-ghost" id="videoAddClient">Add a client</button></p>
       <div class="field">
         <label class="f" for="videoUrl">Video link</label>
-        <input id="videoUrl" type="url" inputmode="url" placeholder="YouTube or a video URL" autocomplete="off">
+        <input id="videoUrl" type="url" inputmode="url" placeholder="Paste a video link" autocomplete="off">
       </div>
-      <div class="field">
-        <label class="f" for="videoFile">Or a video file</label>
-        <input id="videoFile" type="file" accept="video/*">
-      </div>
+      <label class="dropzone" for="videoFile">Upload a video<input id="videoFile" type="file" accept="video/*"></label>
       <div class="field">
         <label class="f" for="videoNote">Note (optional)</label>
         <input id="videoNote" maxlength="280" placeholder="Short note">
@@ -2554,7 +2773,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   </div>
   <div class="card" id="videoClientWait" hidden>
     <h2>Videos</h2>
-    <p class="note">Sign in on this phone, open Join your trainer, and enter the code your trainer copied.</p>
+    <p class="note">Enter the invite code in Coach.</p>
     <button class="full" id="videoJoinCoach" type="button">Open Coach to join</button>
   </div>
   <div class="card" id="videoListCard" hidden>
@@ -2575,11 +2794,8 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
         <button type="button" class="chip" data-sessionlabel="training">Training session</button>
       </div>
     </div>
-    <div class="field">
-      <label class="f" for="sessionFile">Photo or video</label>
-      <input id="sessionFile" type="file" accept="image/*,video/*">
-    </div>
-    <button class="primary full" id="sessionSave" type="button">Save on this phone</button>
+    <label class="dropzone" for="sessionFile">Upload a photo or video<input id="sessionFile" type="file" accept="image/*,video/*"></label>
+    <button class="primary full" id="sessionSave" type="button">Save session</button>
   </div>
   <h2 class="sec">Group sessions</h2>
   <div id="sessionGroup"></div>
@@ -2590,11 +2806,10 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 <!-- ============ ASK AI ============ -->
 <section class="page" id="page-ask">
   <h2 class="asktitle">Ask AI</h2>
-  <p class="note">Ask for a workout idea, a video saved on this phone, or a meal from foods already listed.</p>
   <div id="askThread" class="askthread"></div>
   <form id="askForm" class="askform">
     <label class="f" for="askInput">Ask</label>
-    <textarea id="askInput" placeholder="Describe the client, or ask about a split, a class, a video, or how to log a meal."></textarea>
+    <textarea id="askInput" placeholder="Ask about a client, a workout or a meal…"></textarea>
     <button class="primary full" type="submit">Ask</button>
   </form>
 </section>
@@ -2607,8 +2822,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
 <section class="page" id="page-librarynote">
   <div class="card">
     <h2 id="libraryNoteTitle">Habits</h2>
-    <p class="cfempty" id="libraryNoteBody">No habits saved yet.</p>
-    <button type="button" class="primary emptyact" id="libraryNoteGo">View clients</button>
+    <div class="empty"><p class="empty__body" id="libraryNoteBody">No habits saved yet.</p><button type="button" class="primary" id="libraryNoteGo">Create habit</button></div>
   </div>
 </section>
 </main>
@@ -2720,11 +2934,11 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <button type="button" class="yourow" data-you="appearance"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="#0B0B39" stroke="none"/></svg><span class="grow"><b>App Appearance</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="privacy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 5-3 7.5-7 9-4-1.5-7-4-7-9V6z"/></svg><span class="grow"><b>Privacy</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M9.5 9a2.5 2.5 0 1 1 3.2 2.4c-.7.3-1.2.9-1.2 1.6V14"/><path d="M12 17h.01"/></svg><span class="grow"><b>Help</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="sync"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-13 6l-1-1M4 12A8 8 0 0 1 17 6l1 1"/><path d="M6 17H4v2M20 5v2h-2"/></svg><span class="grow"><b>Sync</b><small id="youSyncWhen">Not saved on this phone yet</small></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="sync"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-13 6l-1-1M4 12A8 8 0 0 1 17 6l1 1"/><path d="M6 17H4v2M20 5v2h-2"/></svg><span class="grow"><b>Sync</b><small id="youSyncWhen">Not saved yet</small></span><span class="chev" aria-hidden="true">›</span></button>
   </div>
   <button type="button" class="navitem" id="menuEdit" aria-expanded="false" aria-controls="menuEditPanel" hidden>Edit</button>
   <div class="navsub" id="menuEditPanel" hidden>
-    <p class="note">Diary color and bubble photo stay on this phone.</p>
+    <p class="note">Diary color and bubble photo.</p>
     <div class="lookpicks" id="lookPicks">
       <button type="button" data-look="purple" aria-pressed="true"><span class="lookswatch" style="background:#FFFFFF"></span>Purple</button>
       <button type="button" data-look="plum" aria-pressed="false"><span class="lookswatch" style="background:#FFFFFF"></span>Plum</button>
@@ -2762,7 +2976,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
     <div class="foodlog-actions">
       <button type="button" id="foodLogBarcode"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6v12M8 6v12M12 6v12M16 6v12M20 6v12"/></svg>Barcode scan</button>
       <button type="button" id="foodLogVoice"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg>Voice log</button>
-      <button type="button" id="foodLogMealScan"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/></svg>Meal scan</button>
+      <button type="button" id="foodLogMealScan" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="3"/></svg>Meal scan</button>
       <button type="button" id="foodLogQuick"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M8 12h8"/></svg>Quick add</button>
     </div>
     <div class="foodsheet" id="foodLogSheet" hidden>
@@ -2831,11 +3045,15 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   <div class="modalbox">
     <div class="row" style="justify-content:space-between;margin-bottom:8px">
       <h2 id="habitTitle">Log</h2>
-      <button class="sm" type="button" id="habitClose">Close</button>
+      <button type="button" class="icon-btn" id="habitClose" aria-label="Close"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
     </div>
     <div id="waterFields">
-      <label class="f" for="waterInput">Cups</label>
-      <input id="waterInput" type="number" inputmode="decimal" min="0" step="0.1" placeholder="0.0">
+      <div class="stepper">
+        <button type="button" id="waterMinus" aria-label="Less water">−</button>
+        <div><output id="waterOut">0</output><div class="card__meta">cups</div></div>
+        <button type="button" id="waterPlus" aria-label="More water">+</button>
+      </div>
+      <input id="waterInput" type="hidden" value="0">
       <button class="primary full" id="waterSave" type="button" style="margin-top:8px">Save</button>
     </div>
     <div id="stepsFields" hidden>
@@ -2868,7 +3086,7 @@ body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;lin
   </div>
   <div id="callDemo" class="calldemo">
     <div class="callbadge">Call</div>
-    <p id="callDemoText">This call stays on this phone.</p>
+    <p id="callDemoText">Video call</p>
     <video id="callPreview" autoplay playsinline muted hidden></video>
     <button class="sm" id="callCam" type="button">Preview my camera</button>
     <div id="callTimer" class="note" style="margin-top:8px;color:#563DD2"></div>
@@ -3576,9 +3794,10 @@ function go(tab){
   if(location.hash!=="#"+tab) history.replaceState(null,"","#"+tab);
 }
 function paintHeader(){
-  const onToday = currentTab==="today";
-  $("todayPick").hidden = !onToday;
-  $("hdrTitle").hidden = onToday;
+  const dateTabs = {today:1, meals:1, workout:1, events:1, calendar:1, checkin:1, bmi:1, weight:1, photos:1};
+  const onDate = !!dateTabs[currentTab];
+  $("todayPick").hidden = !onDate;
+  $("hdrTitle").hidden = false;
   const t = todayStr();
   $("todayPickLabel").textContent = diaryDate===t ? "Today" : diaryDate===addDays(t,-1) ? "Yesterday" : diaryDate===addDays(t,1) ? "Tomorrow" : fmtDate(diaryDate,{weekday:"short",month:"short",day:"numeric"});
   const n = streakCount();
@@ -3695,6 +3914,7 @@ function syncMenu(){
   if(mealsTab) mealsTab.hidden = trainerAsk;
   document.body.classList.toggle("trainer-bar", trainerAsk);
   const onWelcome = document.body.classList.contains("welcome-on");
+  if($("menuRoles")) $("menuRoles").hidden = client && !onWelcome;
   const roleShown = onWelcome ? menuRole() : ID.role;
   document.querySelectorAll("#menuRoles [data-menurole]").forEach(b=>{
     const on = b.dataset.menurole===roleShown;
@@ -3771,7 +3991,12 @@ $("page-clients").addEventListener("click", (e)=>{
 $("page-overview").addEventListener("click", (e)=>{
   if(e.target.closest("#ovEmptyAdd")) overviewAddClient();
 });
-$("libraryNoteGo").onclick = () => { if(signedInTrainer()) go("clients"); };
+$("libraryNoteGo").onclick = () => {
+  if(libraryNote==="forms"){ go("checkin"); return; }
+  const name = window.prompt ? null : null;
+  const body = $("libraryNoteBody");
+  if(body) body.textContent = "Name a habit, then it will show here.";
+};
 $("cfPaneOther").addEventListener("click", (e)=>{
   const btn = e.target.closest("[data-cfgo]");
   if(!btn) return;
@@ -3916,6 +4141,7 @@ function renderLibraryNote(){
   if($("hdrSub")) $("hdrSub").textContent = "";
   $("libraryNoteTitle").textContent = title;
   $("libraryNoteBody").textContent = forms ? "No forms saved yet." : "No habits saved yet.";
+  if($("libraryNoteGo")) $("libraryNoteGo").textContent = forms ? "Create form" : "Create habit";
 }
 $("masterLib").addEventListener("click", (e)=>{
   const row = e.target.closest("[data-ml]");
@@ -3954,6 +4180,9 @@ document.addEventListener("keydown", e=>{
   if(e.key!=="Escape") return;
   if(!$("navMenu").hidden) closeMenu();
   closeTools();
+  if($("dayMenu")) $("dayMenu").hidden = true;
+  if($("habitSheet")) $("habitSheet").style.display = "none";
+  if($("ovAddForm")) $("ovAddForm").hidden = true;
 });
 document.querySelectorAll("[data-goto]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.goto)));
 
@@ -3983,27 +4212,44 @@ function renderToday(){
   paintMyPage();
   const t = diaryDate, tot = totals(t), st = S.settings;
   $("hdrSub").textContent = fmtDate(t,{weekday:"long",month:"long",day:"numeric"});
-  const calTarget = st.calTarget || 2793;
-  const proTarget = st.proteinTarget || 165;
-  const carbTarget = st.carbTarget || 360;
-  const fatTarget = st.fatTarget || 77;
+  const hasGoal = !!(st.calTarget || st.proteinTarget || st.carbTarget || st.fatTarget);
+  document.querySelectorAll("#page-today .dcard").forEach(c=>{ c.hidden = !hasGoal; });
+  const banner = $("targetBanner");
+  if(banner){
+    banner.hidden = hasGoal;
+    if(!hasGoal){
+      banner.innerHTML = '<div class="empty"><p class="empty__body">Set a calorie and macro goal to see targets.</p><button type="button" class="btn-secondary" id="setTargetsBtn">Set targets</button></div>';
+      const setBtn = $("setTargetsBtn");
+      if(setBtn) setBtn.onclick = () => go("settings");
+    }
+  }
+  const calTarget = hasGoal ? (st.calTarget || 0) : 0;
+  const proTarget = hasGoal ? (st.proteinTarget || 0) : 0;
+  const carbTarget = hasGoal ? (st.carbTarget || 0) : 0;
+  const fatTarget = hasGoal ? (st.fatTarget || 0) : 0;
+  if(!hasGoal){
+    $("weightPromptTitle").textContent = "Log weight";
+    if($("weightPromptMeta")) $("weightPromptMeta").textContent = parseYmd(t).toLocaleDateString("en-US",{weekday:"long"});
+  }
+  if(hasGoal){
   $("dCal").textContent = fmtComma(tot.cal);
   $("dCalTarget").textContent = fmtComma(calTarget);
   const calLeft = calTarget - tot.cal;
   $("dCalSub").textContent = calLeft>=0 ? fmtComma(calLeft)+" left" : fmtComma(-calLeft)+" over";
-  $("dCalBar").firstElementChild.style.width = Math.min(100, tot.cal/calTarget*100)+"%";
+  $("dCalBar").firstElementChild.style.width = Math.min(100, (calTarget?tot.cal/calTarget*100:0))+"%";
   $("dCarb").textContent = fmtComma(tot.carbs);
   $("dCarbTarget").textContent = fmtComma(carbTarget);
-  $("dCarbBar").firstElementChild.style.width = Math.min(100, tot.carbs/carbTarget*100)+"%";
+  $("dCarbBar").firstElementChild.style.width = Math.min(100, (carbTarget?tot.carbs/carbTarget*100:0))+"%";
   $("dFat").textContent = fmtComma(tot.fat);
   $("dFatTarget").textContent = fmtComma(fatTarget);
-  $("dFatBar").firstElementChild.style.width = Math.min(100, tot.fat/fatTarget*100)+"%";
+  $("dFatBar").firstElementChild.style.width = Math.min(100, (fatTarget?tot.fat/fatTarget*100:0))+"%";
   $("dPro").textContent = fmtComma(tot.protein);
   $("dProTarget").textContent = fmtComma(proTarget);
-  $("dProBar").firstElementChild.style.width = Math.min(100, tot.protein/proTarget*100)+"%";
-
+  $("dProBar").firstElementChild.style.width = Math.min(100, proTarget ? tot.protein/proTarget*100 : 0)+"%";
+  }
   const wd = parseYmd(t).toLocaleDateString("en-US",{weekday:"long"});
-  $("weightPromptTitle").innerHTML = "Weight log "+esc(wd)+' <span class="heart" aria-hidden="true">♥</span>';
+  $("weightPromptTitle").textContent = "Log weight";
+  if($("weightPromptMeta")) $("weightPromptMeta").textContent = wd;
 
   const start = parseYmd(t); start.setDate(start.getDate()-start.getDay());
   const letters = ["S","M","T","W","T","F","S"];
@@ -4013,7 +4259,8 @@ function renderToday(){
     const d = new Date(start); d.setDate(start.getDate()+i);
     const ds = ymd(d);
     const cls = (ds===realToday?" today":"")+(ds===t && ds!==realToday?" sel":"");
-    dots += `<button type="button" class="${cls.trim()}" data-diary="${ds}">${letters[i]}<span class="dot"></span></button>`;
+    const logged = mealsOn(ds).length || (S.weights||[]).some(w=>w.date===ds) || isWoDone(ds);
+    dots += `<button type="button" class="${cls.trim()}" data-diary="${ds}" ${ds===t?'aria-selected="true"':""}>${letters[i]}<span class="dot${logged?" on":""}"></span></button>`;
   }
   $("weekDots").innerHTML = dots;
   $("weekDots").querySelectorAll("[data-diary]").forEach(b=>b.onclick=()=>{ diaryDate=b.dataset.diary; mealDate=diaryDate; render(); });
@@ -4037,7 +4284,8 @@ function renderToday(){
 
   const cups = S.water && S.water[t]!=null ? Number(S.water[t]) : 0;
   $("waterLine").textContent = cups>0 ? cups.toFixed(1)+" cups" : "0.0 cups";
-  if(document.activeElement!==$("waterInput")) $("waterInput").value = cups ? String(cups) : "";
+  if($("waterInput")) $("waterInput").value = cups ? String(cups) : "0";
+  if($("waterOut")) $("waterOut").textContent = cups ? String(r1(cups)) : "0";
 
   const steps = S.steps[t];
   $("stepsLine").textContent = steps!=null && steps!=="" ? Number(steps).toLocaleString("en-US")+" steps" : "Connect a device";
@@ -4066,7 +4314,7 @@ function renderToday(){
     const names = foods.map(m=>m.name);
     planned.forEach(m=>{ if(!names.includes(m.name)) names.push(m.name); });
     const sub = names.length ? esc(names.join(", ")) : "";
-    return `<div class="mealrow"><span class="mealico" aria-hidden="true">${slot.icon}</span><div class="mealmain"><b>${slot.label}</b>${sub?`<small>${sub}</small>`:""}</div><button type="button" class="morebtn" data-more="${slot.type}" aria-label="More for ${slot.label}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="19" cy="12" r="1.5" fill="currentColor"/></svg></button><button type="button" class="logpill" data-logslot="${slot.type}">Log</button></div>`;
+    return `<div class="mealrow"><span class="mealico" aria-hidden="true">${slot.icon}</span><div class="mealmain"><b>${slot.label}</b>${sub?`<small>${sub}</small>`:""}</div><button type="button" class="icon-btn logplus" data-logslot="${slot.type}" aria-label="Log ${slot.label}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>`;
   }).join("");
   $("mealRows").querySelectorAll("[data-logslot]").forEach(b=>b.onclick=()=>openFoodLog(b.dataset.logslot));
   $("mealRows").querySelectorAll("[data-more]").forEach(b=>b.onclick=(e)=>{
@@ -4098,52 +4346,18 @@ function renderToday(){
     });
   });
 }
-const RECENT_FOODS = [
-  {name:"Unflavored 100% Grass-Fed Whey...", detail:"130 cal, 1 scoop, Transparent Labs", cal:130, mark:true},
-  {name:"Banana", detail:"105 cal, 1 medium", cal:105},
-  {name:"Thai Rice, Fragrant, Jasmine, Boil-i...", detail:"540 cal, 150 g, Success", cal:540, mark:true},
-  {name:"Plant-Based Ultimate Original Chic...", detail:"194 cal, 4 oz(s), Gardein", cal:194, mark:true},
-  {name:"Broccoli Florets", detail:"20 cal, 1 cup, Kroger", cal:20, mark:true},
-  {name:"Sweet potato", detail:"216 cal, 7 ounce", cal:216},
-  {name:"Steak Bites", detail:"340 cal, 6 oz, Impossible", cal:340, mark:true},
-  {name:"Brussels Sprouts", detail:"225 cal, 25 sprouts, Kroger", cal:225, mark:true},
-  {name:"100% Liquid Egg Whites", detail:"50 cal, 6 tbsp, Kroger", cal:50, mark:true},
-  {name:"Cafe Free Brown AA Large Eggs", detail:"210 cal, 3 egg, Simple Truth", cal:210},
-  {name:"Rolled Classic Protein Oats", detail:"190 cal, 0.5 cup, Kodiak", cal:190, mark:true},
-  {name:"21 whole grain", detail:"220 cal, 90 gram, daves", cal:220},
-  {name:"Super Mass Gainer", detail:"650 cal, 1 scoops, Dymatized", cal:650},
-  {name:"6 Large Egg Whites", detail:"103 cal, 6 LG whites, Hectors Egg Whi...", cal:103},
-  {name:"Factor, Chicken Pizzaiola", detail:"480 cal, 1 Tray (366g), Factor", cal:480},
-  {name:"Oatmeal, cooked", detail:"154 cal, 1 cup", cal:154},
-  {name:"Pink Flamingo Smoothie", detail:"340 cal, 24 oz, Nekter", cal:340},
-  {name:"Salmon", detail:"100 cal, 4 ounce", cal:100},
-  {name:"Green bean", detail:"100 cal, 4 ounces, Whole Foods", cal:100},
-  {name:"Watermelon chunks", detail:"45 cal, 1 cup, Wholefoods", cal:45},
-  {name:"Whey", detail:"120 cal, 1 scoop, Golds whey protien", cal:120},
-  {name:"Gold Whey", detail:"120 cal, 1 Scoop, Whey", cal:120},
-  {name:"White Rice", detail:"181 cal, 1 cup, Jasmin White Rice", cal:181},
-  {name:"Egg white", detail:"17 cal, 1 large", cal:17},
-  {name:"Blueberries", detail:"42 cal, 1 cup", cal:42},
-  {name:"Lean turkey", detail:"150 cal, 4 oz, 93/7 Lean turkey", cal:150},
-  {name:"Protein Powder Supplement, Serious Ma...", detail:"630 cal, 1 scoops, ON Optimum Nutriti...", cal:630},
-  {name:"Blueberries", detail:"85 cal, 1 cup", cal:85},
-  {name:"Greek Yogurt, Vanilla, Fat Free", detail:"209 cal, 1 cup, Great Value", cal:209},
-  {name:"Mixed vegetables, frozen", detail:"48 cal, 1 cup", cal:48},
-  {name:"Boneless, Skinless Chicken Breast Fillet...", detail:"110 cal, 4 oz, Great Value", cal:110},
-  {name:"Whole wheat bread", detail:"91 cal, 1 slice", cal:91},
-  {name:"1 Cup Oatmeal", detail:"150 cal, 1 cup, Oatmeal", cal:150},
-  {name:"Brown Rice, Whole Grain, Boil-in-Bag", detail:"180 cal, 0.5 bag, Success", cal:180},
-  {name:"White Turkey", detail:"140 cal, 4 oz., Honeysuckle White", cal:140},
-  {name:"Ground Beef, Extra Lean", detail:"140 cal, 4 oz., Unknown", cal:140},
-  {name:"Ground Beef", detail:"400 cal, 224 g", cal:400},
-  {name:"Wheybolic Performance Protein Dietary...", detail:"180 cal, 2 scoop, AMP", cal:180},
-  {name:"Kidney Beans", detail:"105 cal, 4.6 oz, Bush's", cal:105},
-  {name:"Black Beans", detail:"100 cal, 0.5 cup, Bush's Black Beans *", cal:100},
-  {name:"Pinto Beans (15.5 Ounce Can)", detail:"110 cal, 0.5 cup, Hanover", cal:110},
-  {name:"Honeysuckle White", detail:"160 cal, 4 oz, Turkey-all Natural Fresh...", cal:160},
-  {name:"Unsweetened Vanilla", detail:"30 cal, 1 cup, Silk Pure Almond Milk", cal:30},
-  {name:"Vanilla Icecream", detail:"120 cal, 31 g, Gold Standard Whey", cal:120}
-];
+function loggedFoods(){
+  const seen = new Set();
+  const out = [];
+  (S.meals||[]).slice().reverse().forEach(m=>{
+    const name = String(m && m.name || "").trim();
+    const key = name.toLowerCase();
+    if(!key || seen.has(key)) return;
+    seen.add(key);
+    out.push({name:name, detail:Math.round(+m.cal||0)+" cal", cal:Math.round(+m.cal||0), protein:m.protein, carbs:m.carbs, fat:m.fat});
+  });
+  return out;
+}
 let foodLogMeal = "breakfast";
 let foodLogTab = "history";
 let foodLookupSeq = 0;
@@ -4264,10 +4478,10 @@ function takeFoodHits(foods, query){
   return hits;
 }
 function paintFoodRows(foods, source){
-  $("foodLogList").innerHTML = foods.map((f,i)=>`<div class="foodrow"><div class="grow"><b>${esc(f.name)}${f.mark?'<span class="mark" aria-label="Checked"> ✓</span>':""}</b><small>${esc(f.detail)}</small></div><button type="button" class="foodplus" data-foodhit="${i}" data-foodsrc="${source}" aria-label="Add ${esc(f.name)}">+</button></div>`).join("");
+  $("foodLogList").innerHTML = foods.map((f,i)=>`<div class="foodrow"><div class="grow"><b>${esc(f.name)}</b><small>${esc(f.detail)}</small></div><button type="button" class="foodplus" data-foodhit="${i}" data-foodsrc="${source}" aria-label="Add ${esc(f.name)}">+</button></div>`).join("");
   $("foodLogList").querySelectorAll("[data-foodhit]").forEach(btn=>{
     btn.onclick = () => {
-      const food = (btn.dataset.foodsrc==="lookup" ? foodLookupHits : RECENT_FOODS.filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(($("foodLogSearch").value||"").trim().toLowerCase())>=0))[+btn.dataset.foodhit];
+      const food = (btn.dataset.foodsrc==="lookup" ? foodLookupHits : loggedFoods().filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(($("foodLogSearch").value||"").trim().toLowerCase())>=0))[+btn.dataset.foodhit];
       if(!food || food.cal==null || !Number.isFinite(Number(food.cal))) return;
       const label = food.amount ? food.name+" · "+food.amount : food.name;
       const macro = (v) => v==null || !Number.isFinite(Number(v)) ? null : r1(Number(v));
@@ -4374,7 +4588,12 @@ function paintFoodLog(){
   $("foodLogEmpty").hidden = history;
   cancelFoodLookup();
   if(!history) return;
-  const list = RECENT_FOODS.filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(q)>=0);
+  const list = loggedFoods().filter(f=>(f.name+" "+f.detail).toLowerCase().indexOf(q)>=0);
+  if(!raw && !list.length){
+    $("foodLogHeading").textContent = "Recently logged";
+    $("foodLogList").innerHTML = '<div class="empty"><p class="empty__body">Foods you log will show here.</p></div>';
+    return;
+  }
   if(list.length || !raw){
     $("foodLogHeading").textContent = "Recently logged";
     paintFoodRows(list, "recent");
@@ -4495,7 +4714,7 @@ function spokenAmount(text){
 }
 function recentMatches(text){
   const key = foodKey(String(text||"").replace(/(\d+(?:\.\d+)?)\s*(?:k?cal(?:ories)?|calories|calorie)\b/ig," "));
-  return RECENT_FOODS.filter(f=>{
+  return loggedFoods().filter(f=>{
     const n = foodKey(f.name);
     return n.length>2 && key.indexOf(n)>=0;
   }).sort((a,b)=>foodKey(b.name).length-foodKey(a.name).length);
@@ -4686,6 +4905,13 @@ $("stepsSave").onclick = () => {
   if(v==null||v<0){ toast("Enter a step count"); return; }
   S.steps[diaryDate] = Math.round(v); save(); $("stepsInput").blur(); closeHabit(); render(); toast("Steps saved");
 };
+function setWaterCups(n){
+  const v = Math.max(0, r1(n));
+  if($("waterInput")) $("waterInput").value = String(v);
+  if($("waterOut")) $("waterOut").textContent = String(v);
+}
+if($("waterMinus")) $("waterMinus").onclick = () => setWaterCups((num($("waterInput").value)||0) - 1);
+if($("waterPlus")) $("waterPlus").onclick = () => setWaterCups((num($("waterInput").value)||0) + 1);
 $("waterSave").onclick = () => {
   const v = num($("waterInput").value);
   if(v==null||v<0){ toast("Enter cups of water"); return; }
@@ -4712,6 +4938,7 @@ $("todayPick").onclick = (e) => {
   const menu=$("dayMenu");
   menu.hidden=!menu.hidden;
   $("todayPick").setAttribute("aria-expanded", menu.hidden?"false":"true");
+  if($("toolScrim")) $("toolScrim").hidden = menu.hidden;
 };
 document.querySelectorAll("#dayMenu [data-shift]").forEach(b=>b.onclick=()=>{
   diaryDate=addDays(todayStr(), +b.dataset.shift);
@@ -5731,10 +5958,10 @@ function watchUrl(name){
   return "https://www.youtube.com/results?search_query="+encodeURIComponent(q).replace(/%20/g,"+");
 }
 function howtoLink(name){
-  return `<a class="howto" href="${esc(watchUrl(name))}" target="_blank" rel="noopener noreferrer">▶ Watch how</a>`;
+  return `<a class="howto icon-btn" href="${esc(watchUrl(name))}" target="_blank" rel="noopener noreferrer" aria-label="Watch how to do ${esc(name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l6-3.5z"/></svg></a>`;
 }
 function logPlaceholder(n){
-  return /walk/i.test(n) ? "Time / distance / incline (e.g. 35 min, 12% @ 3.0)" : /plank/i.test(n) ? "Hold times (e.g. 30, 30, 25 s)" : "Weight × reps (e.g. 135 lb × 10,10,8)";
+  return /walk/i.test(n) ? "Time" : /plank/i.test(n) ? "Hold" : "Weight · reps";
 }
 /* Local photos only. Files and licenses are listed in images/SOURCES.txt. */
 const FOOD_FILES = {
@@ -5848,13 +6075,23 @@ function workFileForDay(p){
   return workSrc("squat");
 }
 function photoTag(src, alt, cls, eager){
+  const s = String(src||"");
+  const stock = s.indexOf("/work/")>=0 || s.indexOf("/food/")>=0;
+  if(stock){
+    if(s.indexOf("/work/")>=0 && (cls==="shot" || cls==="strip")){
+      return `<img class="${cls} keyta" src="images/real_keyta_dumbbell_loop_poster.jpg" alt="Coach Keyta (Marquita Foster)" width="720" height="900" loading="${eager?"eager":"lazy"}" decoding="async">`;
+    }
+    const food = s.indexOf("/food/")>=0;
+    const svg = food
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v6M5 3v4.5a2 2 0 0 0 4 0V3M7 9.5V21M17 3v18"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9v6M18 9v6M6 12h12M3 8v8M21 8v8"/></svg>';
+    return `<span class="ex-thumb ${cls||""}" aria-hidden="true">${svg}</span>`;
+  }
   const load = eager ? "eager" : "lazy";
   const pri = eager ? "" : " fetchpriority=\"low\"";
   const w = cls==="thumb" || cls==="mini" ? 320 : 640;
   const h = cls==="strip" ? 180 : (cls==="thumb" || cls==="mini" ? 320 : 400);
-  const person = String(src).indexOf("/work/")>=0 ? " person" : "";
-  const lower = String(src).indexOf("lower-body")>=0 ? " lowerbody" : "";
-  return `<img class="${cls}${person}${lower}" src="${esc(src)}" alt="${esc(alt||"")}" width="${w}" height="${h}" loading="${load}" decoding="async"${pri}>`;
+  return `<img class="${cls}" src="${esc(src)}" alt="${esc(alt||"")}" width="${w}" height="${h}" loading="${load}" decoding="async"${pri}>`;
 }
 function setPhotoBox(el, src, alt, cls, eager){
   if(!el) return;
@@ -6026,7 +6263,7 @@ function renderEditor(){
     if(i>=0) editorDraft.days.splice(i,1); else editorDraft.days.push(d);
     renderEditor();
   });
-  $("edDaysNote").textContent = editorDraft.days.length ? "Shows on "+editorDraft.days.slice().sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b)).map(d=>DAYS[d]).join(", ")+"." : "No day selected — this workout stays unscheduled and can be logged any day.";
+  $("edDaysNote").textContent = editorDraft.days.length ? "Shows on "+editorDraft.days.slice().sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b)).map(d=>DAYS[d]).join(", ")+"." : "Optional. Leave blank to log any day.";
   $("edList").innerHTML = editorDraft.exercises.length ? editorDraft.exercises.map(ex=>`<div class="ex">${photoTag(workFileForName(ex.name),"","thumb")}<div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div><button class="x" data-edrm="${esc(ex.id)}" aria-label="Remove ${esc(ex.name)}">×</button></div><div style="margin:2px 0 6px">${howtoLink(ex.name)}</div><input type="text" data-edtarget="${esc(ex.id)}" value="${esc(ex.target)}" placeholder="Sets × reps or time"></div></div>`).join("") : '<div class="empty">Pick exercises from the library.</div>';
   $("edDelete").style.display = editorDraft.isNew ? "none" : "";
 }
@@ -6222,9 +6459,11 @@ $("libAdd").onclick = () => {
   save();
   $("libName").value=""; $("libCue").value=""; $("libVideo").value="";
   libGroup=group;
+  if($("libAddCard")) $("libAddCard").hidden = true;
   render();
   toast("Added to library");
 };
+if($("libAddOpen")) $("libAddOpen").onclick = () => { if($("libAddCard")) $("libAddCard").hidden = !$("libAddCard").hidden; };
 $("edCancel").onclick = () => { leaveEditor(); render(); };
 $("edSave").onclick = () => saveEditor();
 $("edAdd").onclick = () => { syncEditorFromDom(); openPicker("editor"); };
@@ -6339,7 +6578,7 @@ function libraryMoves(idea){
 }
 function renderWoBuild(){
   $("hdrTitle").textContent = "Workout";
-  $("hdrSub").textContent = "From one prompt";
+  $("hdrSub").textContent = "";
   document.querySelectorAll("[data-woidea]").forEach(b=>b.classList.toggle("sel", b.dataset.woidea===woIdea));
   document.querySelectorAll("[data-wotype]").forEach(b=>b.classList.toggle("sel", b.dataset.wotype===woType));
   const draft = $("woDraft");
@@ -6351,7 +6590,7 @@ function renderWoBuild(){
     const forWhom = woClientName ? '<p class="note">For '+esc(woClientName)+'.</p>' : "";
     const blank = woType==="interval" ? "Time not set" : (woType==="circuit" ? "Rounds not set" : "Sets not set");
     draft.hidden = false;
-    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">'+esc(WO_TYPE_NOTES[woType]||WO_TYPE_NOTES.regular)+' Taken from the exercise library on this phone.</p><ul>'+woDraftMoves.map(n=>'<li><b>'+esc(n)+'</b><div class="note">'+blank+'</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
+    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">'+esc(WO_TYPE_NOTES[woType]||WO_TYPE_NOTES.regular)+' From the exercise library.</p><ul>'+woDraftMoves.map(n=>'<li><b>'+esc(n)+'</b><div class="note">'+blank+'</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
     $("woDraftEdit").onclick = () => useDraftInEditor();
   }
   paintWoClients();
@@ -6375,7 +6614,9 @@ async function paintWoClients(){
   if(!pairs.length){
     woClientId = "";
     woClientName = "";
-    box.innerHTML = '<p class="note">No clients yet.</p>';
+    box.innerHTML = '<p class="card__meta">No clients yet. <button type="button" class="btn-ghost" id="woAddClient">Add a client</button></p>';
+    const addClient=$("woAddClient");
+    if(addClient) addClient.onclick=()=>overviewAddClient();
     return;
   }
   if(woClientId && !pairs.some(p=>p.id===woClientId)){ woClientId=""; woClientName=""; }
@@ -6453,7 +6694,7 @@ function renderWeight(){
   if(ws.length){
     const first=ws[0], last=ws[ws.length-1], lost=first.lbs-last.lbs;
     $("wLost").textContent = (lost>=0?"":"+")+r1(Math.abs(lost))+" lb";
-    $("wLost").style.color = lost>=0?"var(--accent)":"var(--warn)";
+    $("wLost").style.color = "var(--navy)";
     $("wLostSub").textContent = `${r1(first.lbs)} → ${r1(last.lbs)} lb since ${fmtDate(first.date,{month:"short",day:"numeric"})}`;
     if(goal){ const rem=last.lbs-goal; $("wToGoal").textContent = rem>0? r1(rem)+" lb" : "Reached 🎉"; $("wGoalSub").textContent=`goal ${r1(goal)} lb`; }
     else { $("wToGoal").textContent="—"; $("wGoalSub").textContent="set goal in Settings"; }
@@ -7798,8 +8039,8 @@ function paintCallStatus(pair){
   if(linkMode()==="demo"){
     const on = !!(pair.call && pair.call.active);
     $("pairCallNote").textContent = on
-      ? "A call is open on this phone."
-      : "This call stays on this phone.";
+      ? "A call is open."
+      : "Video call.";
     $("pairCall").disabled = ID.role==="client" && !on;
     $("pairCall").textContent = ID.role==="trainer"
       ? (on ? "Rejoin call" : "Start call")
@@ -8455,7 +8696,7 @@ function clientGroupHtml(id, pairs){
       const name = signedInTrainerName() || "Not specified";
       const chip = clientGroupTrainer ? '<div class="cgchip"><span>'+esc(name)+'</span><button type="button" data-cgclear aria-label="Remove trainer filter">×</button></div>' : "";
       const more = "";
-      extra = '<p>Coaching clients get workouts, habits, and nutrition coaching.</p><div class="cgfilters"><b>Filters</b><button type="button" id="cgClear">Clear all</button></div><p class="cglabel">By trainer</p>'+chip+'<button type="button" class="cgadd" id="cgAddFilter">Add filter</button>'+more;
+      extra = '<p>Coaching clients get workouts, habits, and nutrition coaching.</p><div class="cgfilters"><b>Filters</b><button type="button" id="cgClear">Clear all</button></div><p class="cglabel">By trainer</p>'+chip+'<button type="button" class="btn-ghost" id="cgAddFilter">Add filter</button>'+more;
     }
     const list = people.length
       ? people.map(p=>'<button type="button" class="cgclient" data-cgopen="'+esc(p.id)+'">'+esc(p.clientName||"Client")+'</button>').join("")
@@ -8511,6 +8752,7 @@ function overviewAddClient(){
   const form = $("ovAddForm");
   if(!form) return;
   form.hidden = false;
+  if($("toolScrim")) $("toolScrim").hidden = false;
   const input = $("ovClientName");
   if(input){
     input.focus();
@@ -8545,9 +8787,27 @@ async function finishNewClient(name){
   cfEditing = false;
   cfAlertsShown = false;
   persistIdentity();
+  inviteFocus = code;
   go("coach");
-  toast("Invite code "+code);
   return pair;
+}
+let inviteFocus = "";
+function paintInviteFocus(pair){
+  const view = $("inviteView");
+  if(!view) return;
+  const on = !!(inviteFocus && pair && pair.inviteCode===inviteFocus);
+  view.hidden = !on;
+  if(!on){
+    if($("clientFileTabs")) $("clientFileTabs").hidden = false;
+    return;
+  }
+  if($("inviteCodeText")) $("inviteCodeText").textContent = pair.inviteCode || "";
+  if($("clientFile")) $("clientFile").hidden = true;
+  if($("clientFileTabs")) $("clientFileTabs").hidden = true;
+  if($("cfPaneSummary")) $("cfPaneSummary").hidden = true;
+  if($("cfPaneOther")) $("cfPaneOther").hidden = true;
+  if($("hdrTitle")) $("hdrTitle").textContent = "Invite";
+  if($("hdrSub")) $("hdrSub").textContent = "";
 }
 function trainerFileOpen(){
   return trainerHere() && showingPair() && clientFileMode;
@@ -8585,13 +8845,13 @@ function paintClientPanes(pair, log, status){
     return;
   }
   if(clientFileSection==="consultation"){
-    other.innerHTML = "<h2>Consultation</h2><p class=\"cfempty\">No consultation is saved for this client.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"notes\">Add a note</button>";
+    other.innerHTML = "<div class=\"empty\"><p class=\"empty__body\">No consultation is saved for this client.</p><button type=\"button\" class=\"primary\" data-cfgo=\"notes\">Start consultation</button></div>";
     return;
   }
   if(clientFileSection==="forms"){
     const rows = (pair.checkins||[]).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
     if(!rows.length){
-      other.innerHTML = "<h2>Forms</h2><p class=\"cfempty\">No forms saved.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"checkin\">Open check-in</button>";
+      other.innerHTML = "<div class=\"empty\"><p class=\"empty__body\">No forms saved.</p><button type=\"button\" class=\"primary\" data-cfgo=\"checkin\">Send a form</button></div>";
       return;
     }
     other.innerHTML = "<h2>Forms</h2>"+rows.map(c=>{
@@ -8611,7 +8871,7 @@ function paintClientPanes(pair, log, status){
     (c && c.photos || []).forEach(p=>{ if(p && safePhotoSrc(p.url)) formPhotos.push(p); });
   });
   if(!photos.length && !videos.length && !formPhotos.length){
-    other.innerHTML = "<h2>Attachments</h2><p class=\"cfempty\">No attachments saved.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"photos\">Open photos</button>";
+    other.innerHTML = "<div class=\"empty\"><p class=\"empty__body\">No attachments saved.</p><button type=\"button\" class=\"primary\" data-cfgo=\"photos\">Upload file</button></div>";
     return;
   }
   const figs = photos.concat(formPhotos).map(p=>{
@@ -8622,7 +8882,6 @@ function paintClientPanes(pair, log, status){
   other.innerHTML = "<h2>Attachments</h2>"+(figs?'<div class="photogrid">'+figs+"</div>":"")+(vids?'<ul class="list">'+vids+"</ul>":"");
 }
 const CF_DEVICE_ROWS = [
-  {id:"apple", name:"Apple Watch"},
   {id:"fitbit", name:"Fitbit"},
   {id:"mfp", name:"MyFitnessPal"},
   {id:"withings", name:"Withings"}
@@ -8665,8 +8924,8 @@ function activityHtml(workouts, meals, log, goals, status){
     : status==="ambiguous"
       ? "More than one client uses this name, so meals and workouts stay blank."
       : "";
-  const woHtml = wo.length ? '<ul class="list">'+wo.map(line=>'<li><div class="name">'+esc(line)+'</div></li>').join("")+"</ul>" : '<p class="cfempty">None</p>';
-  const foodHtml = food.length ? '<ul class="list">'+food.map(line=>'<li><div class="name">'+esc(line)+'</div></li>').join("")+"</ul>" : '<p class="cfempty">None</p>';
+  const woHtml = wo.length ? '<ul class="list">'+wo.map(line=>'<li><div class="name">'+esc(line)+'</div></li>').join("")+"</ul>" : '<p class="cfempty dash">\u2014</p>';
+  const foodHtml = food.length ? '<ul class="list">'+food.map(line=>'<li><div class="name">'+esc(line)+'</div></li>').join("")+"</ul>" : '<p class="cfempty dash">\u2014</p>';
   const program = programHtml(log);
   const hasProgram = log && log.program && String(log.program.name||"").trim();
   return '<section class="card"><h2>Activity</h2>'+(note?'<p class="note">'+esc(note)+'</p>':"")+'<p>Workouts</p>'+woHtml+'<p>Meals</p>'+foodHtml+(hasProgram?'<p>Program</p>'+program:"")+(goals?'<p>Nutrition goal</p>'+goalHtml(goals):"")+'</section>';
@@ -8695,9 +8954,11 @@ async function paintClientFile(){
   const goals = savedGoals(log);
   const file = readClientFile(pair.id);
   const photo = pickClientPhoto(pair);
+  const who = pair.clientName || "Client";
+  const initials = who.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w.charAt(0)).join("").toUpperCase() || "C";
   $("cfPhoto").innerHTML = photo
-    ? '<img alt="'+esc((pair.clientName||"Client")+" progress photo")+'" src="'+photo+'">'
-    : '<span class="cfnophoto">No photo</span>';
+    ? '<img alt="'+esc(who+" progress photo")+'" src="'+photo+'">'
+    : '<span class="cfinitials">'+esc(initials)+'</span>';
   if(!cfEditing){
     $("cfName").hidden = false;
     $("cfEdit").hidden = false;
@@ -8707,7 +8968,9 @@ async function paintClientFile(){
   const joined = pair.clientDevice ? "Joined on their phone." : "Waiting for them to enter the code.";
   $("cfInvite").textContent = pair.inviteCode ? pair.inviteCode+" · "+joined : joined;
   const groupNow = clientGroup(pair);
-  if($("cfGroupNow")) $("cfGroupNow").textContent = "This client is in "+(CLIENT_GROUP_LABEL[groupNow]||"Pending")+".";
+  if($("cfGroupNow")) $("cfGroupNow").textContent = CLIENT_GROUP_LABEL[groupNow] || "Pending";
+  const groupChip = document.querySelector('#cfGroups [data-cfgroup=""]');
+  if(groupChip) groupChip.textContent = CLIENT_GROUP_LABEL[groupNow] || "Pending";
   const storedGroup = cleanClientStatus(pair.clientStatus) || cleanClientStatus(readClientFile(pair.id).clientStatus);
   const usualGroup = storedGroup==="" || storedGroup==="coaching";
   document.querySelectorAll("#cfGroups [data-cfgroup]").forEach(btn=>{
@@ -8717,20 +8980,20 @@ async function paintClientFile(){
   $("cfBadges").textContent = "No badges yet";
   const workoutCount = countWorkouts(workouts);
   const cardioCount = countCardio(workouts);
-  $("cfWorkouts").textContent = workoutCount>0 ? String(workoutCount) : "None";
-  $("cfCardio").textContent = cardioCount>0 ? String(cardioCount) : "None";
+  $("cfWorkouts").textContent = workoutCount>0 ? String(workoutCount) : "\u2014";
+  $("cfCardio").textContent = cardioCount>0 ? String(cardioCount) : "\u2014";
   $("cfSeen").textContent = "Not yet";
   const sent = latestMessage(pair.messages, "trainer");
   const received = latestMessage(pair.messages, "client");
-  $("cfSent").textContent = sent ? fmtStamp(sent.createdAt) : "None";
-  $("cfRecv").textContent = received ? fmtStamp(received.createdAt) : "None";
+  $("cfSent").textContent = sent ? fmtStamp(sent.createdAt) : "\u2014";
+  $("cfRecv").textContent = received ? fmtStamp(received.createdAt) : "\u2014";
   $("cfTags").innerHTML = file.tags.length
     ? file.tags.map(tag=>'<span class="cftag">'+esc(tag)+'<button type="button" data-cftag="'+esc(tag)+'" aria-label="Remove tag">×</button></span>').join("")
     : '<p class="cfempty">No tags yet.</p>';
   const devices = devicesForClient(pair.clientName, matched.email);
   $("cfDevices").innerHTML = connectRows(devices, file.connectAsks);
   if($("cfAlertsNote")) $("cfAlertsNote").hidden = !cfAlertsShown;
-  $("cfCredits").textContent = file.sessionCredits>0 ? String(file.sessionCredits) : "None";
+  $("cfCredits").textContent = file.sessionCredits>0 ? String(file.sessionCredits) : "\u2014";
   const trainerName = signedInTrainerName();
   $("cfTrainer").textContent = trainerName || "Not specified";
   $("cfLocation").textContent = "Not specified";
@@ -8749,6 +9012,8 @@ async function paintClientFile(){
     : '<p class="cfempty">No notes yet.</p>';
   $("cfAttachCount").textContent = String(attachmentCount(pair));
   paintClientPanes(pair, log, matched.status);
+  if($("hdrTitle")) $("hdrTitle").textContent = pair.clientName || "Client";
+  paintInviteFocus(pair);
   ensureLiveChannel(pair.id);
 }
 async function paintTrainerList(){
@@ -8953,16 +9218,27 @@ $("trCreate").onclick = () => run(async ()=>{
   await finishNewClient($("trName").value);
   $("trName").value = "";
 });
-$("ovAddCancel").onclick = () => {
+function closeAddClient(){
   $("ovAddForm").hidden = true;
-};
+  if($("toolScrim") && $("addPanel").hidden && $("checkPanel").hidden && $("bellPanel").hidden && $("dayMenu").hidden) $("toolScrim").hidden = true;
+}
+$("ovAddCancel").onclick = () => closeAddClient();
 $("ovAddForm").onsubmit = (e) => {
   e.preventDefault();
+  const input = $("ovClientName");
+  const err = $("ovClientErr");
+  if(!String(input.value||"").trim()){
+    if(err){ err.hidden = false; err.textContent = "Enter a client name."; }
+    input.setAttribute("aria-invalid","true");
+    input.focus();
+    return;
+  }
+  if(err) err.hidden = true;
+  input.removeAttribute("aria-invalid");
   run(async ()=>{
-    const input = $("ovClientName");
     await finishNewClient(input.value);
     input.value = "";
-    $("ovAddForm").hidden = true;
+    closeAddClient();
   });
 };
 $("clJoinBtn").onclick = () => run(async ()=>{
@@ -8985,7 +9261,18 @@ function closeClientPage(){
   }
 }
 $("pairBack").onclick = () => closeClientPage();
-$("clientFileBack").onclick = () => closeClientPage();
+$("clientFileBack").onclick = () => { inviteFocus=""; closeClientPage(); };
+if($("inviteDone")) $("inviteDone").onclick = () => { inviteFocus=""; render(); };
+if($("inviteCopy")) $("inviteCopy").onclick = () => {
+  const code = ($("inviteCodeText") && $("inviteCodeText").textContent) || "";
+  if(navigator.clipboard && code) navigator.clipboard.writeText(code).then(()=>toast("Copied")).catch(()=>toast(code));
+  else toast(code);
+};
+if($("inviteShare")) $("inviteShare").onclick = () => {
+  const code = ($("inviteCodeText") && $("inviteCodeText").textContent) || "";
+  if(navigator.share) navigator.share({title:"Invite", text:code}).catch(()=>{});
+  else if($("inviteCopy")) $("inviteCopy").click();
+};
 $("ovMenu").onclick = () => { if(signedInTrainer()) $("menuBtn").click(); };
 $("ovAdd").onclick = () => overviewAddClient();
 $("ovFilter").onclick = () => {
@@ -9034,7 +9321,7 @@ $("ovAutoForm").onsubmit = (e) => {
     quiet: $("ovAutoQuiet").checked
   });
   overviewAutoOpen = false;
-  toast("Saved on this phone");
+  toast("Saved");
   paintOverview().catch(()=>{});
 };
 $("ovTabOverview").onclick = () => {
@@ -9359,7 +9646,7 @@ function eventCard(ev){
 }
 function renderEvents(){
   $("hdrTitle").textContent="Events";
-  $("hdrSub").textContent="Classes and sessions on this phone";
+  $("hdrSub").textContent="";
   document.querySelectorAll("#eventFilters button").forEach(b=>b.classList.toggle("sel", b.dataset.ekind===eventFilter));
   const mine=(S.events||[]).filter(ev=>ev.kind===eventFilter);
   const today=todayStr();
@@ -9407,14 +9694,21 @@ function renderCalendar(){
   }
   scheduledCustoms(calSelected).forEach(c=>workoutBits.push(esc(customProgress(calSelected, c))));
   $("calDayTitle").textContent=fmtDate(calSelected,{weekday:"long",month:"long",day:"numeric"});
-  const evHtml=evs.length?evs.map(ev=>`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"} · ${ev.spots} spots</small></span></div>`).join(""):'<div class="empty">No events this day.</div>';
-  $("calDayBody").innerHTML=`<div class="note" style="margin-bottom:8px">Workout · ${workoutBits.join(" · ")||"None"}</div>`+evHtml;
+  const items=[];
+  if(!(p.rest && !scheduledCustoms(calSelected).length)){
+    const done=p.exercises.filter(ex=>exState(w, ex.id).checked).length;
+    items.push(`<div class="checkrow"><span><b>${esc(p.title||"Workout")}</b><small>${p.exercises.length?done+"/"+p.exercises.length+" checked":"Scheduled"}</small></span></div>`);
+  }
+  scheduledCustoms(calSelected).forEach(c=>items.push(`<div class="checkrow"><span><b>${esc(c.name||"Workout")}</b><small>${esc(customProgress(calSelected, c))}</small></span></div>`));
+  evs.forEach(ev=>items.push(`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"} · ${ev.spots} spots</small></span></div>`));
+  $("calDayBody").innerHTML = items.length ? items.join("") : '<div class="empty"><p class="empty__body">No workouts or events.</p></div>';
 }
 function closeTools(){
   ["addPanel","checkPanel","bellPanel"].forEach(id=>{ $(id).hidden=true; });
   $("toolPlus").setAttribute("aria-expanded","false");
   $("toolCheck").setAttribute("aria-expanded","false");
   $("toolBell").setAttribute("aria-expanded","false");
+  if($("toolScrim")) $("toolScrim").hidden = true;
 }
 function paintCheck(){
   const date=todayStr();
@@ -9439,7 +9733,7 @@ function paintCheck(){
 }
 function paintBell(list){
   const ups=list||upcomingToday();
-  $("bellList").innerHTML=ups.length?ups.map(ev=>`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"}</small></span></div>`).join(""):'<div class="empty">No notifications.</div>';
+  $("bellList").innerHTML=ups.length?ups.map(ev=>`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"}</small></span></div>`).join(""):'<div class="empty"><p class="empty__body">You\'re all caught up.</p></div>';
 }
 function paintTools(){
   const ups=upcomingToday();
@@ -9457,9 +9751,18 @@ function openTool(which){
   if(!willOpen) return;
   $(id).hidden=false;
   $(buttons[which]).setAttribute("aria-expanded","true");
+  if($("toolScrim")) $("toolScrim").hidden = false;
+  const first=$(id).querySelector("button,input,textarea,select");
+  if(first) first.focus();
   if(which==="check") paintCheck();
   if(which==="bell") paintBell();
 }
+if($("toolScrim")) $("toolScrim").onclick = () => {
+  closeTools();
+  if($("dayMenu")){ $("dayMenu").hidden = true; }
+  if($("todayPick")) $("todayPick").setAttribute("aria-expanded","false");
+  if($("ovAddForm")) $("ovAddForm").hidden = true;
+};
 $("toolPlus").onclick=e=>{ e.stopPropagation(); openTool("add"); };
 $("toolCheck").onclick=e=>{ e.stopPropagation(); openTool("check"); };
 $("toolBell").onclick=e=>{ e.stopPropagation(); openTool("bell"); };
@@ -9528,9 +9831,10 @@ document.addEventListener("click", e=>{
   if(e.target.closest("#appTools") || e.target.closest("#tabPlus")) return;
   closeTools();
   if($("moreMenu") && !$("moreMenu").hidden && !e.target.closest("#moreMenu") && !e.target.closest(".morebtn")) $("moreMenu").hidden=true;
-  if($("dayMenu") && !$("dayMenu").hidden && !e.target.closest("#dayMenu") && !e.target.closest("#todayPick")){
+  if($("dayMenu") && !$("dayMenu").hidden && !e.target.closest("#dayMenu") && !e.target.closest("#todayPick") && !e.target.closest("#toolScrim")){
     $("dayMenu").hidden=true;
     $("todayPick").setAttribute("aria-expanded","false");
+    if($("toolScrim") && $("addPanel").hidden && $("checkPanel").hidden && $("bellPanel").hidden) $("toolScrim").hidden=true;
   }
 });
 
@@ -9563,11 +9867,16 @@ function fillVideoClients(pairs){
   const prev = sel.value;
   sel.dataset.ids = ids;
   sel.replaceChildren();
+  sel.disabled = !pairs.length;
+  const sendBtn = $("videoSendBtn");
+  if(sendBtn) sendBtn.disabled = !pairs.length;
   if(!pairs.length){
     const opt = document.createElement("option");
     opt.value = "";
-    opt.textContent = "No clients yet";
+    opt.textContent = "Add a client first";
     sel.appendChild(opt);
+    const goAdd = $("videoAddClient");
+    if(goAdd) goAdd.onclick = () => overviewAddClient();
     return;
   }
   pairs.forEach(p=>{
@@ -9632,7 +9941,7 @@ function paintVideoList(items){
   if(!items.length){
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = ID.role==="trainer" ? "No videos sent yet." : "No videos from your trainer yet.";
+    empty.textContent = ID.role==="trainer" ? "Videos you send will show here." : "Videos from your trainer will show here.";
     box.appendChild(empty);
     return;
   }
@@ -9644,7 +9953,7 @@ function paintVideoList(items){
     const yt = youtubeId(v.playUrl || v.url);
     if(ID.role==="trainer") name.textContent = v.clientName || "Client";
     else if(v.fileName) name.textContent = v.fileName;
-    else if(yt) name.textContent = "YouTube video";
+    else if(yt) name.textContent = "Video link";
     else name.textContent = "Video";
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -9818,7 +10127,7 @@ function paintClientCheckin(){
   const joined = ID.role==="client" && ID.activePairId;
   $("checkinNote").textContent = joined
     ? "Your trainer can see this check-in."
-    : "Saved on this phone. Join your trainer with an invite code so they can see it.";
+    : "Join your trainer with an invite code so they can see it.";
   const dateField = '<div class="qcard"><div class="ql">Date</div><input type="date" id="checkinDate" value="'+esc(checkinDate)+'"></div>';
   let body = "";
   if(checkinStep==="weight"){
@@ -9880,7 +10189,9 @@ async function paintTrainerCheckins(){
   const pairs = await Link.pairsForTrainer();
   if(!pairs.length){
     $("checkinNote").textContent = "Client answers show up here.";
-    $("checkinBody").innerHTML = '<div class="card"><p>No clients yet. Add a client and copy the invite code. They sign in on their own phone, open Join your trainer, and enter that code.</p></div>';
+    $("checkinBody").innerHTML = '<div class="empty"><p class="empty__body">No check-ins yet.</p><button type="button" class="primary" id="checkinAddClient">Add a client</button></div>';
+    const add=$("checkinAddClient");
+    if(add) add.onclick=()=>overviewAddClient();
     return;
   }
   if(!checkinPairId || !pairs.some(p=>p.id===checkinPairId)) checkinPairId = pairs[0].id;
@@ -10000,7 +10311,7 @@ function paintBmiSummary(){
 function paintBmiList(){
   const rows = (S.bmi||[]).slice().sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:0).slice(0, 6);
   const fallback = num(S.settings.heightIn);
-  if(!rows.length){ $("bmiList").innerHTML = '<div class="empty">Nothing saved on this phone yet.</div>'; return; }
+  if(!rows.length){ $("bmiList").innerHTML = '<div class="empty"><p class="empty__body">Add height and weight to see BMI.</p></div>'; return; }
   $("bmiList").innerHTML = "<ul class=\"list\">"+rows.map(r=>{
     const b = bmiFrom(r.weight, r.heightIn || fallback);
     const band = bmiBandName(b);
@@ -10076,7 +10387,7 @@ function saveBmi(){
   if(existing) existing.weight = r1(weight);
   else S.weights.push({date:date, weight:r1(weight)});
   save();
-  toast("Saved on this phone");
+  toast("Saved");
   paintBmiSummary();
   paintBmiList();
 }
@@ -10253,7 +10564,7 @@ $("sessionSave").onclick = () => {
     $("sessionFile").value = "";
     render();
     if(!authKeyReady()){
-      toast("Saved on this phone");
+      toast("Saved");
       return;
     }
     return shareSessionFile(row, file).then(() => {
@@ -10261,7 +10572,7 @@ $("sessionSave").onclick = () => {
     }).catch(e => {
       if(e && e.code==="missing") toast("Saved on this phone. Session storage is not created in Supabase yet");
       else if(e && e.code==="signin") toast("Saved on this phone. Sign in to share it");
-      else toast("Saved on this phone");
+      else toast("Saved");
     });
   }).catch(e => toast(e && e.message ? e.message : "Could not store that on this phone"));
 };
@@ -10701,7 +11012,7 @@ function paintAskThread(){
         html += `<p class="asksrc">${esc(askDayTotals(day.items))}</p></div>`;
       });
     }
-    if(draft) html += `<button type="button" class="primary full" data-asksave="${i}">${msg.saved?"Saved on this phone":"Save on this phone"}</button>`;
+    if(draft) html += `<button type="button" class="primary full" data-asksave="${i}">${msg.saved?"Saved":"Save"}</button>`;
     html += `</div>`;
     return html;
   }).join("");
@@ -10752,11 +11063,11 @@ function saveAskDraft(index){
   msg.saved = true;
   persistAsk();
   paintAskThread();
-  toast("Saved on this phone");
+  toast("Saved");
 }
 function renderAsk(){
   $("hdrTitle").textContent = "Ask AI";
-  $("hdrSub").textContent = "Ideas from this phone";
+  $("hdrSub").textContent = "";
   const form = $("askForm");
   if(!signedInTrainer()){
     if($("askThread")) $("askThread").innerHTML = '<p class="note">Ask AI stays on the bar for a signed-in trainer account.</p>';
@@ -10807,7 +11118,7 @@ let youView = "premium";
 function lastSaveText(){
   let t = 0;
   try { t = parseInt(localStorage.getItem(LAST_SAVE_KEY)||"", 10) || 0; } catch(e){ t = 0; }
-  if(!t) return "Not saved on this phone yet";
+  if(!t) return "Not saved yet";
   return "Last saved " + new Date(t).toLocaleTimeString(undefined, {hour:"numeric", minute:"2-digit"});
 }
 function themeChoice(){
@@ -11002,7 +11313,7 @@ function devicesHtml(y){
   const readBtn = browserHeartApi()
     ? '<button type="button" data-devread="heart">Read heart rate from a Bluetooth sensor</button><p class="note">That reads a heart-rate sensor this browser can see.</p>'
     : "";
-  return '<form class="card" data-youform="device"><p>Add an Apple Watch or another device, and choose steps, heart rate, or both. The choice is saved on this phone.</p><div class="field"><label class="f" for="devName">Device</label><input id="devName" name="name" maxlength="60" placeholder="Device name" autocomplete="off"></div><button type="button" data-devname="Apple Watch">Apple Watch</button><label class="devpick"><input type="checkbox" name="steps"> Steps</label><label class="devpick"><input type="checkbox" name="heart"> Heart rate</label><button class="primary full" type="submit">Save device</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'<p class="note">No device saved on this phone yet.</p>')+'<div class="card">'+readBtn+'<p>The camera opens only when you choose a photo.</p><p>'+esc(cloud)+'</p></div>';
+  return '<form class="card" data-youform="device"><div class="field"><label class="f" for="devName">Device</label><input id="devName" name="name" maxlength="60" placeholder="Device name" autocomplete="off"></div><label class="devpick"><input type="checkbox" name="steps"> Steps</label><label class="devpick"><input type="checkbox" name="heart"> Heart rate</label>'+(readBtn?readBtn:"")+'<button class="primary full" type="submit">Save device</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'<div class="empty"><p class="empty__body">No devices connected.</p></div>');
 }
 const FAST_MARKS = [
   {h:4, note:"Around 4 hours, digestion of the last meal is winding down."},
@@ -11049,7 +11360,7 @@ function fastingClockHtml(y){
   const clock = cleanFastClock(y.fastClock);
   const goals = [12,16,18,24].map(h=>'<button type="button" class="chip'+(clock.goalHours===h?" sel":"")+'" data-fastgoal="'+h+'" aria-pressed="'+(clock.goalHours===h?"true":"false")+'">'+h+" hours</button>").join("");
   const marks = FAST_MARKS.map(m=>'<li data-fasth="'+m.h+'">'+esc(fastMarkLabel(m.h))+"</li>").join("");
-  return '<div class="card fastclock"><p class="note">General information, not medical advice.</p><p class="fasttime" id="fastElapsed" aria-live="polite">0:00:00</p><p class="fastmark" id="fastMark"></p><p id="fastNote"></p><p class="note" id="fastGoalLine"></p><p class="themelabel">Goal length</p><div class="chips">'+goals+'</div><div class="fastactions"><button type="button" class="primary" data-fastact="start" id="fastStart">Start</button><button type="button" data-fastact="pause" id="fastPause">Pause</button><button type="button" data-fastact="reset" id="fastReset">Reset</button></div><ul class="fastmarks">'+marks+"</ul></div>";
+  return '<div class="card fastclock"><p class="note">General information, not medical advice.</p><p class="fasttime" id="fastElapsed" aria-live="polite">0:00:00</p><p class="fastmark" id="fastMark"></p><p id="fastNote"></p><p class="note" id="fastGoalLine" hidden></p><div class="chips">'+goals+'</div><div class="fastactions"><button type="button" class="primary" data-fastact="start" id="fastStart">Start fast</button><button type="button" data-fastact="pause" id="fastPause" hidden>Pause</button><button type="button" data-fastact="reset" id="fastReset" hidden>End fast</button></div><h3 class="card__title">What happens over time</h3><ul class="fastmarks">'+marks+"</ul></div>";
 }
 function paintFastClock(){
   const elapsedEl = $("fastElapsed");
@@ -11078,11 +11389,19 @@ function paintFastClock(){
   });
   const startBtn = $("fastStart");
   const pauseBtn = $("fastPause");
+  const resetBtn = $("fastReset");
   if(startBtn){
-    startBtn.textContent = clock.status==="paused" ? "Resume" : "Start";
-    startBtn.disabled = clock.status==="running";
+    startBtn.hidden = clock.status==="running";
+    startBtn.textContent = clock.status==="paused" ? "Resume" : "Start fast";
+    startBtn.disabled = false;
   }
-  if(pauseBtn) pauseBtn.disabled = clock.status!=="running";
+  if(pauseBtn) pauseBtn.hidden = clock.status!=="running";
+  if(resetBtn){
+    resetBtn.hidden = clock.status==="idle";
+    resetBtn.textContent = clock.status==="running" ? "End fast" : "Reset";
+    resetBtn.classList.toggle("primary", clock.status==="running");
+  }
+  if(goalEl) goalEl.hidden = true;
 }
 function stopFastTimer(){
   if(fastTimer){ clearInterval(fastTimer); fastTimer = null; }
@@ -11157,9 +11476,9 @@ function refreshYou(){
   syncMenu();
 }
 const YOU_TITLES = {
-  premium:"My Premium", profile:"My Profile", accounts:"Accounts", glp1:"GLP-1 Support", fasting:"Intermittent Fasting",
+  premium:"My Premium", profile:"My Profile", accounts:"Accounts", glp1:"GLP-1 Support", fasting:"Fasting",
   sleep:"Sleep", goals:"Goals", weight:"Weight & Measurements", report:"My Weekly Report",
-  nutrition:"Nutrition", reminders:"Reminders", devices:"Apps & Devices", steps:"Steps",
+  nutrition:"Nutrition", reminders:"Reminders", devices:"Apps & devices", steps:"Steps",
   community:"Community", learn:"Learn", friends:"Friends", messages:"Messages",
   appearance:"App Appearance", privacy:"Privacy", help:"Help", sync:"Sync"
 };
@@ -11315,7 +11634,7 @@ function onYouSubmit(e){
     if(!account){ toast("Sign in to save your profile"); return; }
     if(!name){ toast("Enter your name"); return; }
     rememberAccount(Object.assign({}, account, {name:name}));
-    toast("Profile saved on this phone");
+    toast("Profile saved");
     return;
   }
   if(kind==="goals"){
@@ -11330,8 +11649,8 @@ function onYouSubmit(e){
     toast("Goals saved");
     return;
   }
-  if(kind==="glp1"){ saveYou({glp1: form.note.value}); toast("Note saved on this phone"); return; }
-  if(kind==="fast"){ saveYou({fastStart: form.start.value, fastEnd: form.end.value, fastNote: form.note.value}); toast("Saved on this phone"); return; }
+  if(kind==="glp1"){ saveYou({glp1: form.note.value}); toast("Note saved"); return; }
+  if(kind==="fast"){ saveYou({fastStart: form.start.value, fastEnd: form.end.value, fastNote: form.note.value}); toast("Saved"); return; }
   if(kind==="sleep"){
     const hoursRaw = form.hours.value.trim();
     let hours = null;
@@ -11352,27 +11671,27 @@ function onYouSubmit(e){
     const y = loadYou();
     saveYou({reminders: y.reminders.concat([{id:uid(), label:label, time: form.time.value}])});
     refreshYou();
-    toast("Reminder saved on this phone");
+    toast("Reminder saved");
     return;
   }
-  if(kind==="community"){ saveYou({community: form.note.value}); toast("Saved on this phone"); return; }
+  if(kind==="community"){ saveYou({community: form.note.value}); toast("Saved"); return; }
   if(kind==="friends"){
     const name = form.name.value.trim();
     if(!name){ toast("Enter a name"); return; }
     const y = loadYou();
     saveYou({friends: y.friends.concat([{id:uid(), name:name}])});
     refreshYou();
-    toast("Saved on this phone");
+    toast("Saved");
     return;
   }
-  if(kind==="messages"){ saveYou({messages: form.note.value}); toast("Saved on this phone"); return; }
+  if(kind==="messages"){ saveYou({messages: form.note.value}); toast("Saved"); return; }
   if(kind==="device"){
     const name = form.name.value.trim();
     if(!name){ toast("Enter a device name"); return; }
     const y = loadYou();
     saveYou({devices: y.devices.concat([{id:uid(), name:name.slice(0,60), steps:!!(form.steps&&form.steps.checked), heart:!!(form.heart&&form.heart.checked), addedAt:Date.now()}])});
     refreshYou();
-    toast("Device saved on this phone");
+    toast("Device saved");
   }
 }
 function onYouClick(e){
@@ -11415,7 +11734,7 @@ function onYouClick(e){
   if(e.target.closest("[data-syncnow]")){
     save();
     refreshYou();
-    toast("Saved on this phone");
+    toast("Saved");
   }
 }
 $("youBody").addEventListener("submit", onYouSubmit);
@@ -11612,6 +11931,7 @@ function showWelcome(view){
   if($("welcomeFront")) $("welcomeFront").hidden = view!=="home";
   $("welcomeSignup").hidden = view!=="signup";
   $("welcomeLogin").hidden = view!=="login";
+  document.body.classList.toggle("login-open", view==="login");
   $("welcomeDock").hidden = true;
   $("roleGate").style.display = "none";
   $("signupForm").hidden = false;
@@ -12355,7 +12675,7 @@ function showForgot(open){
   $("forgotForm").hidden = !open;
   $("loginHeading").textContent = open ? "New password" : "Log in";
   if(open){
-    $("forgotNote").textContent = "Set a new password for the "+loginRole+" account already on this phone.";
+    $("forgotNote").textContent = "Set a new password for this "+loginRole+" account.";
     $("forgotEmail").value = $("loginEmail").value.trim();
     $("forgotNew").value = "";
     $("forgotNew2").value = "";
@@ -12416,7 +12736,7 @@ $("forgotForm").onsubmit = (e) => {
     $("loginEmail").value = email;
     $("loginPass").value = "";
     showForgot(false);
-    toast("Password saved on this phone");
+    toast("Password saved");
   });
 };
 $("logOutBtn").onclick = () => logOut();
@@ -12435,7 +12755,7 @@ async function onBubbleFile(file){
     writeMyLook({bubble:url});
     applyMemberLook();
     paintMyPage();
-    toast("Photo bubble updated on this phone");
+    toast("Photo updated");
   } catch(err) {
     toast(err && err.message ? err.message : "Could not use that photo");
   }
