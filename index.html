@@ -276,6 +276,27 @@ button:active{transform:scale(.98)}
 .menuaction{margin-top:28px;background:#563DD2;color:#fff;border:none;border-radius:4px;padding:14px 22px;font-weight:800;font-size:15px;letter-spacing:0;text-transform:none;min-width:210px;text-align:center}
 .menulogout{flex:none;align-self:stretch;background:#FFFFFF;border:none;border-top:1px solid rgba(11,11,57,.16);color:#0B0B39;margin-top:12px;padding:16px 0 2px;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:right}
 .menubrand{margin:0 0 18px;font-size:22px;font-weight:600;letter-spacing:.01em;text-align:right;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+.findclient,.masterlib{align-self:stretch;width:100%;color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+.findclient{margin:0 0 16px}
+.findclient[hidden],.masterlib[hidden],.findhits[hidden]{display:none !important}
+.findbox{display:flex;align-items:center;gap:8px;background:#FFFFFF;border:1px solid #E4E2EB;border-radius:12px;padding:10px 12px}
+.findbox svg{width:18px;height:18px;stroke:#0B0B39;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.findbox input{flex:1;width:auto;min-width:0;background:transparent;border:none;border-radius:0;padding:0;color:#0B0B39;font:inherit;font-size:16px}
+.findbox input::placeholder{color:#0B0B39;opacity:.55}
+.findhits{margin-top:6px}
+.findhits button{display:block;width:100%;text-align:left;background:#FFFFFF;color:#0B0B39;border:1px solid #E4E2EB;border-radius:10px;padding:10px 12px;margin-top:6px;font:inherit;font-size:16px}
+.findempty{margin:8px 2px 0;color:#0B0B39;font-size:15px}
+.masterlib{margin:8px 0 18px}
+.mltitle{margin:8px 0 6px;text-align:left;font-size:22px;font-weight:600;color:#0B0B39}
+.mlsec{margin:14px 2px 2px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#0B0B39}
+.mlrow{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:transparent;border:none;border-radius:12px;padding:11px 10px;color:#0B0B39;font:inherit;font-size:18px;font-weight:600}
+.mlrow svg{width:22px;height:22px;stroke:#0B0B39;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mlrow .grow{flex:1;min-width:0}
+.mlrow .chev{margin-left:auto;color:#563DD2}
+.mlrow.sel{background:#E4E2EB}
+body.theme-dark:not(.welcome-on) #masterLib .mlrow,
+body.theme-dark:not(.welcome-on) #menuFind .findhits button{background:transparent;border-color:transparent;color:#0B0B39}
+body.theme-dark:not(.welcome-on) #masterLib .mlrow.sel{background:#E4E2EB}
 .rolepick{display:flex;gap:8px;justify-content:flex-end;margin:0 0 18px;width:100%}
 .rolepick button{background:transparent;border:1px solid rgba(11,11,57,.35);color:#0B0B39;border-radius:999px;padding:8px 16px;font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .rolepick button.sel{background:#563DD2;color:#fff;border-color:#563DD2}
@@ -291,7 +312,7 @@ button:active{transform:scale(.98)}
 a.vopen{display:inline-block;margin-top:8px;color:#563DD2;font-weight:700;font-size:13px}
 body.welcome-on main,body.welcome-on .screentitle,body.welcome-on #hdrSub,body.welcome-on #demoBanner,body.welcome-on #appTools{display:none !important}
 body.welcome-on #roleGate{display:none !important}
-body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welcome-on #navMenu .navsub,body.welcome-on #menuAction,body.welcome-on #menuLogout,body.welcome-on #menuCheck,body.welcome-on #menuBell,body.welcome-on #menuEdit,body.welcome-on #menuEditPanel,body.welcome-on #youList{display:none !important}
+body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welcome-on #navMenu .navsub,body.welcome-on #menuAction,body.welcome-on #menuLogout,body.welcome-on #menuCheck,body.welcome-on #menuBell,body.welcome-on #menuEdit,body.welcome-on #menuEditPanel,body.welcome-on #youList,body.welcome-on #menuFind,body.welcome-on #masterLib{display:none !important}
 body:not(.welcome-on) .welcome-only{display:none !important}
 body:not(.welcome-on) #welcome{display:none !important}
 .welcome{max-width:560px;margin:0 auto;padding:6px 22px 8px;position:relative;z-index:2}
@@ -2148,11 +2169,24 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
   <h2 class="asktitle" id="youTitle">You</h2>
   <div id="youBody"></div>
 </section>
+<section class="page" id="page-librarynote">
+  <div class="card">
+    <h2 id="libraryNoteTitle">Habits</h2>
+    <p id="libraryNoteBody">Habits is not open yet.</p>
+  </div>
+</section>
 </main>
 
 <nav class="navmenu" id="navMenu" hidden>
   <div class="navscroll">
   <p class="menubrand">Curly Gurl Fitness</p>
+  <div class="findclient" id="menuFind" hidden>
+    <label class="findbox">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg>
+      <input id="menuFindInput" type="search" placeholder="Find a client" autocomplete="off" aria-label="Find a client">
+    </label>
+    <div class="findhits" id="menuFindHits" hidden></div>
+  </div>
   <div class="rolepick" id="menuRoles" role="group" aria-label="Trainer or client">
     <button type="button" data-menurole="trainer" aria-pressed="false">Trainer</button>
     <button type="button" data-menurole="client" aria-pressed="false">Client</button>
@@ -2206,6 +2240,18 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
     <input id="bubbleLibFile" type="file" accept="image/*" hidden>
   </div>
   <button type="button" class="navitem" data-tab="clients" hidden>Clients</button>
+  <div class="masterlib" id="masterLib" hidden>
+    <p class="mltitle">Master Library</p>
+    <button type="button" class="mlrow" data-ml="exercises"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M11 9.5v5l4.5-2.5z"/></svg><span>Exercises</span></button>
+    <p class="mlsec">Nutrition</p>
+    <button type="button" class="mlrow" data-ml="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5M11 3v5"/><path d="M4 11h12a6 6 0 0 1-12 0z"/><path d="M10 17v3"/></svg><span>Meals</span></button>
+    <button type="button" class="mlrow" data-ml="foods"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20c-3.5 0-6-2.4-6-6 0-3.2 2.2-6 4.2-8.2C11.2 8.6 12 11 12 11s.8-2.4 1.8-5.2C15.8 8 18 10.8 18 14c0 3.6-2.5 6-6 6z"/><path d="M12 11c1.2-2 3-2.6 4-2"/></svg><span>Foods</span></button>
+    <p class="mlsec">Habits</p>
+    <button type="button" class="mlrow" data-ml="habits"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.2"/><path d="M4.5 18c.7-2.6 2.3-4 4.5-4s3.8 1.4 4.5 4"/><circle cx="17" cy="8" r="2"/></svg><span>Habits</span></button>
+    <p class="mlsec">Others</p>
+    <button type="button" class="mlrow" data-ml="forms"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3.5h6V6H9zM9 10h6M9 14h6"/></svg><span>Forms</span></button>
+    <button type="button" class="mlrow" data-ml="scheduling"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow">Scheduling</span><span class="chev" aria-hidden="true">›</span></button>
+  </div>
   <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
   <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
   <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
@@ -2977,8 +3023,9 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {overview:"Clients", clients:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You"};
+const TITLES = {overview:"Clients", clients:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You", librarynote:"Habits"};
 let currentTab = "today";
+let libraryNote = "habits";
 let diaryDate = todayStr();
 function tabGroup(tab){
   if(tab==="overview") return "overview";
@@ -3001,7 +3048,7 @@ function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="work
 function sessionsVisible(){ return trainerHere() || clientView(); }
 function go(tab){
   if(!TITLES[tab]) tab="today";
-  if((tab==="overview" || tab==="clients") && !signedInTrainer()) tab="today";
+  if((tab==="overview" || tab==="clients" || tab==="librarynote") && !signedInTrainer()) tab="today";
   if(tab==="sessions" && !sessionsVisible()) tab="today";
   if(tab==="ask" && !signedInTrainer()) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
@@ -3102,6 +3149,16 @@ function syncMenu(){
   }
   const syncWhen = $("youSyncWhen");
   if(syncWhen) syncWhen.textContent = lastSaveText();
+  const trainerMenu = signedInTrainer() && !document.body.classList.contains("welcome-on");
+  const menuFind = $("menuFind");
+  const masterLib = $("masterLib");
+  if(menuFind) menuFind.hidden = !trainerMenu;
+  if(masterLib) masterLib.hidden = !trainerMenu;
+  if(!trainerMenu){
+    const hits = $("menuFindHits");
+    if(hits){ hits.hidden = true; hits.innerHTML = ""; }
+  }
+  paintMasterLib();
   const weekPlan = $("menuWeekPlan");
   if(weekPlan){
     weekPlan.hidden = !signedInTrainer();
@@ -3133,6 +3190,12 @@ function setMenuOpen(open){
   btn.setAttribute("aria-expanded", open ? "true" : "false");
   btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
   document.body.style.overflow = open ? "hidden" : "";
+  if(open && signedInTrainer()){
+    const input = $("menuFindInput");
+    if(input) input.value = "";
+    paintMenuFind();
+    loadMenuClients();
+  }
   syncMenu();
 }
 function closeMenu(){ setMenuOpen(false); }
@@ -3210,6 +3273,126 @@ $("menuAction").onclick = () => {
   woDate = todayStr();
   go("workout");
 };
+let menuClients = [];
+function paintMasterLib(){
+  document.querySelectorAll("#masterLib [data-ml]").forEach(btn=>{
+    const kind = btn.dataset.ml;
+    const on = kind==="exercises" ? currentTab==="library" && libSection==="exercises"
+      : kind==="meals" ? currentTab==="meals" && $("foodLog").hidden
+      : kind==="foods" ? !$("foodLog").hidden
+      : kind==="habits" ? currentTab==="librarynote" && libraryNote==="habits"
+      : kind==="forms" ? (currentTab==="librarynote" && libraryNote==="forms") || (trainerFileOpen() && clientFileSection==="forms")
+      : kind==="scheduling" ? currentTab==="events" || currentTab==="calendar"
+      : false;
+    btn.classList.toggle("sel", on);
+  });
+}
+function paintMenuFind(){
+  const box = $("menuFindHits");
+  const input = $("menuFindInput");
+  if(!box || !input) return;
+  const q = input.value.trim().toLowerCase();
+  if(!q || !signedInTrainer()){
+    box.hidden = true;
+    box.innerHTML = "";
+    return;
+  }
+  const hits = menuClients.filter(p=>String(p.clientName||"").toLowerCase().indexOf(q)>=0);
+  box.hidden = false;
+  box.innerHTML = hits.length
+    ? hits.map(p=>'<button type="button" data-findclient="'+esc(p.id)+'">'+esc(p.clientName||"Client")+'</button>').join("")
+    : '<p class="findempty">No clients match.</p>';
+}
+async function loadMenuClients(){
+  if(!signedInTrainer()){ menuClients = []; paintMenuFind(); return; }
+  try { menuClients = await Link.pairsForTrainer(); }
+  catch(e){ menuClients = []; }
+  if(!signedInTrainer()){ menuClients = []; }
+  paintMenuFind();
+}
+function openMaster(kind){
+  if(!signedInTrainer()) return;
+  if(kind==="exercises"){
+    libSection = "exercises";
+    returnView = "home";
+    closeMenu();
+    go("library");
+    return;
+  }
+  if(kind==="meals"){
+    closeMenu();
+    go("meals");
+    return;
+  }
+  if(kind==="foods"){
+    closeMenu();
+    openFoodLog();
+    const input = $("foodLogSearch");
+    if(input) input.focus();
+    syncMenu();
+    return;
+  }
+  if(kind==="habits"){
+    libraryNote = "habits";
+    closeMenu();
+    go("librarynote");
+    return;
+  }
+  if(kind==="scheduling"){
+    closeMenu();
+    go("events");
+    return;
+  }
+  if(kind==="forms"){
+    closeMenu();
+    openMasterForms();
+  }
+}
+async function openMasterForms(){
+  if(!signedInTrainer()) return;
+  let pairs = menuClients.slice();
+  if(!pairs.length){
+    try { pairs = await Link.pairsForTrainer(); }
+    catch(e){ pairs = []; }
+  }
+  const active = ID.activePairId && pairs.some(p=>p.id===ID.activePairId) ? ID.activePairId : "";
+  const only = !active && pairs.length===1 ? pairs[0].id : "";
+  const id = active || only;
+  if(!id){
+    libraryNote = "forms";
+    go("librarynote");
+    return;
+  }
+  openOverviewClient(id);
+  clientFileSection = "forms";
+  render();
+}
+function renderLibraryNote(){
+  const forms = libraryNote==="forms";
+  const title = forms ? "Forms" : "Habits";
+  $("hdrTitle").textContent = title;
+  if($("hdrSub")) $("hdrSub").textContent = "";
+  $("libraryNoteTitle").textContent = title;
+  $("libraryNoteBody").textContent = forms ? "Open a client to see forms." : "Habits is not open yet.";
+}
+$("masterLib").addEventListener("click", (e)=>{
+  const row = e.target.closest("[data-ml]");
+  if(!row) return;
+  openMaster(row.dataset.ml);
+});
+$("menuFindInput").addEventListener("input", paintMenuFind);
+$("menuFindInput").addEventListener("keydown", (e)=>{
+  if(e.key!=="Enter") return;
+  e.preventDefault();
+  const btn = $("menuFindHits").querySelector("[data-findclient]");
+  if(btn) btn.click();
+});
+$("menuFind").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-findclient]");
+  if(!btn || !signedInTrainer()) return;
+  closeMenu();
+  openOverviewClient(btn.dataset.findclient);
+});
 document.addEventListener("keydown", e=>{
   if(e.key!=="Escape") return;
   if(!$("navMenu").hidden) closeMenu();
@@ -10149,7 +10332,7 @@ function render(){
   paintHeader();
   paintSubbar();
   applyMemberLook();
-  ({overview:renderOverview, clients:renderClientGroups, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou})[currentTab]();
+  ({overview:renderOverview, clients:renderClientGroups, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou, librarynote:renderLibraryNote})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
