@@ -472,8 +472,12 @@ button.learnmore{background:transparent;border:none;color:#0B0B39;font-weight:70
   50%,92%{transform:translateX(-50%)}
   100%{transform:translateX(0)}
 }
+#welcomeFront .phonefeed{position:absolute;inset:0;overflow:hidden;border-radius:18px;background:#fff;touch-action:pan-y}
+#welcomeFront .phonefeed-track{display:flex;flex-direction:column;animation:phone-rise 36s linear infinite;will-change:transform}
+#welcomeFront .phonefeed-track img,#welcomeFront .phonefeed-track video{width:100%;height:180px;object-fit:cover;display:block;flex:none;background:#E4E2EB}
+@keyframes phone-rise{from{transform:translateY(0)}to{transform:translateY(-50%)}}
 @media (prefers-reduced-motion:reduce){
-  .loginphone-track{animation:none}
+  .loginphone-track,.phonefeed-track{animation:none}
 }
 button.outline{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#0B0B39;border:1.5px solid #0B0B39;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
 .wshot{position:relative;margin:28px 0 8px}
@@ -1206,14 +1210,58 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
 <div id="welcome" class="welcome">
   <div id="welcomeFront">
     <section class="front-hero">
-      <h2>Train here, and come home to it.</h2>
-      <p>Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.</p>
-      <form class="front-start" id="frontStart">
-        <label class="f" for="frontEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
-        <input id="frontEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email">
-        <button type="submit">Get started</button>
-      </form>
+      <div class="phonehero">
+        <div class="phonehero-copy">
+          <h2>Train here, and come home to it.</h2>
+          <p>Curly Gurl Fitness isn't just a brand, it's a family. Trainers, clients, and anyone walking in for the first time, you have a place here. Welcome home. That is Curly Gurl Fitness.</p>
+          <form class="front-start" id="frontStart">
+            <label class="f" for="frontEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email</label>
+            <input id="frontEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email">
+            <button type="submit">Get started</button>
+          </form>
+        </div>
+        <div class="loginphone">
+          <div class="loginphone-bezel">
+            <div class="loginphone-screen">
+              <div class="loginphone-notch"></div>
+              <div class="phonefeed" id="phoneFeed">
+                <div class="phonefeed-track">
+                  <img src="images/header-portrait.jpg" alt="">
+                  <video src="images/welcome-reel.mp4" muted playsinline autoplay loop preload="auto" poster="images/work/boxing.jpg"></video>
+                  <img src="images/work/lower-body.jpg" alt="">
+                  <img src="images/food/salad.jpg" alt="">
+                  <img src="images/work/glute.jpg" alt="">
+                  <img src="images/food/salmon.jpg" alt="">
+                  <img src="images/library-step.jpg" alt="">
+                  <img src="images/welcome-rooftop.jpg" alt="">
+                  <img src="images/header-portrait.jpg" alt="">
+                  <video src="images/welcome-reel.mp4" muted playsinline autoplay loop preload="auto" poster="images/work/boxing.jpg"></video>
+                  <img src="images/work/lower-body.jpg" alt="">
+                  <img src="images/food/salad.jpg" alt="">
+                  <img src="images/work/glute.jpg" alt="">
+                  <img src="images/food/salmon.jpg" alt="">
+                  <img src="images/library-step.jpg" alt="">
+                  <img src="images/welcome-rooftop.jpg" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+    <script>
+    (function(){
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      function syncPhone(){
+        document.querySelectorAll("#welcomeFront .phonefeed video").forEach(function(v){
+          if(reduce.matches) v.pause();
+          else { var play = v.play(); if(play && play.catch) play.catch(function(){}); }
+        });
+      }
+      if(reduce.addEventListener) reduce.addEventListener("change", syncPhone);
+      syncPhone();
+    })();
+    </script>
     <section class="front-photo" aria-label="Marquita Foster">
       <img src="images/header-portrait.jpg" alt="Marquita Foster">
     </section>
