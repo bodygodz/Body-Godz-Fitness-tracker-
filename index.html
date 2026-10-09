@@ -33,9 +33,14 @@ if ("serviceWorker" in navigator) {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#FFFFFF; --card:#E4E2EB; --card2:#E4E2EB; --line:#E4E2EB; --text:#0B0B39; --muted:#0B0B39;
-  --accent:#563DD2; --accent2:#563DD2; --warn:#b45309; --danger:#e11d48; --radius:16px;
+  --bg:#FFFFFF; --card:#FFFFFF; --card2:#FFFFFF; --line:#E4E2EB; --text:#0B0B39; --muted:rgba(11,11,57,.62);
+  --accent:#563DD2; --accent2:#563DD2; --warn:#b45309; --danger:#e11d48; --radius:18px;
   --safe-b:env(safe-area-inset-bottom,0px);
+  --s1:8px; --s2:16px; --s3:24px; --s4:32px;
+  --sans:-apple-system,"SF Pro Text",system-ui,sans-serif;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif;
+  --shadow:0 1px 2px rgba(11,11,57,.05),0 10px 28px rgba(11,11,57,.05);
+  --hair:rgba(11,11,57,.12);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;font-size:14px;line-height:1.45}
@@ -996,6 +1001,155 @@ body.theme-dark:not(.welcome-on) .devpick{color:#0B0B39}
 button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcome-dock button.primary,.gatebox button.primary,.setupcard button.primary,.toolplus,.tabplus,.foodplus,.eventfilters button.sel,.calgrid button.sel,.subbar button.sel,.csteps button.sel,.yesno button.sel,#clientFile .cfcount,#page-overview .ovadd,#page-overview .ovmark,.ps-btn{color:#fff}
 #page-overview .ovadd svg,#page-overview .ovmark svg{stroke:#fff}
 
+/* One layout system: 8px scale, white cards, sans UI, serif headlines. */
+html,body{font-family:var(--sans);overflow-x:clip}
+body{font-size:15px;line-height:1.45}
+main{padding:var(--s2);max-width:560px}
+img,video,canvas{max-width:100%}
+#page-overview,#page-clients,#clientFile,#trainerMealStart,#trainerQuick,#trainerPdfPlan,.findclient,.masterlib,.youhead,.asktitle,.wocard b,.wotype b,.wodraft .wotitle,header h1,#hdrTitle,header .screentitle{font-family:var(--sans)}
+#welcomeFront h2,.mhero h2,.tmlead,#clientFile .cfname,.wobuild h2,.wodraft .wotitle,.todaypick,.welcome .card h2,.asktitle{font-family:var(--serif)}
+#hdrTitle,header .screentitle{font-size:20px;font-weight:700;letter-spacing:-.02em;line-height:1.15;margin:0}
+.todaypick{font-size:28px;font-weight:700;letter-spacing:-.03em;min-height:44px}
+.sec,.sechead h2{font-family:var(--sans);font-size:17px;font-weight:700;letter-spacing:-.02em;text-transform:none}
+.card h2{font-family:var(--sans);font-size:15px;font-weight:650;letter-spacing:0;text-transform:none;color:#0B0B39;margin:0 0 12px}
+.note,label.f,.stat .label,.stat .small{font-size:12px;color:var(--muted);letter-spacing:0;text-transform:none}
+header{background:#fff;border-bottom:1px solid var(--hair);padding:calc(var(--s1) + env(safe-area-inset-top,0px)) var(--s2) var(--s1)}
+.topbar{min-height:44px;gap:var(--s1)}
+.menubtn,.profilebtn{width:44px;height:44px;border-radius:12px}
+.subbar{gap:var(--s1);padding:0 0 var(--s1)}
+.subbar button{min-height:40px;border-radius:999px;font-size:13px;font-weight:650}
+body:not(.welcome-on) .card,
+body:not(.welcome-on) .stat,
+body:not(.welcome-on) .dcard,
+body:not(.welcome-on) .promptcard,
+body:not(.welcome-on) .qcard,
+body:not(.welcome-on) .sessioncard,
+body:not(.welcome-on) .setupcard,
+body:not(.welcome-on) .noterow,
+body:not(.welcome-on) .gatebox,
+body.theme-dark:not(.welcome-on) .card,
+body.theme-dark:not(.welcome-on) .stat,
+body.theme-dark:not(.welcome-on) .dcard,
+body.theme-dark:not(.welcome-on) .promptcard,
+body.theme-dark:not(.welcome-on) .setupcard,
+#page-overview .ovcard,
+#page-overview .ovact,
+#clientFile .card,
+.wocard,.wotype,.worow,.welcome .card{
+  background:#fff;color:#0B0B39;border:1px solid #E4E2EB;border-radius:18px;
+  box-shadow:var(--shadow);padding:var(--s2);margin-bottom:var(--s2)
+}
+.welcome .card h2{font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin:0 0 8px}
+body.welcome-on .welcome .card input,
+body.welcome-on .welcome .card select,
+body.welcome-on .welcome .card textarea{background:#fff;border:1px solid #E4E2EB;border-radius:12px;min-height:44px}
+button.primary,.menuaction,#tmStart:not(:disabled){border-radius:999px;min-height:44px;padding:12px 18px}
+button.sm{border-radius:999px;min-height:36px}
+button.full{border-radius:999px}
+input:not([type=checkbox]):not([type=radio]),select,textarea{border-radius:12px}
+input:not([type=checkbox]):not([type=radio]):not([type=file]),select{min-height:44px}
+.chip,.pill,.rolepick button,.logpill,.askchips button,.lookpicks button{border-radius:999px}
+.thumb,.shot,.tmcard img,.sessioncard img,.eventrow img,.foodrow,.recipecard{border-radius:16px}
+.modalbox,.foodsheet{border-radius:24px 24px 0 0;background:#fff;border:1px solid #E4E2EB}
+.modalbox{border-bottom:none}
+.tabbar{align-items:center;gap:var(--s1);width:100%;box-sizing:border-box;background:#fff;border-top:1px solid var(--hair);padding:var(--s1) var(--s1) calc(var(--s1) + var(--safe-b));box-shadow:none}
+.tabpill{align-items:stretch;min-height:52px;padding:4px;border:1px solid #E4E2EB;border-radius:999px;box-shadow:none;background:#fff}
+.tabpill button{min-width:0;min-height:44px;font-size:11px;font-weight:650;letter-spacing:0;line-height:1.1;border-radius:999px;gap:2px;padding:4px 2px}
+.tabpill button span{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabpill button.sel{color:#563DD2;background:#E4E2EB}
+.tabplus{width:52px;height:52px;font-size:30px;align-self:center}
+body.trainer-bar .tabbar{gap:var(--s1);padding:var(--s1) var(--s1) calc(var(--s1) + var(--safe-b))}
+body.trainer-bar .tabpill{padding:4px;min-width:0}
+body.trainer-bar .tabpill button{font-size:10px;font-weight:650;letter-spacing:0;line-height:1.1;gap:2px;padding:4px 1px}
+body.trainer-bar .tabpill button svg{width:20px;height:20px}
+body.trainer-bar .tabplus{width:52px;height:52px;font-size:30px}
+#page-overview .ovbar{position:sticky;top:0;z-index:22;display:flex;align-items:center;gap:4px;background:#fff;margin:-16px -16px 16px;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px;border-bottom:1px solid var(--hair);min-height:52px}
+#page-overview .ovtitle{flex:1;min-width:0;margin:0;font-family:var(--sans);font-size:20px;font-weight:700;letter-spacing:-.02em;color:#0B0B39;text-align:left}
+#page-overview .ovicon,#page-overview .ovadd{width:44px;height:44px;border-radius:12px}
+#page-overview .ovadd{border-radius:14px}
+#page-overview .ovme{width:36px;height:36px;margin-left:4px}
+#page-overview .ovcard,#page-overview .ovfilter,#page-overview .ovact{background:#fff}
+.navmenu{align-items:stretch;padding:0;background:#fff}
+.navscroll{align-items:stretch;padding:0 0 var(--s2)}
+.sheetbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:var(--s1);min-height:56px;padding:calc(8px + env(safe-area-inset-top,0px)) 8px 8px var(--s2);background:#fff;border-bottom:1px solid var(--hair)}
+#menuClose{margin-left:auto}
+.sheetlogo{display:block;height:auto;width:auto;max-height:40px;max-width:min(200px,calc(100% - 64px));object-fit:contain}
+.sheetbar .menubrand{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.menugroup{margin:0 0 var(--s1)}
+body.welcome-on .menugroup{display:none !important}
+.menugroup:not(:has(button:not([hidden]))){display:none}
+.menulabel,.mltitle,.mlsec,.youhead{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(11,11,57,.55);text-align:left;margin:20px 16px 4px}
+.youhead{margin-bottom:4px}
+.navmenu .navitem,.mlrow{position:relative;display:flex;align-items:center;gap:12px;width:calc(100% - 16px);margin:0 8px;min-height:48px;padding:8px 12px;border:none;border-bottom:1px solid #E4E2EB;border-radius:0;background:transparent;color:#0B0B39;font-family:var(--sans);font-size:16px;font-weight:600;letter-spacing:0;text-transform:none;text-align:left;line-height:1.25}
+.navmenu .navitem.sub{font-size:15px;font-weight:600;padding-left:16px}
+.navico{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.navmenu .navitem .grow,.mlrow .grow{flex:1;min-width:0;text-align:left}
+.navmenu .navitem::after{content:"›";margin-left:auto;color:#563DD2;font-size:22px;font-weight:400;line-height:1}
+.navsplit .navitem::after{content:none}
+.navmenu .navitem.active,.mlrow.sel,#menuWeekPlan.active{background:#E4E2EB;border-radius:12px;border-bottom-color:transparent;box-shadow:inset 3px 0 0 #563DD2;text-decoration:none;color:#0B0B39}
+.navsplit{justify-content:flex-start;align-items:center;width:calc(100% - 16px);margin:0 8px;border-bottom:1px solid #E4E2EB}
+.navsplit .navitem{width:auto;flex:1;margin:0;border-bottom:none}
+.navsub{align-items:stretch;width:100%;padding:0 0 4px}
+.menuaction{margin:16px;width:calc(100% - 32px);align-self:stretch;border-radius:999px;min-height:48px}
+.menulogout{text-align:left;text-transform:none;letter-spacing:0;font-size:16px;font-weight:650;padding:16px 24px calc(12px + var(--safe-b));border-radius:0}
+.yourow{min-height:48px;font-size:16px;font-weight:600}
+.rolepick{justify-content:flex-start;padding:8px 16px 0}
+.findbox{min-height:44px;border-radius:12px}
+.findclient{padding:12px 16px 0;margin:0}
+#menuEditPanel{align-items:stretch;padding:0 16px 8px}
+#menuEditPanel .note,#menuEditPanel .lookpicks,#menuEditPanel .bubbleedit{text-align:left;justify-content:flex-start;max-width:none}
+.list li,.mealrow,.habitrow,#page-overview .ovperson,#page-clients .cgrow{min-height:48px;gap:12px}
+.list .meta{margin-left:auto;text-align:right}
+#page-clients .cgclient,#page-overview .ovperson{display:flex;align-items:center;gap:12px}
+#page-clients .cgclient::after,#page-overview .ovperson::after,.findhits button::after{content:"›";margin-left:auto;color:#563DD2;font-size:22px;font-weight:400}
+.empty,.ovempty,.sessionempty,.cgempty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--s1);text-align:center;padding:var(--s3) var(--s2);margin:var(--s1) 0;color:rgba(11,11,57,.72);font-size:14px;font-weight:500;line-height:1.4}
+.empty::before,.ovempty::before,.sessionempty::before,.cgempty::before{content:"";width:48px;height:48px;border-radius:16px;background:#E4E2EB url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%230B0B39' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='4' width='14' height='16' rx='2'/><path d='M8 9h8M8 13h5'/></svg>") center no-repeat;flex:none}
+#clientFile{font-family:var(--sans)}
+#clientFile .cfwho{display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:12px;row-gap:8px;align-items:start}
+#clientFile .cfwho>.grow{display:contents}
+#clientFile .cfphoto{grid-column:1;grid-row:1}
+#clientFile .cfname,#clientFile #cfNameForm,#clientFile #cfAccess,#clientFile #cfInvite,#clientFile .cfwho>.grow>.f,#clientFile #cfGroupNow{grid-column:2}
+#clientFile #cfGroups{grid-column:1 / -1;margin-top:4px}
+#clientFile .cfname{font-family:var(--serif);font-size:28px;letter-spacing:-.03em}
+#clientFile .toolbar{gap:var(--s1)}
+#clientFile .toolbar{flex-wrap:wrap}
+#clientFile .toolbar button{min-height:44px;min-width:0;border-radius:999px;white-space:normal}
+#clientFile .cftabs{max-width:100%;min-width:0}
+#clientFile .cftabs button{min-height:44px;font-family:var(--sans)}
+#clientFile .cffoot{position:sticky;bottom:calc(76px + var(--safe-b));margin:var(--s2) 0 0;border:1px solid #E4E2EB;border-radius:16px;box-shadow:var(--shadow);background:#fff}
+#clientFile .cffoot button{text-transform:none;letter-spacing:0;font-size:14px;min-height:44px;border-radius:12px;font-family:var(--sans)}
+#clientFile .cflines li{min-height:44px;align-items:center}
+#clientFile .cflines b,.list .meta{text-align:right}
+.week,.calgrid{grid-template-columns:repeat(7,minmax(0,1fr))}
+.macros{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tmcards,.grid2,.tapelist,.bmiranges{grid-template-columns:repeat(2,minmax(0,1fr))}
+.wocards{grid-template-columns:repeat(3,minmax(0,1fr))}
+.wocard,.wotype{margin-bottom:0}
+@media(max-width:420px){
+  .wocards{grid-template-columns:minmax(0,1fr)}
+  .wocard,.wotype{min-height:0}
+}
+.tmcard,.tmpdf{border-radius:18px}
+.tmcard img{border-radius:16px}
+.wobuild h2{font-size:32px}
+body.theme-dark:not(.welcome-on) .navmenu .navitem,
+body.theme-dark:not(.welcome-on) .mlrow,
+body.theme-dark:not(.welcome-on) .yourow,
+body.theme-dark:not(.welcome-on) .menulogout,
+body.theme-dark:not(.welcome-on) .tabpill button{background:transparent;border-color:transparent;color:#0B0B39}
+body.theme-dark:not(.welcome-on) .tabpill button.sel,
+body.theme-dark:not(.welcome-on) .navmenu .navitem.active,
+body.theme-dark:not(.welcome-on) .mlrow.sel{background:#E4E2EB;color:#0B0B39}
+body.theme-dark:not(.welcome-on) .card,
+body.theme-dark:not(.welcome-on) .dcard,
+body.theme-dark:not(.welcome-on) .promptcard,
+body.theme-dark:not(.welcome-on) .modalbox,
+body.theme-dark:not(.welcome-on) .stat,
+body.theme-dark:not(.welcome-on) .setupcard,
+body.theme-dark #clientFile,
+body.theme-dark #clientFile .card,
+body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-color:#E4E2EB}
+
 </style>
 </head>
 <body class="welcome-on front-on">
@@ -1348,6 +1502,7 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
 <section class="page" id="page-overview">
   <div class="ovbar">
     <button type="button" class="ovicon" id="ovMenu" aria-label="Open menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <h1 class="ovtitle">Clients</h1>
     <button type="button" class="ovadd" id="ovAdd" aria-label="Add a client"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
     <button type="button" class="ovicon" id="ovFilter" aria-label="Filter groups" aria-expanded="false" aria-controls="ovFilterMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/><circle cx="9" cy="7" r="1.7" fill="#0B0B39" stroke="none"/><circle cx="16" cy="12" r="1.7" fill="#0B0B39" stroke="none"/><circle cx="11" cy="17" r="1.7" fill="#0B0B39" stroke="none"/></svg></button>
     <button type="button" class="ovicon" id="ovBell" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></button>
@@ -2250,7 +2405,11 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
 
 <nav class="navmenu" id="navMenu" hidden>
   <div class="navscroll">
-  <p class="menubrand">Curly Gurl Fitness</p>
+  <div class="sheetbar">
+    <img class="sheetlogo" src="images/login-logo.png" alt="">
+    <p class="menubrand">Curly Gurl Fitness</p>
+    <button type="button" class="menubtn" id="menuClose" aria-label="Close menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
   <div class="findclient" id="menuFind" hidden>
     <label class="findbox">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M16 16l4 4"/></svg>
@@ -2262,6 +2421,69 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
     <button type="button" data-menurole="trainer" aria-pressed="false">Trainer</button>
     <button type="button" data-menurole="client" aria-pressed="false">Client</button>
   </div>
+  <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
+  <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
+  <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
+  <section class="menugroup">
+    <p class="menulabel">Clients</p>
+    <button type="button" class="navitem" data-tab="clients" hidden><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.2"/><circle cx="16" cy="9" r="2"/><path d="M4.2 18c.6-2.4 2.2-3.6 4.8-3.6s4.2 1.2 4.8 3.6M14 18c.4-1.8 1.6-2.8 3.4-2.8 1.6 0 2.8.8 3.4 2.4"/></svg><span class="grow">Clients</span></button>
+  </section>
+  <div class="masterlib menugroup" id="masterLib" hidden>
+    <p class="mltitle">Master Library</p>
+    <button type="button" class="mlrow" data-ml="exercises"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M11 9.5v5l4.5-2.5z"/></svg><span>Exercises</span></button>
+    <p class="mlsec">Nutrition</p>
+    <button type="button" class="mlrow" data-ml="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5M11 3v5"/><path d="M4 11h12a6 6 0 0 1-12 0z"/><path d="M10 17v3"/></svg><span>Meals</span></button>
+    <button type="button" class="mlrow" data-ml="foods"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20c-3.5 0-6-2.4-6-6 0-3.2 2.2-6 4.2-8.2C11.2 8.6 12 11 12 11s.8-2.4 1.8-5.2C15.8 8 18 10.8 18 14c0 3.6-2.5 6-6 6z"/><path d="M12 11c1.2-2 3-2.6 4-2"/></svg><span>Foods</span></button>
+    <p class="mlsec">Habits</p>
+    <button type="button" class="mlrow" data-ml="habits"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.2"/><path d="M4.5 18c.7-2.6 2.3-4 4.5-4s3.8 1.4 4.5 4"/><circle cx="17" cy="8" r="2"/></svg><span>Habits</span></button>
+    <p class="mlsec">Others</p>
+    <button type="button" class="mlrow" data-ml="forms"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3.5h6V6H9zM9 10h6M9 14h6"/></svg><span>Forms</span></button>
+    <button type="button" class="mlrow" data-ml="scheduling"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow">Scheduling</span><span class="chev" aria-hidden="true">›</span></button>
+  </div>
+  <div class="masterlib menugroup" id="menuMeals" hidden>
+    <p class="mltitle">Meals</p>
+    <button type="button" class="mlrow" data-menu-meal="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg><span>Today</span></button>
+    <button type="button" class="mlrow" data-menu-meal="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v6"/><path d="M5 3v4.5a2 2 0 0 0 4 0V3"/><path d="M7 9.5V21"/><path d="M17 3v18"/><path d="M17 3c2 2.2 2 4.2 0 6.2"/></svg><span>Meals</span></button>
+  </div>
+  <section class="menugroup">
+    <p class="menulabel">Today</p>
+    <button type="button" class="navitem" data-tab="today"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg><span class="grow">Today</span></button>
+    <button type="button" class="navitem" data-tab="meals"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v6"/><path d="M5 3v4.5a2 2 0 0 0 4 0V3"/><path d="M7 9.5V21"/><path d="M17 3v18"/></svg><span class="grow">Meals</span></button>
+  </section>
+  <section class="menugroup">
+    <p class="menulabel">Plan</p>
+    <button type="button" class="navitem" data-tab="workout"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6M8 7v10M16 7v10M20 9v6M8 12h8"/></svg><span class="grow">Workout</span></button>
+    <button type="button" class="navitem" id="menuWeekPlan" hidden><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow">This week's plan</span></button>
+    <div class="navsplit">
+      <button type="button" class="navitem" data-tab="library" data-lib="home"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H20v16H7.5A2.5 2.5 0 0 0 5 21.5z"/><path d="M5 5.5V21"/></svg><span class="grow">Library</span></button>
+      <button type="button" class="caretbtn" id="libToggle" aria-expanded="false" aria-controls="libSub" aria-label="Library sections"><span class="caret"></span></button>
+    </div>
+    <div class="navsub" id="libSub" hidden>
+      <button type="button" class="navitem sub" data-tab="library" data-lib="exercises"><span class="grow">Exercises</span></button>
+      <button type="button" class="navitem sub" data-tab="library" data-lib="cookbook"><span class="grow">Cookbook</span></button>
+    </div>
+  </section>
+  <section class="menugroup">
+    <p class="menulabel">Scheduling</p>
+    <button type="button" class="navitem" data-tab="events"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3"/></svg><span class="grow">Events</span></button>
+    <button type="button" class="navitem" data-tab="calendar"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow">Calendar</span></button>
+  </section>
+  <section class="menugroup">
+    <p class="menulabel">Progress</p>
+    <button type="button" class="navitem" data-tab="checkin"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12.5l2.5 2.5L16 9"/><rect x="4" y="4" width="16" height="16" rx="3"/></svg><span class="grow">Check-in</span></button>
+    <button type="button" class="navitem" data-tab="photos"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="13" rx="2"/><circle cx="12" cy="12.5" r="2.5"/><path d="M9 6l1.2-2h3.6L15 6"/></svg><span class="grow">Photos</span></button>
+    <button type="button" class="navitem" data-tab="bmi"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 19c1.2-3 3.2-4.5 6-4.5s4.8 1.5 6 4.5"/></svg><span class="grow">BMI</span></button>
+    <button type="button" class="navitem" data-tab="weight"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V10M10 19V6M16 19v-7M22 19H2"/></svg><span class="grow">Weight</span></button>
+    <button type="button" class="navitem" data-tab="coach"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v9H8l-3 3V6z"/></svg><span class="grow">Coach</span></button>
+    <button type="button" class="navitem" data-tab="videos"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M11 9.5v5l4-2.5z"/></svg><span class="grow">Videos</span></button>
+    <button type="button" class="navitem" data-tab="sessions" hidden><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg><span class="grow">Sessions</span></button>
+  </section>
+  <section class="menugroup">
+    <p class="menulabel">Settings</p>
+    <button type="button" class="navitem" data-tab="settings"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg><span class="grow">Settings</span></button>
+    <button type="button" class="navitem" id="menuCheck"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7h11M9 12h11M9 17h11"/><path d="M4 7.5l1.2 1.2L7.5 6.5M4 12.5l1.2 1.2 2.3-2.2M4 17.5l1.2 1.2 2.3-2.2"/></svg><span class="grow">Checklist</span></button>
+    <button type="button" class="navitem" id="menuBell"><svg class="navico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span class="grow">Notifications</span></button>
+  </section>
   <div class="youlist" id="youList" hidden>
     <p class="youhead">You</p>
     <button type="button" class="yourow" data-you="premium"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg><span class="grow"><b>My Premium</b></span><span class="chev" aria-hidden="true">›</span></button>
@@ -2310,51 +2532,6 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
     <input id="bubbleCamFile" type="file" accept="image/*" capture="environment" hidden>
     <input id="bubbleLibFile" type="file" accept="image/*" hidden>
   </div>
-  <button type="button" class="navitem" data-tab="clients" hidden>Clients</button>
-  <div class="masterlib" id="masterLib" hidden>
-    <p class="mltitle">Master Library</p>
-    <button type="button" class="mlrow" data-ml="exercises"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M11 9.5v5l4.5-2.5z"/></svg><span>Exercises</span></button>
-    <p class="mlsec">Nutrition</p>
-    <button type="button" class="mlrow" data-ml="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v5M11 3v5"/><path d="M4 11h12a6 6 0 0 1-12 0z"/><path d="M10 17v3"/></svg><span>Meals</span></button>
-    <button type="button" class="mlrow" data-ml="foods"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20c-3.5 0-6-2.4-6-6 0-3.2 2.2-6 4.2-8.2C11.2 8.6 12 11 12 11s.8-2.4 1.8-5.2C15.8 8 18 10.8 18 14c0 3.6-2.5 6-6 6z"/><path d="M12 11c1.2-2 3-2.6 4-2"/></svg><span>Foods</span></button>
-    <p class="mlsec">Habits</p>
-    <button type="button" class="mlrow" data-ml="habits"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="2.2"/><path d="M4.5 18c.7-2.6 2.3-4 4.5-4s3.8 1.4 4.5 4"/><circle cx="17" cy="8" r="2"/></svg><span>Habits</span></button>
-    <p class="mlsec">Others</p>
-    <button type="button" class="mlrow" data-ml="forms"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3.5h6V6H9zM9 10h6M9 14h6"/></svg><span>Forms</span></button>
-    <button type="button" class="mlrow" data-ml="scheduling"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow">Scheduling</span><span class="chev" aria-hidden="true">›</span></button>
-  </div>
-  <div class="masterlib" id="menuMeals" hidden>
-    <p class="mltitle">Meals</p>
-    <button type="button" class="mlrow" data-menu-meal="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg><span>Today</span></button>
-    <button type="button" class="mlrow" data-menu-meal="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v6"/><path d="M5 3v4.5a2 2 0 0 0 4 0V3"/><path d="M7 9.5V21"/><path d="M17 3v18"/><path d="M17 3c2 2.2 2 4.2 0 6.2"/></svg><span>Meals</span></button>
-  </div>
-  <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
-  <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
-  <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
-  <button type="button" class="navitem" data-tab="today">Today</button>
-  <button type="button" class="navitem" data-tab="meals">Meals</button>
-  <button type="button" class="navitem" data-tab="workout">Workout</button>
-  <button type="button" class="navitem" id="menuWeekPlan" hidden>This week's plan</button>
-  <button type="button" class="navitem" data-tab="events">Events</button>
-  <button type="button" class="navitem" data-tab="calendar">Calendar</button>
-  <div class="navsplit">
-    <button type="button" class="navitem" data-tab="library" data-lib="home">Library</button>
-    <button type="button" class="caretbtn" id="libToggle" aria-expanded="false" aria-controls="libSub" aria-label="Library sections"><span class="caret"></span></button>
-  </div>
-  <div class="navsub" id="libSub" hidden>
-    <button type="button" class="navitem sub" data-tab="library" data-lib="exercises">Exercises</button>
-    <button type="button" class="navitem sub" data-tab="library" data-lib="cookbook">Cookbook</button>
-  </div>
-  <button type="button" class="navitem" data-tab="checkin">Check-in</button>
-  <button type="button" class="navitem" data-tab="photos">Photos</button>
-  <button type="button" class="navitem" data-tab="bmi">BMI</button>
-  <button type="button" class="navitem" data-tab="weight">Weight</button>
-  <button type="button" class="navitem" data-tab="coach">Coach</button>
-  <button type="button" class="navitem" data-tab="videos">Videos</button>
-  <button type="button" class="navitem" data-tab="sessions" hidden>Sessions</button>
-  <button type="button" class="navitem" data-tab="settings">Settings</button>
-  <button type="button" class="navitem" id="menuCheck">Checklist</button>
-  <button type="button" class="navitem" id="menuBell">Notifications</button>
   <button type="button" class="menuaction" id="menuAction">Start today's workout</button>
   </div>
   <button type="button" class="menulogout" id="menuLogout">Log out</button>
@@ -3234,6 +3411,7 @@ function syncMenu(){
   document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
     const lib = b.dataset.lib;
     let on = b.dataset.tab===currentTab;
+    if(b.dataset.tab==="clients" && currentTab==="overview") on = true;
     if(b.dataset.tab==="workout" && signedInTrainer() && woView==="home") on = false;
     if(lib) on = currentTab==="library" && (lib==="home" ? libSection==="home" : lib===libSection);
     b.classList.toggle("active", on);
@@ -3322,7 +3500,7 @@ function setMenuOpen(open){
   const menu = $("navMenu");
   const btn = $("menuBtn");
   menu.hidden = !open;
-  if(open) menu.style.paddingTop = (document.querySelector("header").offsetHeight + 18) + "px";
+  menu.style.paddingTop = "";
   btn.setAttribute("aria-expanded", open ? "true" : "false");
   btn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
   document.body.style.overflow = open ? "hidden" : "";
@@ -3336,6 +3514,7 @@ function setMenuOpen(open){
 }
 function closeMenu(){ setMenuOpen(false); }
 $("menuBtn").onclick = () => setMenuOpen($("navMenu").hidden);
+$("menuClose").onclick = () => closeMenu();
 $("libToggle").onclick = () => {
   const sub = $("libSub");
   const open = sub.hidden;
