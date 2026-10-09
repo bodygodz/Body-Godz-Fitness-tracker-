@@ -312,7 +312,7 @@ body.theme-dark:not(.welcome-on) #masterLib .mlrow.sel{background:#E4E2EB}
 a.vopen{display:inline-block;margin-top:8px;color:#563DD2;font-weight:700;font-size:13px}
 body.welcome-on main,body.welcome-on .screentitle,body.welcome-on #hdrSub,body.welcome-on #demoBanner,body.welcome-on #appTools{display:none !important}
 body.welcome-on #roleGate{display:none !important}
-body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welcome-on #navMenu .navsub,body.welcome-on #menuAction,body.welcome-on #menuLogout,body.welcome-on #menuCheck,body.welcome-on #menuBell,body.welcome-on #menuEdit,body.welcome-on #menuEditPanel,body.welcome-on #youList,body.welcome-on #menuFind,body.welcome-on #masterLib{display:none !important}
+body.welcome-on #navMenu [data-tab],body.welcome-on #navMenu .navsplit,body.welcome-on #navMenu .navsub,body.welcome-on #menuAction,body.welcome-on #menuLogout,body.welcome-on #menuCheck,body.welcome-on #menuBell,body.welcome-on #menuEdit,body.welcome-on #menuEditPanel,body.welcome-on #youList,body.welcome-on #menuFind,body.welcome-on #masterLib,body.welcome-on #menuMeals{display:none !important}
 body:not(.welcome-on) .welcome-only{display:none !important}
 body:not(.welcome-on) #welcome{display:none !important}
 .welcome{max-width:560px;margin:0 auto;padding:6px 22px 8px;position:relative;z-index:2}
@@ -2252,6 +2252,11 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
     <button type="button" class="mlrow" data-ml="forms"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M9 3.5h6V6H9zM9 10h6M9 14h6"/></svg><span>Forms</span></button>
     <button type="button" class="mlrow" data-ml="scheduling"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg><span class="grow">Scheduling</span><span class="chev" aria-hidden="true">›</span></button>
   </div>
+  <div class="masterlib" id="menuMeals" hidden>
+    <p class="mltitle">Meals</p>
+    <button type="button" class="mlrow" data-menu-meal="today"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/></svg><span>Today</span></button>
+    <button type="button" class="mlrow" data-menu-meal="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v6"/><path d="M5 3v4.5a2 2 0 0 0 4 0V3"/><path d="M7 9.5V21"/><path d="M17 3v18"/><path d="M17 3c2 2.2 2 4.2 0 6.2"/></svg><span>Meals</span></button>
+  </div>
   <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
   <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
   <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
@@ -3120,6 +3125,7 @@ function syncMenu(){
   document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
     if(b.dataset.tab==="overview" || b.dataset.tab==="clients"){ b.hidden = !signedInTrainer(); return; }
     if(b.dataset.tab==="sessions"){ b.hidden = !sessionsVisible(); return; }
+    if((b.dataset.tab==="today" || b.dataset.tab==="meals") && signedInTrainer()){ b.hidden = true; return; }
     if(!client){ b.hidden = false; return; }
     b.hidden = !clientAllows(b.dataset.tab) || !!b.dataset.lib;
   });
@@ -3154,6 +3160,13 @@ function syncMenu(){
   const masterLib = $("masterLib");
   if(menuFind) menuFind.hidden = !trainerMenu;
   if(masterLib) masterLib.hidden = !trainerMenu;
+  const menuMeals = $("menuMeals");
+  if(menuMeals){
+    menuMeals.hidden = !trainerMenu;
+    menuMeals.querySelectorAll("[data-menu-meal]").forEach(btn=>{
+      btn.classList.toggle("sel", btn.dataset.menuMeal===currentTab);
+    });
+  }
   if(!trainerMenu){
     const hits = $("menuFindHits");
     if(hits){ hits.hidden = true; hits.innerHTML = ""; }
@@ -3169,6 +3182,10 @@ function syncMenu(){
   const overviewBtn = document.querySelector('#tabbar [data-tabgo="overview"]');
   if(overviewBtn) overviewBtn.hidden = !trainerAsk;
   if(askBtn) askBtn.hidden = !trainerAsk;
+  const todayTab = document.querySelector('#tabbar [data-tabgo="today"]');
+  const mealsTab = document.querySelector('#tabbar [data-tabgo="meals"]');
+  if(todayTab) todayTab.hidden = trainerAsk;
+  if(mealsTab) mealsTab.hidden = trainerAsk;
   document.body.classList.toggle("trainer-bar", trainerAsk);
   const onWelcome = document.body.classList.contains("welcome-on");
   const roleShown = onWelcome ? menuRole() : ID.role;
@@ -3379,6 +3396,12 @@ $("masterLib").addEventListener("click", (e)=>{
   const row = e.target.closest("[data-ml]");
   if(!row) return;
   openMaster(row.dataset.ml);
+});
+$("menuMeals").addEventListener("click", (e)=>{
+  const row = e.target.closest("[data-menu-meal]");
+  if(!row || !signedInTrainer()) return;
+  closeMenu();
+  go(row.dataset.menuMeal);
 });
 $("menuFindInput").addEventListener("input", paintMenuFind);
 $("menuFindInput").addEventListener("keydown", (e)=>{
