@@ -73,7 +73,17 @@ body.client-file .tabbar{max-width:1080px}
 #clientFile .cfname button{margin-left:8px;vertical-align:middle}
 #clientFile .cflines{list-style:none;margin:8px 0 0;padding:0}
 #clientFile .cflines li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #E4E2EB;color:#0B0B39}
-#clientFile .cflines b{font-variant-numeric:tabular-nums}
+#clientFile .cflines b{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;word-break:break-word}
+#clientFile .cflink{background:transparent;border:none;color:#563DD2;font-weight:700;padding:4px 0}
+#clientFile .cftagrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid rgba(11,11,57,.12)}
+#clientFile .cftagrow form{display:flex;gap:8px;align-items:center;margin:0}
+#clientFile .cftagrow input{width:140px;background:#FFFFFF;border:1px solid #E4E2EB;border-radius:12px;padding:8px 10px;color:#0B0B39}
+#clientFile .cfdev{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(11,11,57,.12);color:#0B0B39}
+#clientFile .cfdev small{display:block;font-size:12px;font-weight:500}
+#clientFile .cfcredit{display:flex;align-items:center;gap:10px}
+#clientFile .cffoot{position:sticky;bottom:0;display:flex;justify-content:space-around;gap:8px;background:#FFFFFF;border-top:1px solid #E4E2EB;padding:12px 8px calc(12px + var(--safe-b));margin:12px -16px -16px}
+#clientFile .cffoot button{background:transparent;border:none;border-radius:0;color:#0B0B39;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:8px}
+#clientFile .cffoot button.sel{color:#563DD2}
 #clientFile .cfempty{margin:0;color:#0B0B39}
 #clientFile .cftag{display:inline-flex;align-items:center;gap:4px;margin:0 6px 6px 0;padding:4px 8px;border-radius:99px;background:#FFFFFF;border:1px solid #E4E2EB;color:#0B0B39}
 #clientFile .cftag button{background:transparent;border:none;padding:0 2px;color:#0B0B39}
@@ -105,9 +115,13 @@ body.theme-dark #clientFile textarea{background:#FFFFFF;color:#0B0B39;border-col
 body.theme-dark #clientFile button:not(.primary){background:#FFFFFF;color:#0B0B39;border-color:#E4E2EB}
 body.theme-dark #clientFile .cftabs button{background:transparent;border:none;border-bottom:2px solid transparent;color:#0B0B39}
 body.theme-dark #clientFile .cftabs button.sel{color:#0B0B39;border-bottom-color:#563DD2}
-body.theme-dark #clientFile .cftag button{background:transparent;border:none;color:#0B0B39}
+body.theme-dark #clientFile .cftag button,
+body.theme-dark #clientFile .cflink,
+body.theme-dark #clientFile .cffoot button{background:transparent;border:none;color:#0B0B39}
+body.theme-dark #clientFile .cflink,
+body.theme-dark #clientFile .cffoot button.sel{color:#563DD2}
 @media(min-width:900px){
-  body.client-file #clientFile .cfgrid{grid-template-columns:minmax(240px,.9fr) minmax(280px,1.25fr) minmax(240px,.95fr)}
+  body.client-file #clientFile .cfgrid{grid-template-columns:1fr}
 }
 body.ov-home,body.theme-dark.ov-home{background:#FFFFFF;color:#0B0B39}
 body.ov-home header{padding:0;border-bottom:none;background:transparent;position:static}
@@ -1770,7 +1784,7 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
       <button type="button" role="tab" data-cf="forms">Forms</button>
     </div>
     <div id="cfPaneSummary">
-      <div class="cfgrid">
+      <div id="cfProfile">
         <section class="card">
           <div class="cfwho">
             <div class="cfphoto" id="cfPhoto"><span class="cfnophoto">No photo</span></div>
@@ -1783,43 +1797,52 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
                   <button class="sm" type="button" id="cfNameCancel">Cancel</button>
                 </div>
               </form>
-              <p class="note" id="cfAccess">You and this client can message each other. Those messages stay with this client.</p>
+              <p class="note" id="cfAccess">Messaging</p>
               <p class="note" id="cfInvite"></p>
             </div>
           </div>
-          <h2>Recently earned badges</h2>
-          <p class="cfempty" id="cfBadges">No badges yet.</p>
           <ul class="cflines">
-            <li><span>Total workouts</span><b id="cfWorkouts">—</b></li>
-            <li><span>Total cardio activities</span><b id="cfCardio">—</b></li>
-            <li><span>Last signed in</span><b id="cfSeen">—</b></li>
-            <li><span>Last message sent</span><b id="cfSent">—</b></li>
-            <li><span>Last message received</span><b id="cfRecv">—</b></li>
+            <li><span>Recently earned badges</span><b id="cfBadges">No badges yet</b></li>
+            <li><span>Total workouts</span><b id="cfWorkouts">None</b></li>
+            <li><span>Total cardio activities</span><b id="cfCardio">None</b></li>
+            <li><span>Last signed in</span><b id="cfSeen">Not yet</b></li>
+            <li><span>Last message sent</span><b id="cfSent">None</b></li>
+            <li><span>Last message received</span><b id="cfRecv">None</b></li>
           </ul>
-          <h2>Tags</h2>
-          <div id="cfTags"><p class="cfempty">No tags yet.</p></div>
-          <form id="cfTagForm" class="row">
-            <input id="cfTagInput" maxlength="40" placeholder="Add a tag" autocomplete="off">
-            <button class="primary sm" type="submit">Add</button>
-          </form>
-          <h2>Device</h2>
-          <div id="cfDevices"><p class="cfempty">No device saved.</p></div>
+          <div class="cftagrow">
+            <div id="cfTags"><p class="cfempty">No tags yet.</p></div>
+            <form id="cfTagForm">
+              <input id="cfTagInput" maxlength="40" placeholder="Tag" autocomplete="off" aria-label="Tag">
+              <button class="cflink" type="submit">+ Add tag</button>
+            </form>
+          </div>
+          <div id="cfDevices"></div>
+          <ul class="cflines">
+            <li><span>Threshold alerts</span><button type="button" class="cflink" id="cfAlerts">Set up alerts</button></li>
+          </ul>
+          <p class="note" id="cfAlertsNote" hidden>Not open yet.</p>
         </section>
         <section class="card">
-          <h2>Program</h2>
-          <div id="cfProgram"><p class="cfempty">No program saved for this client.</p></div>
-          <h2>Meal plan</h2>
-          <div id="cfMeals"><p class="cfempty">—</p></div>
-          <h2>Exercise compliance</h2>
-          <div class="cfweeks" id="cfExComp"></div>
-          <h2>Nutrition compliance</h2>
-          <div class="cfweeks" id="cfNutComp"></div>
-          <h2>Nutrition goal</h2>
-          <div id="cfGoal"><p class="cfempty">—</p></div>
-          <p class="note" id="cfLogNote"></p>
+          <ul class="cflines">
+            <li><span>Session credits</span><span class="cfcredit"><b id="cfCredits">None</b><button type="button" class="cflink" id="cfCreditAdd" aria-label="Add a session credit">+</button></span></li>
+            <li><span>Assigned to trainer</span><b id="cfTrainer">Not specified</b></li>
+            <li><span>Assigned to location</span><b id="cfLocation">Not specified</b></li>
+            <li><span>Email</span><b id="cfEmail">Not specified</b></li>
+            <li><span>Phone number</span><b id="cfPhone">Not specified</b></li>
+            <li><span>Activity level</span><b id="cfLevel">Not specified</b></li>
+            <li><span>Added on</span><b id="cfAdded">Not specified</b></li>
+            <li><span>Trial status</span><b id="cfTrial">Not specified</b></li>
+            <li><span>Timezone</span><b id="cfZone">Not specified</b></li>
+            <li><span>Calendar look-ahead</span><b id="cfLook">Not specified</b></li>
+            <li><span>Units</span><b id="cfUnits">Not specified</b></li>
+            <li><span>Meal workflow</span><b id="cfFlow">Not specified</b></li>
+          </ul>
         </section>
+      </div>
+      <div id="cfActivity" hidden></div>
+      <div id="cfPaneNotes" hidden>
         <section class="card">
-          <h2>Trainer's notes</h2>
+          <h2>Notes</h2>
           <p class="note">Notes stay with you and this client. Another client cannot open them.</p>
           <form id="cfNoteForm">
             <div class="field"><label class="f" for="cfNoteInput">Today</label><textarea id="cfNoteInput" maxlength="1000" placeholder="Add today's note"></textarea></div>
@@ -1828,6 +1851,11 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
           <div id="cfNotes"><p class="cfempty">No notes yet.</p></div>
         </section>
       </div>
+      <nav class="cffoot" id="cfFoot">
+        <button type="button" data-cfoot="profile" class="sel">Profile</button>
+        <button type="button" data-cfoot="activity">Activity</button>
+        <button type="button" data-cfoot="notes">Notes</button>
+      </nav>
     </div>
     <div class="card" id="cfPaneOther" hidden></div>
   </div>
@@ -5826,7 +5854,9 @@ function run(fn){
 let pairOpen = !!(ID.activePairId && ID.role==="trainer");
 let clientFileMode = false;
 let clientFileSection = "summary";
+let clientFileFoot = "profile";
 let cfEditing = false;
+let cfAlertsShown = false;
 let openPair = null;
 let photoAngle = "front";
 let liveChannel = null;
@@ -6445,10 +6475,18 @@ function clientFileStore(){
 function clientFileKey(pairId){
   return String(ID.deviceId||"")+"::"+String(pairId||"");
 }
+const CF_ASKS = ["apple","fitbit","mfp","withings"];
 function readClientFile(pairId){
   const row = clientFileStore()[clientFileKey(pairId)] || {};
   const tags = Array.isArray(row.tags) ? row.tags : [];
   const notes = Array.isArray(row.notes) ? row.notes : [];
+  const asks = row.connectAsks && typeof row.connectAsks==="object" ? row.connectAsks : {};
+  const connectAsks = {};
+  CF_ASKS.forEach(id=>{
+    const t = Number(asks[id]);
+    if(t>0) connectAsks[id] = t;
+  });
+  const credits = Math.floor(Number(row.sessionCredits));
   return {
     tags: tags.map(t=>String(t||"").trim().slice(0,40)).filter(Boolean).slice(0,40),
     notes: notes.map(n=>{
@@ -6457,7 +6495,9 @@ function readClientFile(pairId){
       if(!text) return null;
       const date = /^\d{4}-\d{2}-\d{2}$/.test(String(n.date||"")) ? String(n.date) : "";
       return {id:String(n.id||""), date:date, text:text, createdAt:Number(n.createdAt)||0};
-    }).filter(Boolean)
+    }).filter(Boolean),
+    connectAsks: connectAsks,
+    sessionCredits: isFinite(credits) && credits>0 ? Math.min(9999, credits) : 0
   };
 }
 function writeClientFile(pairId, patch){
@@ -6465,7 +6505,9 @@ function writeClientFile(pairId, patch){
   const cur = readClientFile(pairId);
   all[clientFileKey(pairId)] = {
     tags: patch.tags!=null ? patch.tags : cur.tags,
-    notes: patch.notes!=null ? patch.notes : cur.notes
+    notes: patch.notes!=null ? patch.notes : cur.notes,
+    connectAsks: patch.connectAsks!=null ? patch.connectAsks : cur.connectAsks,
+    sessionCredits: patch.sessionCredits!=null ? patch.sessionCredits : cur.sessionCredits
   };
   localStorage.setItem(CLIENT_FILE_KEY, JSON.stringify(all));
 }
@@ -7042,7 +7084,9 @@ function openOverviewClient(id){
   pairOpen = true;
   clientFileMode = true;
   clientFileSection = "summary";
+  clientFileFoot = "profile";
   cfEditing = false;
+  cfAlertsShown = false;
   persistIdentity();
   go("coach");
 }
@@ -7082,7 +7126,9 @@ async function finishNewClient(name){
   pairOpen = true;
   clientFileMode = true;
   clientFileSection = "summary";
+  clientFileFoot = "profile";
   cfEditing = false;
+  cfAlertsShown = false;
   persistIdentity();
   go("coach");
   toast("Invite code "+code);
@@ -7096,10 +7142,25 @@ function paintClientPanes(pair, log, status){
     btn.classList.toggle("sel", btn.dataset.cf===clientFileSection);
     btn.setAttribute("aria-selected", btn.dataset.cf===clientFileSection ? "true" : "false");
   });
-  $("cfPaneSummary").hidden = clientFileSection!=="summary";
+  const summary = clientFileSection==="summary";
+  $("cfPaneSummary").hidden = !summary;
+  const foot = $("cfFoot");
+  if(foot) foot.hidden = !summary;
+  if(summary){
+    const which = clientFileFoot==="activity" || clientFileFoot==="notes" ? clientFileFoot : "profile";
+    clientFileFoot = which;
+    if($("cfProfile")) $("cfProfile").hidden = which!=="profile";
+    if($("cfActivity")) $("cfActivity").hidden = which!=="activity";
+    if($("cfPaneNotes")) $("cfPaneNotes").hidden = which!=="notes";
+    document.querySelectorAll("#cfFoot [data-cfoot]").forEach(btn=>{
+      const on = btn.dataset.cfoot===which;
+      btn.classList.toggle("sel", on);
+      btn.setAttribute("aria-selected", on ? "true" : "false");
+    });
+  }
   const other = $("cfPaneOther");
-  other.hidden = clientFileSection==="summary";
-  if(clientFileSection==="summary") return;
+  other.hidden = summary;
+  if(summary) return;
   if(clientFileSection==="sales"){
     other.innerHTML = "<h2>Sales</h2><p>Sales is not open yet.</p>";
     return;
@@ -7145,6 +7206,56 @@ function paintClientPanes(pair, log, status){
   const vids = videos.map(v=>"<li><div class=\"grow\"><div class=\"name\">"+esc(v.fileName || v.note || "Video")+"</div></div></li>").join("");
   other.innerHTML = "<h2>Attachments</h2>"+(figs?'<div class="photogrid">'+figs+"</div>":"")+(vids?'<ul class="list">'+vids+"</ul>":"");
 }
+const CF_DEVICE_ROWS = [
+  {id:"apple", name:"Apple Watch"},
+  {id:"fitbit", name:"Fitbit"},
+  {id:"mfp", name:"MyFitnessPal"},
+  {id:"withings", name:"Withings"}
+];
+function signedInTrainerName(){
+  const auth = currentAuth();
+  const account = auth ? accountForAuth(auth) : null;
+  return account ? String(account.name||"").trim() : "";
+}
+function clientEmailText(pair, matched){
+  if(matched && matched.status==="ambiguous") return "";
+  if(matched && matched.email) return String(matched.email).trim();
+  const nm = String(pair && pair.clientName||"").trim().toLowerCase();
+  if(!nm) return "";
+  const accounts = loadAccounts().filter(a=>a && a.role==="client" && String(a.name||"").trim().toLowerCase()===nm && String(a.email||"").trim());
+  if(accounts.length!==1) return "";
+  return String(accounts[0].email).trim();
+}
+function addedOnText(pair){
+  const t = pair && pair.createdAt;
+  const d = new Date(t);
+  if(!t || isNaN(d.getTime())) return "Not specified";
+  return fmtStamp(t);
+}
+function connectRows(devices, asks){
+  const saved = {};
+  (devices||[]).forEach(d=>{ saved[String(d.name||"").trim().toLowerCase()] = 1; });
+  return CF_DEVICE_ROWS.map(row=>{
+    const asked = asks && asks[row.id];
+    const onPhone = !!saved[row.name.toLowerCase()];
+    const note = asked ? "Request saved. Not open yet." : (onPhone ? "Saved on their phone. Not connected." : "");
+    return '<div class="cfdev"><div><b>'+esc(row.name)+'</b>'+(note?'<small>'+esc(note)+'</small>':"")+'</div><button type="button" class="cflink" data-cfask="'+row.id+'">Ask to Connect</button></div>';
+  }).join("");
+}
+function activityHtml(workouts, meals, log, goals, status){
+  const wo = recentWorkoutLines(workouts);
+  const food = recentMealLines(meals);
+  const note = status==="missing"
+    ? "Shared meal and workout logs are not in this project yet."
+    : status==="ambiguous"
+      ? "More than one client uses this name, so meals and workouts stay blank."
+      : "";
+  const woHtml = wo.length ? '<ul class="list">'+wo.map(line=>'<li><div class="name">'+esc(line)+'</div></li>').join("")+"</ul>" : '<p class="cfempty">None</p>';
+  const foodHtml = food.length ? '<ul class="list">'+food.map(line=>'<li><div class="name">'+esc(line)+'</div></li>').join("")+"</ul>" : '<p class="cfempty">None</p>';
+  const program = programHtml(log);
+  const hasProgram = log && log.program && String(log.program.name||"").trim();
+  return '<section class="card"><h2>Activity</h2>'+(note?'<p class="note">'+esc(note)+'</p>':"")+'<p>Workouts</p>'+woHtml+'<p>Meals</p>'+foodHtml+(hasProgram?'<p>Program</p>'+program:"")+(goals?'<p>Nutrition goal</p>'+goalHtml(goals):"")+'</section>';
+}
 async function paintClientFile(){
   if(!trainerFileOpen()){
     $("clientFile").hidden = true;
@@ -7180,37 +7291,36 @@ async function paintClientFile(){
   }
   const joined = pair.clientDevice ? "Joined on their phone." : "Waiting for them to enter the code.";
   $("cfInvite").textContent = pair.inviteCode ? pair.inviteCode+" · "+joined : joined;
-  $("cfBadges").textContent = "No badges yet.";
+  $("cfBadges").textContent = "No badges yet";
   const workoutCount = countWorkouts(workouts);
   const cardioCount = countCardio(workouts);
-  $("cfWorkouts").textContent = workoutCount>0 ? String(workoutCount) : "—";
-  $("cfCardio").textContent = cardioCount>0 ? String(cardioCount) : "—";
-  $("cfSeen").textContent = "—";
+  $("cfWorkouts").textContent = workoutCount>0 ? String(workoutCount) : "None";
+  $("cfCardio").textContent = cardioCount>0 ? String(cardioCount) : "None";
+  $("cfSeen").textContent = "Not yet";
   const sent = latestMessage(pair.messages, "trainer");
   const received = latestMessage(pair.messages, "client");
-  $("cfSent").textContent = sent ? fmtStamp(sent.createdAt) : "—";
-  $("cfRecv").textContent = received ? fmtStamp(received.createdAt) : "—";
+  $("cfSent").textContent = sent ? fmtStamp(sent.createdAt) : "None";
+  $("cfRecv").textContent = received ? fmtStamp(received.createdAt) : "None";
   $("cfTags").innerHTML = file.tags.length
     ? file.tags.map(tag=>'<span class="cftag">'+esc(tag)+'<button type="button" data-cftag="'+esc(tag)+'" aria-label="Remove tag">×</button></span>').join("")
     : '<p class="cfempty">No tags yet.</p>';
   const devices = devicesForClient(pair.clientName, matched.email);
-  $("cfDevices").innerHTML = devices.length
-    ? '<ul class="list">'+devices.map(d=>{
-        const picked = [d.steps?"Steps chosen":"", d.heart?"Heart rate chosen":""].filter(Boolean).join(" · ");
-        return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+esc(picked || "Saved")+"</div></div></li>";
-      }).join("")+"</ul>"
-    : '<p class="cfempty">No device saved.</p>';
-  $("cfProgram").innerHTML = programHtml(log);
-  $("cfMeals").innerHTML = mealHtml(meals);
-  $("cfExComp").innerHTML = complianceRow(workouts, meals, goals && goals.cal, "work");
-  $("cfNutComp").innerHTML = complianceRow(workouts, meals, goals && goals.cal, "food");
-  $("cfGoal").innerHTML = goalHtml(goals);
-  const logNote = matched.status==="missing"
-    ? "Shared meal and workout logs are not in this project yet."
-    : matched.status==="ambiguous"
-      ? "More than one client uses this name, so meals and workouts stay blank."
-      : "";
-  $("cfLogNote").textContent = logNote;
+  $("cfDevices").innerHTML = connectRows(devices, file.connectAsks);
+  if($("cfAlertsNote")) $("cfAlertsNote").hidden = !cfAlertsShown;
+  $("cfCredits").textContent = file.sessionCredits>0 ? String(file.sessionCredits) : "None";
+  const trainerName = signedInTrainerName();
+  $("cfTrainer").textContent = trainerName || "Not specified";
+  $("cfLocation").textContent = "Not specified";
+  $("cfEmail").textContent = clientEmailText(pair, matched) || "Not specified";
+  $("cfPhone").textContent = "Not specified";
+  $("cfLevel").textContent = "Not specified";
+  $("cfAdded").textContent = addedOnText(pair);
+  $("cfTrial").textContent = "Not specified";
+  $("cfZone").textContent = "Not specified";
+  $("cfLook").textContent = "Not specified";
+  $("cfUnits").textContent = "Not specified";
+  $("cfFlow").textContent = meals.length ? "In app" : "Not specified";
+  $("cfActivity").innerHTML = activityHtml(workouts, meals, log, goals, matched.status);
   $("cfNotes").innerHTML = file.notes.length
     ? file.notes.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(n=>'<div class="cfnote"><b>'+esc(n.date ? fmtDate(n.date) : "Note")+"</b>"+esc(n.text)+"</div>").join("")
     : '<p class="cfempty">No notes yet.</p>';
@@ -7599,6 +7709,33 @@ $("clientFile").addEventListener("click", (e)=>{
     paintClientFile().catch(()=>{});
     return;
   }
+  const foot = e.target.closest("[data-cfoot]");
+  if(foot && foot.closest("#cfFoot")){
+    clientFileFoot = foot.dataset.cfoot || "profile";
+    paintClientFile().catch(()=>{});
+    return;
+  }
+  const ask = e.target.closest("[data-cfask]");
+  if(ask && trainerHere() && ID.activePairId){
+    const id = ask.dataset.cfask;
+    if(CF_ASKS.indexOf(id)<0) return;
+    const file = readClientFile(ID.activePairId);
+    file.connectAsks[id] = Date.now();
+    writeClientFile(ID.activePairId, {connectAsks:file.connectAsks});
+    paintClientFile().catch(()=>{});
+    return;
+  }
+  if(e.target.closest("#cfCreditAdd") && trainerHere() && ID.activePairId){
+    const file = readClientFile(ID.activePairId);
+    writeClientFile(ID.activePairId, {sessionCredits: Math.min(9999, (file.sessionCredits||0)+1)});
+    paintClientFile().catch(()=>{});
+    return;
+  }
+  if(e.target.closest("#cfAlerts")){
+    cfAlertsShown = true;
+    if($("cfAlertsNote")) $("cfAlertsNote").hidden = false;
+    return;
+  }
   const rm = e.target.closest("[data-cftag]");
   if(!rm || !trainerHere() || !ID.activePairId) return;
   const file = readClientFile(ID.activePairId);
@@ -7666,7 +7803,9 @@ $("page-coach").addEventListener("click", (e)=>{
     pairOpen = true;
     clientFileMode = true;
     clientFileSection = "summary";
+    clientFileFoot = "profile";
     cfEditing = false;
+    cfAlertsShown = false;
     persistIdentity();
     renderCoach();
     refreshCoachData().catch(err=>toast(err.message||"Could not open that client"));
