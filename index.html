@@ -472,12 +472,17 @@ button.learnmore{background:transparent;border:none;color:#0B0B39;font-weight:70
   50%,92%{transform:translateX(-50%)}
   100%{transform:translateX(0)}
 }
-#welcomeFront .phonefeed{position:absolute;inset:0;overflow:hidden;border-radius:18px;background:#fff;touch-action:pan-y}
-#welcomeFront .phonefeed-track{display:flex;flex-direction:column;animation:phone-rise 36s linear infinite;will-change:transform}
-#welcomeFront .phonefeed-track img,#welcomeFront .phonefeed-track video{width:100%;height:180px;object-fit:cover;display:block;flex:none;background:#E4E2EB}
-@keyframes phone-rise{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+#welcomeFront .phonevideo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#0B0B39;border-radius:18px}
 @media (prefers-reduced-motion:reduce){
-  .loginphone-track,.phonefeed-track{animation:none}
+  .loginphone-track{animation:none}
+}
+@media (max-width:430px){
+  #welcomeFront .phonehero{flex-direction:column}
+  #welcomeFront .phonehero-copy{flex:none;width:100%}
+  #welcomeFront .loginphone{align-self:center}
+  #welcomeFront .front-start{flex-direction:column;align-items:stretch;gap:8px;border:none;background:transparent;overflow:visible}
+  #welcomeFront .front-start input{width:100%;border:1.5px solid #E4E2EB;border-radius:12px;min-height:44px}
+  #welcomeFront .front-start button{width:100%;border-radius:12px;min-height:44px}
 }
 button.outline{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:#0B0B39;border:1.5px solid #0B0B39;border-radius:8px;padding:14px 22px;min-width:168px;font-size:16px;font-weight:700;text-shadow:none}
 .wshot{position:relative;margin:28px 0 8px}
@@ -1223,27 +1228,8 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
         <div class="loginphone">
           <div class="loginphone-bezel">
             <div class="loginphone-screen">
+              <video class="phonevideo" id="welcomeReel" src="videos/welcome-reel.mp4" poster="images/welcome-reel-poster.jpg" muted playsinline autoplay loop preload="metadata"></video>
               <div class="loginphone-notch"></div>
-              <div class="phonefeed" id="phoneFeed">
-                <div class="phonefeed-track">
-                  <img src="images/header-portrait.jpg" alt="">
-                  <video src="images/welcome-reel.mp4" muted playsinline autoplay loop preload="auto" poster="images/work/boxing.jpg"></video>
-                  <img src="images/work/lower-body.jpg" alt="">
-                  <img src="images/food/salad.jpg" alt="">
-                  <img src="images/work/glute.jpg" alt="">
-                  <img src="images/food/salmon.jpg" alt="">
-                  <img src="images/library-step.jpg" alt="">
-                  <img src="images/welcome-rooftop.jpg" alt="">
-                  <img src="images/header-portrait.jpg" alt="">
-                  <video src="images/welcome-reel.mp4" muted playsinline autoplay loop preload="auto" poster="images/work/boxing.jpg"></video>
-                  <img src="images/work/lower-body.jpg" alt="">
-                  <img src="images/food/salad.jpg" alt="">
-                  <img src="images/work/glute.jpg" alt="">
-                  <img src="images/food/salmon.jpg" alt="">
-                  <img src="images/library-step.jpg" alt="">
-                  <img src="images/welcome-rooftop.jpg" alt="">
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -1252,11 +1238,17 @@ body.theme-dark #page-overview .ovcard{background:#fff;color:#0B0B39;border-colo
     <script>
     (function(){
       var reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var reel = document.getElementById("welcomeReel");
       function syncPhone(){
-        document.querySelectorAll("#welcomeFront .phonefeed video").forEach(function(v){
-          if(reduce.matches) v.pause();
-          else { var play = v.play(); if(play && play.catch) play.catch(function(){}); }
-        });
+        if(!reel) return;
+        if(reduce.matches){
+          reel.pause();
+          reel.removeAttribute("autoplay");
+          reel.load();
+        } else {
+          var play = reel.play();
+          if(play && play.catch) play.catch(function(){});
+        }
       }
       if(reduce.addEventListener) reduce.addEventListener("change", syncPhone);
       syncPhone();
