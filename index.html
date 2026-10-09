@@ -127,6 +127,22 @@ body.ov-home,body.theme-dark.ov-home{background:#FFFFFF;color:#0B0B39}
 body.ov-home header{padding:0;border-bottom:none;background:transparent;position:static}
 body.ov-home header .topbar,body.ov-home header #hdrSub,body.ov-home header #subbar,body.ov-home header #dayMenu{display:none !important}
 #page-overview{color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+#page-clients{color:#0B0B39;font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+body.clients-on #hdrTitle{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Didot,Georgia,serif}
+#page-clients .cgrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#FFFFFF;color:#0B0B39;border:none;border-bottom:1px solid #E4E2EB;border-left:4px solid transparent;border-radius:0;padding:16px 8px;font-weight:600;font-size:16px}
+#page-clients .cgrow svg{width:22px;height:22px;stroke:#0B0B39;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#page-clients .cgrow.sel{background:#E4E2EB;border-left-color:#563DD2}
+#page-clients .cgpanel{padding:12px 8px 16px 16px;border-bottom:1px solid #E4E2EB;color:#0B0B39}
+#page-clients .cgpanel p{margin:0 0 12px;line-height:1.45}
+#page-clients .cgfilters{display:flex;justify-content:space-between;align-items:center;margin:0 0 12px}
+#page-clients .cgfilters button,#page-clients .cglink{background:transparent;border:none;color:#563DD2;font-weight:700;padding:0}
+#page-clients .cglabel{margin:0 0 8px;font-weight:600}
+#page-clients .cgchip{display:inline-flex;align-items:center;gap:8px;background:#E4E2EB;color:#0B0B39;border-radius:99px;padding:6px 8px 6px 10px;margin:0 0 14px}
+#page-clients .cgchip button{background:transparent;border:none;color:#0B0B39;padding:0 4px;font-size:16px}
+#page-clients .cgadd{background:#563DD2;color:#fff;border:none;border-radius:8px;font-weight:700;letter-spacing:.04em;padding:10px 14px}
+#page-clients .cgclient{display:block;width:100%;text-align:left;background:#FFFFFF;color:#0B0B39;border:1px solid #E4E2EB;border-radius:12px;padding:12px;margin:8px 0 0;font-weight:600}
+#page-clients .cgempty{margin:8px 0 0;color:#0B0B39}
+#page-clients .cglink{display:inline-block;margin-top:16px}
 #page-overview .ovbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;background:#FFFFFF;padding:4px 0 12px}
 #page-overview .ovicon{width:36px;height:36px;padding:0;border:none;background:transparent;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;color:#0B0B39;position:relative}
 #page-overview .ovicon svg{width:22px;height:22px;stroke:#0B0B39;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -1319,6 +1335,11 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
   <div id="ovActivity" hidden></div>
 </section>
 
+<section class="page" id="page-clients">
+  <div id="cgList"></div>
+  <button type="button" class="cglink" id="cgOverview">Client overview</button>
+</section>
+
 <!-- ============ TODAY ============ -->
 <section class="page active" id="page-today">
   <div id="targetBanner" hidden></div>
@@ -1799,6 +1820,14 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
               </form>
               <p class="note" id="cfAccess">Messaging</p>
               <p class="note" id="cfInvite"></p>
+              <p class="f">Client group</p>
+              <p class="note" id="cfGroupNow"></p>
+              <div class="chips" id="cfGroups">
+                <button type="button" class="chip" data-cfgroup="">Pending or Coaching</button>
+                <button type="button" class="chip" data-cfgroup="prospects">Prospects</button>
+                <button type="button" class="chip" data-cfgroup="basic">Basic</button>
+                <button type="button" class="chip" data-cfgroup="deactivated">Deactivated</button>
+              </div>
             </div>
           </div>
           <ul class="cflines">
@@ -2176,7 +2205,7 @@ button.primary,.menuaction,.rolepick button.sel,.welcome .card .chip.sel,.welcom
     <input id="bubbleCamFile" type="file" accept="image/*" capture="environment" hidden>
     <input id="bubbleLibFile" type="file" accept="image/*" hidden>
   </div>
-  <button type="button" class="navitem" data-tab="overview" hidden>Clients</button>
+  <button type="button" class="navitem" data-tab="clients" hidden>Clients</button>
   <button type="button" class="navitem welcome-only" id="menuLearn">Learn more</button>
   <button type="button" class="navitem welcome-only" id="menuLogin">Log in</button>
   <button type="button" class="navitem welcome-only" id="menuSignup">Sign up</button>
@@ -2948,7 +2977,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {overview:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You"};
+const TITLES = {overview:"Clients", clients:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You"};
 let currentTab = "today";
 let diaryDate = todayStr();
 function tabGroup(tab){
@@ -2972,7 +3001,7 @@ function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="work
 function sessionsVisible(){ return trainerHere() || clientView(); }
 function go(tab){
   if(!TITLES[tab]) tab="today";
-  if(tab==="overview" && !signedInTrainer()) tab="today";
+  if((tab==="overview" || tab==="clients") && !signedInTrainer()) tab="today";
   if(tab==="sessions" && !sessionsVisible()) tab="today";
   if(tab==="ask" && !signedInTrainer()) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
@@ -3042,7 +3071,7 @@ function syncMenu(){
   if(action) action.textContent = trainerHere() ? "Add client" : "Start today's workout";
   const client = clientView();
   document.querySelectorAll("#navMenu [data-tab]").forEach(b=>{
-    if(b.dataset.tab==="overview"){ b.hidden = !signedInTrainer(); return; }
+    if(b.dataset.tab==="overview" || b.dataset.tab==="clients"){ b.hidden = !signedInTrainer(); return; }
     if(b.dataset.tab==="sessions"){ b.hidden = !sessionsVisible(); return; }
     if(!client){ b.hidden = false; return; }
     b.hidden = !clientAllows(b.dataset.tab) || !!b.dataset.lib;
@@ -3122,6 +3151,31 @@ $("menuEdit").onclick = () => {
   $("menuEdit").setAttribute("aria-expanded", open ? "true" : "false");
   if(open) paintMyPage();
 };
+$("page-clients").addEventListener("click", (e)=>{
+  if(!signedInTrainer()) return;
+  const group = e.target.closest("[data-cg]");
+  if(group && group.closest("#cgList")){
+    clientGroupId = group.dataset.cg || "coaching";
+    paintClientGroups().catch(()=>{});
+    return;
+  }
+  const open = e.target.closest("[data-cgopen]");
+  if(open){
+    openOverviewClient(open.dataset.cgopen);
+    return;
+  }
+  if(e.target.closest("#cgClear") || e.target.closest("[data-cgclear]")){
+    clientGroupTrainer = false;
+    clientGroupMore = false;
+    paintClientGroups().catch(()=>{});
+    return;
+  }
+  if(e.target.closest("#cgAddFilter")){
+    clientGroupMore = true;
+    paintClientGroups().catch(()=>{});
+  }
+});
+$("cgOverview").onclick = () => { if(signedInTrainer()) go("overview"); };
 $("menuWeekPlan").onclick = () => {
   editorDraft = null;
   woView = "home";
@@ -5560,6 +5614,10 @@ const SETUP_SQL = [
 "do $$ begin alter publication supabase_realtime add table public.photos; exception when duplicate_object then null; end $$;",
 "do $$ begin alter publication supabase_realtime add table public.pairs; exception when duplicate_object then null; end $$;",
 "do $$ begin alter publication supabase_realtime add table public.videos; exception when duplicate_object then null; end $$;",
+"alter table public.pairs add column if not exists client_status text;",
+"do $$ begin",
+"  alter table public.pairs add constraint pairs_client_status_check check (client_status is null or client_status in ('prospects','basic','deactivated','coaching'));",
+"exception when duplicate_object then null; end $$;",
 "-- Shared sessions and private client logs. Run this in the Supabase SQL editor.",
 "create table if not exists public.profiles (",
 "  id uuid primary key references auth.users(id) on delete cascade,",
@@ -5972,7 +6030,8 @@ function mapPairRow(row, extras){
     videos: extra.videos || [],
     checkins: extra.checkins || row.checkins || [],
     call: null,
-    createdAt: Date.parse(row.created_at)||Date.now()
+    createdAt: Date.parse(row.created_at)||Date.now(),
+    clientStatus: cleanClientStatus(row.client_status)
   };
 }
 function photoPublicUrl(path){
@@ -6130,7 +6189,7 @@ const Link = {
       const pair = {
         id:makeId(), inviteCode:code, clientName:name, trainerDevice:ID.deviceId, clientDevice:"",
         dailyRoomUrl:"", dailyRoomName:"", weighIns:[], photos:[], messages:[], videos:[], checkins:[],
-        call:{active:false, startedAt:0, by:""}, createdAt:Date.now()
+        call:{active:false, startedAt:0, by:""}, createdAt:Date.now(), clientStatus:""
       };
       bus.pairs.unshift(pair);
       demoSave(bus);
@@ -6167,6 +6226,33 @@ const Link = {
     const rows = await sbFetch("pairs?id=eq."+encodeURIComponent(pairId)+"&trainer_device=eq."+encodeURIComponent(ID.deviceId), {method:"PATCH", body:{client_name:clean}});
     if(!rows || !rows.length) throw new Error("That client is not on this phone");
     return clean;
+  },
+  async setClientStatus(pairId, status){
+    if(!trainerHere()) throw new Error("Only a trainer can set a client group");
+    const clean = cleanClientStatus(status);
+    const saveLocal = () => {
+      const bus = demoLoad();
+      const pair = bus.pairs.find(p=>p.id===pairId && p.trainerDevice===ID.deviceId);
+      if(pair){ pair.clientStatus = clean; demoSave(bus); }
+      writeClientFile(pairId, {clientStatus: clean});
+    };
+    if(linkMode()==="demo"){
+      saveLocal();
+      return clean;
+    }
+    try {
+      const rows = await sbFetch("pairs?id=eq."+encodeURIComponent(pairId)+"&trainer_device=eq."+encodeURIComponent(ID.deviceId), {method:"PATCH", body:{client_status: clean || null}});
+      if(!rows || !rows.length) throw new Error("That client is not on this phone");
+      writeClientFile(pairId, {clientStatus: clean});
+      return clean;
+    } catch(e){
+      const msg = String(e && e.message || "");
+      if(e && (e.code==="missing" || e.code==="PGRST204" || e.code==="42703" || /client_status/i.test(msg))){
+        saveLocal();
+        return clean;
+      }
+      throw e;
+    }
   },
   async joinWithCode(raw){
     const code = normalizeCode(raw);
@@ -6497,7 +6583,8 @@ function readClientFile(pairId){
       return {id:String(n.id||""), date:date, text:text, createdAt:Number(n.createdAt)||0};
     }).filter(Boolean),
     connectAsks: connectAsks,
-    sessionCredits: isFinite(credits) && credits>0 ? Math.min(9999, credits) : 0
+    sessionCredits: isFinite(credits) && credits>0 ? Math.min(9999, credits) : 0,
+    clientStatus: cleanClientStatus(row.clientStatus)
   };
 }
 function writeClientFile(pairId, patch){
@@ -6507,7 +6594,8 @@ function writeClientFile(pairId, patch){
     tags: patch.tags!=null ? patch.tags : cur.tags,
     notes: patch.notes!=null ? patch.notes : cur.notes,
     connectAsks: patch.connectAsks!=null ? patch.connectAsks : cur.connectAsks,
-    sessionCredits: patch.sessionCredits!=null ? patch.sessionCredits : cur.sessionCredits
+    sessionCredits: patch.sessionCredits!=null ? patch.sessionCredits : cur.sessionCredits,
+    clientStatus: patch.clientStatus!=null ? cleanClientStatus(patch.clientStatus) : cur.clientStatus
   };
   localStorage.setItem(CLIENT_FILE_KEY, JSON.stringify(all));
 }
@@ -7069,6 +7157,67 @@ async function paintOverview(){
   if(token!==overviewPaintToken) return;
   paintOverviewBody(people, packed.status);
 }
+const CLIENT_GROUP_ORDER = ["prospects","pending","coaching","basic","deactivated"];
+const CLIENT_GROUP_LABEL = {prospects:"Prospects", pending:"Pending", coaching:"Coaching", basic:"Basic", deactivated:"Deactivated"};
+function cleanClientStatus(value){
+  const s = String(value||"").trim().toLowerCase();
+  return s==="prospects" || s==="basic" || s==="deactivated" || s==="coaching" ? s : "";
+}
+function clientGroup(pair){
+  const set = cleanClientStatus(pair && pair.clientStatus) || cleanClientStatus(readClientFile(pair && pair.id).clientStatus);
+  if(set==="prospects" || set==="basic" || set==="deactivated") return set;
+  if(pair && pair.clientDevice) return "coaching";
+  return "pending";
+}
+let clientGroupId = "coaching";
+let clientGroupTrainer = true;
+let clientGroupMore = false;
+const CLIENT_GROUP_ICONS = {
+  prospects:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.2"/><circle cx="16" cy="9" r="2.2"/><path d="M4 18c.7-2.2 2.2-3.2 4-3.2s3.3 1 4 3.2M12 18c.7-2.2 2.2-3.2 4-3.2s3.3 1 4 3.2"/></svg>',
+  pending:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg>',
+  coaching:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 19c1.2-3 3.2-4.5 6-4.5s4.8 1.5 6 4.5"/></svg>',
+  basic:'<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M4 10h16"/></svg>',
+  deactivated:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M9 9l6 6M15 9l-6 6"/></svg>'
+};
+function clientGroupHtml(id, pairs){
+  const on = id===clientGroupId;
+  const people = pairs.filter(p=>clientGroup(p)===id);
+  let panel = "";
+  if(on){
+    let extra = "";
+    if(id==="coaching"){
+      const name = signedInTrainerName() || "Not specified";
+      const chip = clientGroupTrainer ? '<div class="cgchip"><span>'+esc(name)+'</span><button type="button" data-cgclear aria-label="Remove trainer filter">×</button></div>' : "";
+      const more = clientGroupMore ? '<p class="note">More filters are not open yet.</p>' : "";
+      extra = '<p>Coaching clients get workouts, habits, and nutrition coaching.</p><div class="cgfilters"><b>Filters</b><button type="button" id="cgClear">Clear all</button></div><p class="cglabel">By trainer</p>'+chip+'<button type="button" class="cgadd" id="cgAddFilter">Add filter</button>'+more;
+    }
+    const list = people.length
+      ? people.map(p=>'<button type="button" class="cgclient" data-cgopen="'+esc(p.id)+'">'+esc(p.clientName||"Client")+'</button>').join("")
+      : '<p class="cgempty">No clients here yet.</p>';
+    panel = '<div class="cgpanel">'+extra+list+'</div>';
+  }
+  return '<button type="button" class="cgrow'+(on?" sel":"")+'" data-cg="'+id+'">'+CLIENT_GROUP_ICONS[id]+'<span>'+CLIENT_GROUP_LABEL[id]+'</span></button>'+panel;
+}
+async function paintClientGroups(){
+  const box = $("cgList");
+  if(!box) return;
+  if(!signedInTrainer()){
+    box.innerHTML = "";
+    return;
+  }
+  let pairs = [];
+  try { pairs = await Link.pairsForTrainer(); }
+  catch(e){ pairs = []; }
+  if(currentTab!=="clients" || !signedInTrainer()) return;
+  if(CLIENT_GROUP_ORDER.indexOf(clientGroupId)<0) clientGroupId = "coaching";
+  box.innerHTML = CLIENT_GROUP_ORDER.map(id=>clientGroupHtml(id, pairs)).join("");
+}
+function renderClientGroups(){
+  if(!signedInTrainer()){ go("today"); return; }
+  $("hdrTitle").textContent = "Clients";
+  if($("hdrSub")) $("hdrSub").textContent = "";
+  paintClientGroups().catch(()=>{});
+}
 function renderOverview(){
   if($("hdrSub")) $("hdrSub").textContent = "";
   if(!signedInTrainer()){
@@ -7291,6 +7440,14 @@ async function paintClientFile(){
   }
   const joined = pair.clientDevice ? "Joined on their phone." : "Waiting for them to enter the code.";
   $("cfInvite").textContent = pair.inviteCode ? pair.inviteCode+" · "+joined : joined;
+  const groupNow = clientGroup(pair);
+  if($("cfGroupNow")) $("cfGroupNow").textContent = "This client is in "+(CLIENT_GROUP_LABEL[groupNow]||"Pending")+".";
+  const storedGroup = cleanClientStatus(pair.clientStatus) || cleanClientStatus(readClientFile(pair.id).clientStatus);
+  const usualGroup = storedGroup==="" || storedGroup==="coaching";
+  document.querySelectorAll("#cfGroups [data-cfgroup]").forEach(btn=>{
+    const on = usualGroup ? btn.dataset.cfgroup==="" : btn.dataset.cfgroup===storedGroup;
+    btn.classList.toggle("sel", on);
+  });
   $("cfBadges").textContent = "No badges yet";
   const workoutCount = countWorkouts(workouts);
   const cardioCount = countCardio(workouts);
@@ -7734,6 +7891,14 @@ $("clientFile").addEventListener("click", (e)=>{
   if(e.target.closest("#cfAlerts")){
     cfAlertsShown = true;
     if($("cfAlertsNote")) $("cfAlertsNote").hidden = false;
+    return;
+  }
+  const grp = e.target.closest("[data-cfgroup]");
+  if(grp && grp.closest("#cfGroups") && trainerHere() && ID.activePairId){
+    run(async ()=>{
+      await Link.setClientStatus(ID.activePairId, grp.dataset.cfgroup||"");
+      await paintClientFile();
+    });
     return;
   }
   const rm = e.target.closest("[data-cftag]");
@@ -9979,11 +10144,12 @@ $("youBody").addEventListener("click", onYouClick);
 function render(){
   if(currentTab!=="coach") document.body.classList.remove("client-file");
   document.body.classList.toggle("ov-home", currentTab==="overview" && signedInTrainer());
+  document.body.classList.toggle("clients-on", currentTab==="clients" && signedInTrainer());
   applyClientLock();
   paintHeader();
   paintSubbar();
   applyMemberLook();
-  ({overview:renderOverview, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou})[currentTab]();
+  ({overview:renderOverview, clients:renderClientGroups, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
