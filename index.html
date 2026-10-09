@@ -1273,6 +1273,58 @@ body.welcome-on .headlogin{display:inline-flex}
   .coachmedia{grid-template-columns:1fr}
 }
 
+/* Signed-in screens: one header, one card, 44px targets, empty states. */
+.yourow[data-you="premium"],.yourow[data-you="glp1"],.yourow[data-you="community"],.yourow[data-you="friends"],.yourow[data-you="messages"],.yourow[data-you="steps"]{display:none !important}
+body.client-file .coachmedia,body.client-file #coachSolo,body.client-file #coachTrainer,body.client-file #coachDemoCard{display:none !important}
+body:not(.welcome-on) #hdrTitle,body:not(.welcome-on) .ovtitle,body:not(.welcome-on) .asktitle,body:not(.welcome-on) #youTitle{font-family:var(--font);font-size:22px;line-height:28px;font-weight:700;letter-spacing:-.01em}
+.menulabel,.mltitle,.mlsec,.youhead{font-size:12px;line-height:16px;letter-spacing:.08em;font-weight:700;text-transform:uppercase;color:var(--accent)}
+.tabpill button,body.trainer-bar .tabpill button{font-size:12px !important;line-height:16px !important;min-height:44px}
+body:not(.welcome-on) .card,body:not(.welcome-on) .ovcard,body:not(.welcome-on) .stat,body:not(.welcome-on) .dcard,body:not(.welcome-on) .promptcard,body:not(.welcome-on) .wocard,body:not(.welcome-on) .wotype,body:not(.welcome-on) .worow,body:not(.welcome-on) .tmcard,body:not(.welcome-on) .sessioncard,body:not(.welcome-on) .noterow{border-radius:var(--r-lg)}
+body:not(.welcome-on) .wobuild h2,body:not(.welcome-on) .wodraft .wotitle{font-family:var(--font);font-size:22px;line-height:28px;font-weight:700;letter-spacing:-.01em}
+button.sm{min-height:44px;border-radius:var(--r-md);padding:0 14px}
+body:not(.welcome-on) button.primary,body:not(.welcome-on) button.full,body:not(.welcome-on) .menuaction,body:not(.welcome-on) #tmStart{border-radius:var(--r-md)}
+body:not(.welcome-on) .subbar{gap:8px}
+body:not(.welcome-on) .subbar button{min-height:44px;font-size:13px;padding:8px 10px}
+body:not(.welcome-on) .stat .label,body:not(.welcome-on) .pill,body:not(.welcome-on) .macros span,body:not(.welcome-on) .bubble .who,body:not(.welcome-on) .photogrid figcaption,body:not(.welcome-on) .bmiranges span,body:not(.welcome-on) .planbadge,body:not(.welcome-on) .photostrip span,body:not(.welcome-on) .brief .tag,body:not(.welcome-on) .eventfilters button,body:not(.welcome-on) .calgrid .dow,body:not(.welcome-on) .asksrc,body:not(.welcome-on) .badge,body:not(.welcome-on) .week div,#clientFile .cfcount,#clientFile .cfnophoto,#clientFile .cfweeks span,#clientFile .cfmain{font-size:12px;line-height:16px}
+.navmenu .navitem::after,#page-clients .cgclient::after,#page-overview .ovperson::after,.findhits button::after{content:"";width:20px;height:20px;flex:none;margin-left:auto;font-size:0;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230B0B39' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6l6 6-6 6'/></svg>") center/20px 20px no-repeat}
+body:not(.welcome-on) .tabpill button,body:not(.welcome-on) .subbar button,body:not(.welcome-on) .cftabs button,body:not(.welcome-on) .cffoot button,body:not(.welcome-on) .foodlog-tabs button,body:not(.welcome-on) .foodlog-actions button,body:not(.welcome-on) .eventfilters button,body:not(.welcome-on) .calgrid button,body:not(.welcome-on) .ovsections button,body:not(.welcome-on) .cgrow,body:not(.welcome-on) .cgclient,body:not(.welcome-on) .ovperson,body:not(.welcome-on) .linkish,body:not(.welcome-on) button.habitrow,body:not(.welcome-on) #page-overview .ovfoot button{border:none !important}
+body:not(.welcome-on) button.wocard,body:not(.welcome-on) button.wotype,body:not(.welcome-on) button.tmcard,body:not(.welcome-on) button.promptcard,body:not(.welcome-on) button.noterow,body:not(.welcome-on) button.card.hub{border:1px solid rgba(11,11,57,.12) !important;border-radius:var(--r-lg)}
+.foodlog-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.foodlog-actions button{min-height:48px;font-size:13px !important;font-weight:600;border-radius:12px;flex-direction:row;justify-content:flex-start;gap:8px;padding:8px 12px}
+.foodlog-back{width:44px;height:44px;min-height:44px}
+.logpill{min-height:44px;padding:0 16px;display:inline-flex;align-items:center}
+body:not(.welcome-on) small,body:not(.welcome-on) .chip small{font-size:12px;line-height:16px}
+#clientFile .toolbar{display:flex;flex-wrap:wrap;gap:8px}
+#clientFile .toolbar button{font-size:14px;line-height:18px}
+.foodlog-tabs{display:flex;gap:8px;overflow-x:auto}
+.foodlog-tabs button{min-height:44px;flex:none;border-radius:12px;font-size:13px;font-weight:600;padding:0 12px}
+.week{gap:4px}
+.week div{min-width:0;border-radius:12px;padding:8px 0}
+#clientFile .cftabs{display:flex;gap:8px;overflow-x:auto;flex-wrap:nowrap;max-width:100%;padding-bottom:4px}
+#clientFile .cftabs button{flex:none;white-space:nowrap;min-height:44px;border-radius:var(--r-md);font-size:13px}
+#clientFile .cffoot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#clientFile .cflines li{display:flex;justify-content:space-between;gap:12px;align-items:center}
+#clientFile .cflines span{min-width:0}
+#clientFile .cflines b{flex:none;text-align:right}
+.empty,.ovempty,.sessionempty,.cgempty,.cfempty,.findempty,.foodlog-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:24px 16px;margin:8px 0;color:var(--text-2);font-size:15px;line-height:22px;font-weight:500}
+.empty::before,.ovempty::before,.sessionempty::before,.cgempty::before,.cfempty::before,.findempty::before,.foodlog-empty::before{content:"";width:48px;height:48px;border-radius:12px;background:var(--lav) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%230B0B39' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='4' width='14' height='16' rx='2'/><path d='M8 9h8M8 13h5'/></svg>") center/24px no-repeat;flex:none}
+.emptyact{align-self:center;margin-top:4px}
+.modalbox,.foodsheet{border-radius:20px 20px 0 0}
+.navmenu{border-radius:20px 20px 0 0}
+.page{padding-bottom:8px}
+.calgrid button{min-height:44px;border-radius:12px}
+.tabpill{border-radius:16px}
+@media (max-width:700px){
+  body:not(.welcome-on) .coachmedia{grid-template-columns:1fr 1fr;gap:8px}
+  body:not(.welcome-on) .coachmedia video,body:not(.welcome-on) .coachmedia img{aspect-ratio:1;max-height:168px;object-fit:cover}
+}
+@media (max-width:430px){
+  main{padding:16px}
+  .macros{gap:8px}
+  .macros b,.stat b{font-size:16px}
+  .tmcards,.grid2,.tapelist{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body class="welcome-on front-on">
@@ -1747,7 +1799,7 @@ body.welcome-on .headlogin{display:inline-flex}
   <h2 class="sec">Healthy habits</h2>
   <div class="dcard">
     <button type="button" class="habitrow" id="waterRow">
-      <div class="grow"><b>Water</b><small id="waterLine">0.0 cups (You must be thirsty!)</small></div>
+      <div class="grow"><b>Water</b><small id="waterLine">0.0 cups</small></div>
       <span class="chev" aria-hidden="true">›</span>
     </button>
     <button type="button" class="habitrow" id="exerciseRow">
@@ -1982,7 +2034,7 @@ body.welcome-on .headlogin{display:inline-flex}
     <button class="card hub" id="openCookbook" type="button"><b>Cookbook</b><span class="note">Keto, bulking, and lean recipes. Log one serving to today.</span></button>
     <div class="card brief" id="newsColumn">
       <h2>Fitness brief</h2>
-      <p class="note">Short briefs written for this app. A different one is featured each day. This is not a live news wire.</p>
+      <p class="note">A short brief, with a different one featured each day.</p>
       <div id="newsFeature"></div>
     </div>
   </div>
@@ -2118,7 +2170,7 @@ body.welcome-on .headlogin{display:inline-flex}
     <div class="bmiranges" id="bmiRanges"></div>
     <div class="taperead" id="bmiTapeRead"></div>
     <p class="note" id="bmiWhen"></p>
-    <p class="note">BMI does not see muscle or where fat sits.</p>
+    <p class="note">BMI uses height and weight.</p>
   </div>
   <div class="card">
     <h2>Last few</h2>
@@ -2140,7 +2192,7 @@ body.welcome-on .headlogin{display:inline-flex}
   </div>
   <div class="card">
     <h2>Front and side photos</h2>
-    <p class="note">Take a photo with the phone camera or choose one already on the phone. It stays on this phone with the date. These photos are not a body scan.</p>
+    <p class="note">Take a photo with the phone camera or choose one already on the phone. It stays on this phone with the date.</p>
     <div class="toolbar">
       <button type="button" class="sm" id="bmiFrontCam">Take front</button>
       <button type="button" class="sm" id="bmiSideCam">Take side</button>
@@ -2189,7 +2241,7 @@ body.welcome-on .headlogin{display:inline-flex}
       </div>
       <div class="card" id="clientLogCard" hidden>
         <h2>Client logs</h2>
-        <p class="note">Meals, workouts, and notes from clients linked to you. Another client cannot open these.</p>
+        <p class="note">Meals, workouts, and notes from clients linked to you.</p>
         <div id="clientLogBody"></div>
       </div>
     </div>
@@ -2253,7 +2305,7 @@ body.welcome-on .headlogin{display:inline-flex}
           <ul class="cflines">
             <li><span>Threshold alerts</span><button type="button" class="cflink" id="cfAlerts">Set up alerts</button></li>
           </ul>
-          <p class="note" id="cfAlertsNote" hidden>Not open yet.</p>
+          <p class="note" id="cfAlertsNote" hidden>Alerts stay on this phone.</p>
         </section>
         <section class="card">
           <ul class="cflines">
@@ -2276,7 +2328,7 @@ body.welcome-on .headlogin{display:inline-flex}
       <div id="cfPaneNotes" hidden>
         <section class="card">
           <h2>Notes</h2>
-          <p class="note">Notes stay with you and this client. Another client cannot open them.</p>
+          <p class="note">Notes stay with you and this client.</p>
           <form id="cfNoteForm">
             <div class="field"><label class="f" for="cfNoteInput">Today</label><textarea id="cfNoteInput" maxlength="1000" placeholder="Add today's note"></textarea></div>
             <button class="primary full" type="submit">Add today's note</button>
@@ -2367,7 +2419,7 @@ body.welcome-on .headlogin{display:inline-flex}
   </div>
   <div class="card">
     <h2>Mode</h2>
-    <div class="note" style="margin-bottom:8px">Trainer and client are separate accounts. Just me stays on this phone and does not change the account you signed in with.</div>
+    <div class="note" style="margin-bottom:8px">Trainer and client are separate accounts. Just me stays on this phone.</div>
     <div class="chips" id="modePicks">
       <button type="button" class="chip" data-mode="trainer">Trainer</button>
       <button type="button" class="chip" data-mode="client">Client</button>
@@ -2377,7 +2429,7 @@ body.welcome-on .headlogin{display:inline-flex}
   </div>
   <div class="card" id="keysCard">
     <h2>Clients</h2>
-    <p class="note">The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.</p>
+    <p class="note">The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.</p>
   </div>
   <div class="card">
     <h2>Targets</h2>
@@ -2475,7 +2527,7 @@ body.welcome-on .headlogin{display:inline-flex}
   </div>
   <div class="card" id="videoDemoNote" hidden>
     <h2>How a client joins</h2>
-    <p class="note">The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.</p>
+    <p class="note">The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.</p>
   </div>
   <div id="videoCoach" hidden>
     <div class="card" id="videoSend">
@@ -2538,7 +2590,7 @@ body.welcome-on .headlogin{display:inline-flex}
 <!-- ============ ASK AI ============ -->
 <section class="page" id="page-ask">
   <h2 class="asktitle">Ask AI</h2>
-  <p class="note">Workout ideas, videos saved on this phone, and meal numbers only when USDA, Open Food Facts, or a saved food already has them. This does not call an outside chat service.</p>
+  <p class="note">Ask for a workout idea, a video saved on this phone, or a meal from foods already listed.</p>
   <div id="askThread" class="askthread"></div>
   <form id="askForm" class="askform">
     <label class="f" for="askInput">Ask</label>
@@ -2555,7 +2607,8 @@ body.welcome-on .headlogin{display:inline-flex}
 <section class="page" id="page-librarynote">
   <div class="card">
     <h2 id="libraryNoteTitle">Habits</h2>
-    <p id="libraryNoteBody">Habits is not open yet.</p>
+    <p class="cfempty" id="libraryNoteBody">No habits saved yet.</p>
+    <button type="button" class="primary emptyact" id="libraryNoteGo">View clients</button>
   </div>
 </section>
 </main>
@@ -2643,10 +2696,10 @@ body.welcome-on .headlogin{display:inline-flex}
   </section>
   <div class="youlist" id="youList" hidden>
     <p class="youhead">You</p>
-    <button type="button" class="yourow" data-you="premium"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg><span class="grow"><b>My Premium</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="premium" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/></svg><span class="grow"><b>My Premium</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M6 19c1.2-3 3.2-4.5 6-4.5S16.8 16 18 19"/></svg><span class="grow"><b>My Profile</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="accounts" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.4"/><circle cx="16" cy="9" r="2.4"/><path d="M4 18c.7-2.2 2.2-3.3 4-3.3s3.3 1.1 4 3.3M12 18c.7-2.2 2.2-3.3 4-3.3s3.3 1.1 4 3.3"/></svg><span class="grow"><b>Accounts</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="glp1"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 8h4M10 12h4"/></svg><span class="grow"><b>GLP-1 Support</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="glp1" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M10 8h4M10 12h4"/></svg><span class="grow"><b>GLP-1 Support</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="fasting"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg><span class="grow"><b>Intermittent Fasting</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 4a8 8 0 1 0 4 12 7 7 0 0 1-4-12z"/></svg><span class="grow"><b>Sleep</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="recipes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10a2 2 0 0 1 2 2v14H8a2 2 0 0 1-2-2z"/><path d="M6 4v14"/></svg><span class="grow"><b>Recipe Discovery</b></span><span class="chev" aria-hidden="true">›</span></button>
@@ -2658,11 +2711,11 @@ body.welcome-on .headlogin{display:inline-flex}
     <button type="button" class="yourow" data-you="meals"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3v18"/></svg><span class="grow"><b>My Meals, Recipes &amp; Foods</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="reminders"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V10a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span class="grow"><b>Reminders</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="devices"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M11 18h2"/></svg><span class="grow"><b>Apps &amp; Devices</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="steps"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="16" r="2"/><circle cx="15" cy="8" r="2"/><path d="M9 14l3-3 2 2 3-4"/></svg><span class="grow"><b>Steps</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="community"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.5"/><circle cx="16" cy="9" r="2.5"/><path d="M4 18c.8-2.4 2.4-3.5 4-3.5S11.2 15.6 12 18c.8-2.4 2.4-3.5 4-3.5s3.2 1.1 4 3.5"/></svg><span class="grow"><b>Community</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="steps" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="16" r="2"/><circle cx="15" cy="8" r="2"/><path d="M9 14l3-3 2 2 3-4"/></svg><span class="grow"><b>Steps</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="community" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="9" r="2.5"/><circle cx="16" cy="9" r="2.5"/><path d="M4 18c.8-2.4 2.4-3.5 4-3.5S11.2 15.6 12 18c.8-2.4 2.4-3.5 4-3.5s3.2 1.1 4 3.5"/></svg><span class="grow"><b>Community</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="learn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-5 9 5-9 5-9-5z"/><path d="M7 12v5c2 2 8 2 10 0v-5"/></svg><span class="grow"><b>Learn</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="friends"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3"/><path d="M4 19c1-3 3-4.5 6-4.5s5 1.5 6 4.5M18 8v6M15 11h6"/></svg><span class="grow"><b>Friends</b></span><span class="chev" aria-hidden="true">›</span></button>
-    <button type="button" class="yourow" data-you="messages"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v9H8l-3 3V6z"/></svg><span class="grow"><b>Messages</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="friends" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3"/><path d="M4 19c1-3 3-4.5 6-4.5s5 1.5 6 4.5M18 8v6M15 11h6"/></svg><span class="grow"><b>Friends</b></span><span class="chev" aria-hidden="true">›</span></button>
+    <button type="button" class="yourow" data-you="messages" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v9H8l-3 3V6z"/></svg><span class="grow"><b>Messages</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="settings"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/></svg><span class="grow"><b>Settings</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="appearance"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="#0B0B39" stroke="none"/></svg><span class="grow"><b>App Appearance</b></span><span class="chev" aria-hidden="true">›</span></button>
     <button type="button" class="yourow" data-you="privacy"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 5-3 7.5-7 9-4-1.5-7-4-7-9V6z"/></svg><span class="grow"><b>Privacy</b></span><span class="chev" aria-hidden="true">›</span></button>
@@ -2671,7 +2724,7 @@ body.welcome-on .headlogin{display:inline-flex}
   </div>
   <button type="button" class="navitem" id="menuEdit" aria-expanded="false" aria-controls="menuEditPanel" hidden>Edit</button>
   <div class="navsub" id="menuEditPanel" hidden>
-    <p class="note">Your diary color and bubble photo stay on this phone. This does not change the login page.</p>
+    <p class="note">Diary color and bubble photo stay on this phone.</p>
     <div class="lookpicks" id="lookPicks">
       <button type="button" data-look="purple" aria-pressed="true"><span class="lookswatch" style="background:#FFFFFF"></span>Purple</button>
       <button type="button" data-look="plum" aria-pressed="false"><span class="lookswatch" style="background:#FFFFFF"></span>Plum</button>
@@ -3708,7 +3761,24 @@ $("page-clients").addEventListener("click", (e)=>{
   if(e.target.closest("#cgAddFilter")){
     clientGroupMore = true;
     paintClientGroups().catch(()=>{});
+    return;
   }
+  if(e.target.closest("[data-cgadd]")){
+    go("overview");
+    overviewAddClient();
+  }
+});
+$("page-overview").addEventListener("click", (e)=>{
+  if(e.target.closest("#ovEmptyAdd")) overviewAddClient();
+});
+$("libraryNoteGo").onclick = () => { if(signedInTrainer()) go("clients"); };
+$("cfPaneOther").addEventListener("click", (e)=>{
+  const btn = e.target.closest("[data-cfgo]");
+  if(!btn) return;
+  const dest = btn.dataset.cfgo;
+  if(dest==="summary"){ clientFileSection = "summary"; render(); return; }
+  if(dest==="notes"){ clientFileSection = "summary"; clientFileFoot = "notes"; render(); return; }
+  if(dest==="photos" || dest==="checkin") go(dest);
 });
 $("cgOverview").onclick = () => { if(signedInTrainer()) go("overview"); };
 $("menuWeekPlan").onclick = () => {
@@ -3845,7 +3915,7 @@ function renderLibraryNote(){
   $("hdrTitle").textContent = title;
   if($("hdrSub")) $("hdrSub").textContent = "";
   $("libraryNoteTitle").textContent = title;
-  $("libraryNoteBody").textContent = forms ? "Open a client to see forms." : "Habits is not open yet.";
+  $("libraryNoteBody").textContent = forms ? "No forms saved yet." : "No habits saved yet.";
 }
 $("masterLib").addEventListener("click", (e)=>{
   const row = e.target.closest("[data-ml]");
@@ -3966,7 +4036,7 @@ function renderToday(){
   $("dWo").textContent = exerciseText;
 
   const cups = S.water && S.water[t]!=null ? Number(S.water[t]) : 0;
-  $("waterLine").textContent = cups>0 ? cups.toFixed(1)+" cups" : "0.0 cups (You must be thirsty!)";
+  $("waterLine").textContent = cups>0 ? cups.toFixed(1)+" cups" : "0.0 cups";
   if(document.activeElement!==$("waterInput")) $("waterInput").value = cups ? String(cups) : "";
 
   const steps = S.steps[t];
@@ -8315,9 +8385,8 @@ function paintOverviewBody(people, status){
   }
   const groups = OV_GROUP_DEFS.filter(g=> overviewFilter==="all" || overviewFilter===g.id).map(g=>({def:g, people:people.filter(p=>p[g.id])})).filter(g=>g.people.length);
   let note = "";
-  if(!people.length) note = '<p class="ovempty">No clients yet.</p>';
-  else if(!groups.length) note = '<p class="ovempty">No clients fit a group yet.</p>';
-  if(status==="missing" && people.length) note += '<p class="ovempty">Shared meal and workout logs are not in the project yet.</p>';
+  if(!people.length) note = '<p class="ovempty">No clients yet.<button type="button" class="primary emptyact" id="ovEmptyAdd">Add a client</button></p>';
+  else if(!groups.length) note = '<p class="ovempty">No clients fit a group yet.<button type="button" class="primary emptyact" id="ovEmptyAdd">Add a client</button></p>';
   box.innerHTML = note+groups.map(g=>groupRow(g.def, g.people)).join("");
 }
 async function paintOverview(){
@@ -8385,12 +8454,12 @@ function clientGroupHtml(id, pairs){
     if(id==="coaching"){
       const name = signedInTrainerName() || "Not specified";
       const chip = clientGroupTrainer ? '<div class="cgchip"><span>'+esc(name)+'</span><button type="button" data-cgclear aria-label="Remove trainer filter">×</button></div>' : "";
-      const more = clientGroupMore ? '<p class="note">More filters are not open yet.</p>' : "";
+      const more = "";
       extra = '<p>Coaching clients get workouts, habits, and nutrition coaching.</p><div class="cgfilters"><b>Filters</b><button type="button" id="cgClear">Clear all</button></div><p class="cglabel">By trainer</p>'+chip+'<button type="button" class="cgadd" id="cgAddFilter">Add filter</button>'+more;
     }
     const list = people.length
       ? people.map(p=>'<button type="button" class="cgclient" data-cgopen="'+esc(p.id)+'">'+esc(p.clientName||"Client")+'</button>').join("")
-      : '<p class="cgempty">No clients here yet.</p>';
+      : '<p class="cgempty">No clients here yet.<button type="button" class="primary emptyact" data-cgadd>Add a client</button></p>';
     panel = '<div class="cgpanel">'+extra+list+'</div>';
   }
   return '<button type="button" class="cgrow'+(on?" sel":"")+'" data-cg="'+id+'">'+CLIENT_GROUP_ICONS[id]+'<span>'+CLIENT_GROUP_LABEL[id]+'</span></button>'+panel;
@@ -8508,21 +8577,21 @@ function paintClientPanes(pair, log, status){
   other.hidden = summary;
   if(summary) return;
   if(clientFileSection==="sales"){
-    other.innerHTML = "<h2>Sales</h2><p>Sales is not open yet.</p>";
+    other.innerHTML = "<h2>Sales</h2><p class=\"cfempty\">No sales saved for this client.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"summary\">Back to summary</button>";
     return;
   }
   if(clientFileSection==="invoices"){
-    other.innerHTML = "<h2>Invoices</h2><p>Invoices is not open yet.</p>";
+    other.innerHTML = "<h2>Invoices</h2><p class=\"cfempty\">No invoices saved for this client.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"summary\">Back to summary</button>";
     return;
   }
   if(clientFileSection==="consultation"){
-    other.innerHTML = "<h2>Consultation</h2><p class=\"cfempty\">No consultation is saved for this client.</p>";
+    other.innerHTML = "<h2>Consultation</h2><p class=\"cfempty\">No consultation is saved for this client.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"notes\">Add a note</button>";
     return;
   }
   if(clientFileSection==="forms"){
     const rows = (pair.checkins||[]).slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
     if(!rows.length){
-      other.innerHTML = "<h2>Forms</h2><p class=\"cfempty\">No forms saved.</p>";
+      other.innerHTML = "<h2>Forms</h2><p class=\"cfempty\">No forms saved.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"checkin\">Open check-in</button>";
       return;
     }
     other.innerHTML = "<h2>Forms</h2>"+rows.map(c=>{
@@ -8542,7 +8611,7 @@ function paintClientPanes(pair, log, status){
     (c && c.photos || []).forEach(p=>{ if(p && safePhotoSrc(p.url)) formPhotos.push(p); });
   });
   if(!photos.length && !videos.length && !formPhotos.length){
-    other.innerHTML = "<h2>Attachments</h2><p class=\"cfempty\">No attachments saved.</p>";
+    other.innerHTML = "<h2>Attachments</h2><p class=\"cfempty\">No attachments saved.</p><button type=\"button\" class=\"primary emptyact\" data-cfgo=\"photos\">Open photos</button>";
     return;
   }
   const figs = photos.concat(formPhotos).map(p=>{
@@ -8584,7 +8653,7 @@ function connectRows(devices, asks){
   return CF_DEVICE_ROWS.map(row=>{
     const asked = asks && asks[row.id];
     const onPhone = !!saved[row.name.toLowerCase()];
-    const note = asked ? "Request saved. Not open yet." : (onPhone ? "Saved on their phone. Not connected." : "");
+    const note = asked ? "Request saved." : (onPhone ? "Saved on their phone." : "");
     return '<div class="cfdev"><div><b>'+esc(row.name)+'</b>'+(note?'<small>'+esc(note)+'</small>':"")+'</div><button type="button" class="cflink" data-cfask="'+row.id+'">Ask to Connect</button></div>';
   }).join("");
 }
@@ -10487,7 +10556,7 @@ function askBmiText(){
   const weight = last && last.weight ? last.weight : null;
   if(!(height>0) || !(weight>0)) return "BMI is not known. Height and weight are not both saved. Open Progress, then BMI, and enter them there. Body-fat is not known. This app does not calculate body-fat.";
   const b = bmiFrom(weight, height);
-  return "The latest saved height and weight on this phone give BMI "+b+" ("+bmiBandName(b)+"), using the same calculation as the BMI screen. That screen says BMI does not see muscle or where fat sits. Body-fat is not known.";
+  return "The latest saved height and weight on this phone give BMI "+b+" ("+bmiBandName(b)+"), using the same calculation as the BMI screen.";
 }
 async function buildAskAnswer(text){
   const intent = askIntents(text);
@@ -10925,15 +10994,15 @@ async function readBrowserHeart(){
   }
 }
 function devicesHtml(y){
-  const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
+  const cloud = "The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.";
   const rows = y.devices.map(d=>{
     const picks = [d.steps?"Steps":"", d.heart?"Heart rate":""].filter(Boolean).join(" and ");
     return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+(picks?esc(picks)+" chosen":"Saved")+'</div><p data-devid="'+esc(d.id)+'">'+esc(deviceStatus(d))+'</p></div><button type="button" class="x" data-youdel="devices" data-id="'+esc(d.id)+'" aria-label="Remove">×</button></li>';
   }).join("");
   const readBtn = browserHeartApi()
-    ? '<button type="button" data-devread="heart">Read heart rate from a Bluetooth sensor</button><p class="note">That reads a heart-rate sensor this browser can see. It does not connect Apple Watch or Apple Health.</p>'
+    ? '<button type="button" data-devread="heart">Read heart rate from a Bluetooth sensor</button><p class="note">That reads a heart-rate sensor this browser can see.</p>'
     : "";
-  return '<form class="card" data-youform="device"><p>Add an Apple Watch or another device, and choose steps, heart rate, or both. The choice is saved on this phone. This page cannot talk to Apple Watch or Apple Health.</p><div class="field"><label class="f" for="devName">Device</label><input id="devName" name="name" maxlength="60" placeholder="Device name" autocomplete="off"></div><button type="button" data-devname="Apple Watch">Apple Watch</button><label class="devpick"><input type="checkbox" name="steps"> Steps</label><label class="devpick"><input type="checkbox" name="heart"> Heart rate</label><button class="primary full" type="submit">Save device</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'<p class="note">No device saved on this phone yet.</p>')+'<div class="card">'+readBtn+'<p>The camera opens only when you choose a photo.</p><p>'+esc(cloud)+'</p></div>';
+  return '<form class="card" data-youform="device"><p>Add an Apple Watch or another device, and choose steps, heart rate, or both. The choice is saved on this phone.</p><div class="field"><label class="f" for="devName">Device</label><input id="devName" name="name" maxlength="60" placeholder="Device name" autocomplete="off"></div><button type="button" data-devname="Apple Watch">Apple Watch</button><label class="devpick"><input type="checkbox" name="steps"> Steps</label><label class="devpick"><input type="checkbox" name="heart"> Heart rate</label><button class="primary full" type="submit">Save device</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'<p class="note">No device saved on this phone yet.</p>')+'<div class="card">'+readBtn+'<p>The camera opens only when you choose a photo.</p><p>'+esc(cloud)+'</p></div>';
 }
 const FAST_MARKS = [
   {h:4, note:"Around 4 hours, digestion of the last meal is winding down."},
@@ -11180,12 +11249,12 @@ function youHtml(view){
     return '<p class="themelabel">Select Theme</p>'+row("system","System Default")+row("light","Light Theme")+row("dark","Dark Theme")+'<p class="note">Until you pick a theme, this phone uses Light Theme. System Default follows this phone’s light or dark setting. The login screen stays linen either way.</p>';
   }
   if(view==="privacy"){
-    const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
+    const cloud = "The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.";
     return '<div class="card"><p>Meals, workouts, weight, photos, and the notes in this menu are stored on this phone.</p><p>The theme you pick is stored on this phone.</p><p>'+esc(cloud)+'</p></div>';
   }
   if(view==="help") return '<div class="card"><p>Log a meal from Meals. Calories and macros are saved only when the food already has them.</p><p>The weekly plan is under This week\'s plan in this menu.</p><p>Weight and tape measurements are under Weight &amp; Measurements.</p><p>This menu is the profile button after you are signed in. It is not on the login screen.</p></div>';
   if(view==="sync"){
-    const cloud = "The trainer adds a client and copies the invite code. The client signs in on their own phone, opens Join your trainer, and enters that code. Trainer and client need two different emails.";
+    const cloud = "The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.";
     return '<div class="card"><p id="youSyncLine">'+esc(lastSaveText())+'</p><p class="note">This is the last time this phone saved your log. It is not a cloud sync.</p><p>'+esc(cloud)+'</p><button type="button" class="primary full" data-syncnow>Save now</button></div>';
   }
   return '<div class="card"><p>Open a row from the menu.</p></div>';
