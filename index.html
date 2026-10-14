@@ -1628,6 +1628,36 @@ body:not(.welcome-on) .wotype.sel{background:#EBDDE5 !important;border-color:#7E
   border-color:#7E5169 !important;
 }
 </style>
+<style id="group-photos">
+#libGroups,#helperChips,#pickerGroups{position:relative;isolation:isolate;overflow:hidden;border-radius:16px;background:#0B0B39;padding:8px;margin:0 0 10px}
+#helperChips{display:block;flex-wrap:unset;overflow:hidden}
+#libGroups .gphoto-bg,#helperChips .gphoto-bg,#pickerGroups .gphoto-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+#libGroups::after,#helperChips::after,#pickerGroups::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,rgba(11,11,57,.55) 0%,rgba(11,11,57,.72) 100%)}
+.gstrip-row{position:relative;z-index:1;display:flex;gap:8px;align-items:center}
+#libGroups .gstrip-row,#pickerGroups .gstrip-row{flex-wrap:wrap}
+#helperChips .gstrip-row{flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}
+.gchip{position:relative;isolation:isolate;overflow:hidden;width:76px;height:76px;min-height:76px;flex:none;padding:0 !important;border:0 !important;border-radius:14px !important;background:#0B0B39 !important;color:#fff !important;box-shadow:none}
+.gchip img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.gchip::after{content:"";position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(11,11,57,.42) 0%,rgba(11,11,57,.72) 100%)}
+.gchip span{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:center;height:100%;padding:6px;font:700 11px/13px var(--font);color:#fff;text-align:center}
+.gchip.sel{box-shadow:0 0 0 2px #fff,0 0 0 4px #7E5169}
+.gtile{position:relative;isolation:isolate;overflow:hidden;border-radius:16px !important;background:#0B0B39 !important;color:#fff !important;border:0 !important}
+.gtile .gphoto-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+.gtile::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,rgba(11,11,57,.58) 0%,rgba(11,11,57,.72) 100%)}
+.gtile > *:not(.gphoto-bg){position:relative;z-index:1}
+.libitem.gtile{display:flex;gap:10px;align-items:center;padding:12px 14px;margin:0 0 8px;border-bottom:0;min-height:76px}
+.libitem.gtile .name,.libitem.gtile .badge,.libitem.gtile .x,.libitem.gtile a.howto{color:#fff}
+.libitem.gtile .cue{color:rgba(255,255,255,.88)}
+#helperLib .helperhit.gtile{background:transparent !important;color:#fff !important}
+#helperLib .helperhit.gtile .name{color:#fff !important}
+#helperLib .helperhit.gtile .meta{color:rgba(255,255,255,.88) !important}
+#helperLib .helperhit.gtile .mark{background:transparent;border-color:#fff}
+#helperLib .helperhit.gtile.sel{background:transparent !important;box-shadow:inset 0 0 0 2px #fff}
+#helperLib .helperhit.gtile.sel .mark{background:#fff;border-color:#fff;box-shadow:inset 0 0 0 4px #0B0B39}
+.pickhit.gtile{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:12px 14px;margin:0 0 8px;min-height:76px;color:#fff !important}
+.pickhit.gtile .name{color:#fff !important}
+.pickhit.gtile .meta{color:rgba(255,255,255,.88) !important;white-space:normal}
+</style>
 </head>
 <body class="welcome-on front-on">
 <script>
@@ -3406,6 +3436,23 @@ const GROUPS = [
 ];
 const GROUP_IDS = GROUPS.map(g=>g[0]);
 function groupLabel(id){ const g=GROUPS.find(x=>x[0]===id); return g?g[1]:""; }
+const GROUP_PHOTO = {chest:"chest", back:"back", shoulders:"shoulders", arms:"arms", legs:"legs", glutes:"glutes", core:"core", cardio:"cardio", full:"fullbody"};
+function groupPhoto(group){
+  return "images/groups/"+(GROUP_PHOTO[group] || "fullbody")+".jpg";
+}
+function groupPhotoImg(group){
+  return '<img class="gphoto-bg" alt="" src="'+esc(groupPhoto(group))+'" loading="lazy" decoding="async">';
+}
+function groupFilterHtml(chips, active, attr){
+  const known = {chest:1, back:1, shoulders:1, arms:1, legs:1, glutes:1, core:1, cardio:1, full:1};
+  const buttons = chips.map(([id,label])=>{
+    const on = active===id;
+    if(!known[id]) return '<button type="button" class="chip'+(on?" sel":"")+'" '+attr+'="'+esc(id)+'">'+esc(label)+'</button>';
+    return '<button type="button" class="gchip'+(on?" sel":"")+'" '+attr+'="'+esc(id)+'" aria-pressed="'+(on?"true":"false")+'"><img alt="" src="'+esc(groupPhoto(id))+'" loading="lazy" decoding="async"><span>'+esc(label)+'</span></button>';
+  }).join("");
+  const bg = known[active] ? active : "";
+  return groupPhotoImg(bg)+'<div class="gstrip-row">'+buttons+'</div>';
+}
 
 /* Built-in how-tos. Every name used by PLAN is included. */
 const LIBRARY = [
@@ -6581,7 +6628,7 @@ function renderLibrary(){
     $("libGroup").innerHTML = GROUPS.map(g=>`<option value="${g[0]}">${g[1]}</option>`).join("");
   }
   const chips=[["all","All"]].concat(GROUPS);
-  $("libGroups").innerHTML = chips.map(([id,label])=>`<button type="button" class="chip ${libGroup===id?"sel":""}" data-libgroup="${id}">${label}</button>`).join("");
+  $("libGroups").innerHTML = groupFilterHtml(chips, libGroup, "data-libgroup");
   $("libGroups").querySelectorAll("[data-libgroup]").forEach(b=>b.onclick=()=>{ libGroup=b.dataset.libgroup; renderLibrary(); });
   const list=filteredExercises(libGroup, $("libSearch").value);
   if(!list.length){ $("libList").innerHTML='<div class="empty">No exercises match.</div>'; return; }
@@ -6594,7 +6641,7 @@ function renderLibrary(){
       const del=e.custom?`<button class="x" data-dellib="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">×</button>`:"";
       const badge=e.custom?'<span class="badge">Custom</span>':"";
       const cue=e.cue?`<div class="cue">${esc(e.cue)}</div>`:"";
-      return `<div class="libitem" data-libitem="${esc(e.name)}">${photoTag(workFileForName(e.name, e.group),"","thumb")}<div class="grow"><div class="name">${esc(e.name)}${badge}</div>${cue}<div>${howtoLink(e.name)}</div></div>${del}</div>`;
+      return `<div class="libitem gtile" data-libitem="${esc(e.name)}">${groupPhotoImg(e.group)}<div class="grow"><div class="name">${esc(e.name)}${badge}</div>${cue}<div>${howtoLink(e.name)}</div></div>${del}</div>`;
     }).join("")+`</div>`);
   });
   $("libList").innerHTML = parts.join("");
@@ -6743,10 +6790,10 @@ function setPickKind(kind){
 }
 function renderPicker(){
   const chips=[["all","All"]].concat(GROUPS);
-  $("pickerGroups").innerHTML = chips.map(([id,label])=>`<button type="button" class="chip ${pickGroup===id?"sel":""}" data-pickgroup="${id}">${label}</button>`).join("");
+  $("pickerGroups").innerHTML = groupFilterHtml(chips, pickGroup, "data-pickgroup");
   $("pickerGroups").querySelectorAll("[data-pickgroup]").forEach(b=>b.onclick=()=>{ pickGroup=b.dataset.pickgroup; renderPicker(); });
   const list=filteredExercises(pickGroup, $("pickerSearch").value);
-  $("pickerResults").innerHTML = list.length ? list.map(e=>`<button type="button" class="pickhit" data-pick="${esc(e.name)}">${photoTag(workFileForName(e.name, e.group),"","thumb")}<div><div class="name">${esc(e.name)}${e.custom?'<span class="badge">Custom</span>':""}</div><div class="meta">${esc(groupLabel(e.group))}${e.cue?" · "+esc(e.cue):""}</div></div></button>`).join("") : '<div class="empty">No exercises match.</div>';
+  $("pickerResults").innerHTML = list.length ? list.map(e=>`<button type="button" class="pickhit gtile" data-pick="${esc(e.name)}">${groupPhotoImg(e.group)}<div><div class="name">${esc(e.name)}${e.custom?'<span class="badge">Custom</span>':""}</div><div class="meta">${esc(groupLabel(e.group))}${e.cue?" · "+esc(e.cue):""}</div></div></button>`).join("") : '<div class="empty">No exercises match.</div>';
   $("pickerResults").querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{
     pickedItem=allExercises().find(e=>e.name===b.dataset.pick)||null;
     if(!pickedItem) return;
@@ -7283,7 +7330,7 @@ function renderHelperLibrary(){
   const listEl = $("helperList");
   if(!chips || !listEl) return;
   const scroll = listEl.scrollTop;
-  chips.innerHTML = HELPER_CHIPS.map(([id,label])=>'<button type="button" class="chip'+(helperFilter===id?" sel":"")+'" data-helperchip="'+id+'" aria-pressed="'+(helperFilter===id?"true":"false")+'">'+label+'</button>').join("");
+  chips.innerHTML = groupFilterHtml(HELPER_CHIPS, helperFilter, "data-helperchip");
   chips.querySelectorAll("[data-helperchip]").forEach(b=>b.onclick=()=>{ helperFilter=b.dataset.helperchip; renderHelperLibrary(); });
   const q = String($("helperSearch").value||"").trim().toLowerCase();
   const list = allExercises().filter(e => helperInChip(e, helperFilter) && (!q || e.name.toLowerCase().includes(q) || groupLabel(e.group).toLowerCase().includes(q)));
@@ -7293,7 +7340,7 @@ function renderHelperLibrary(){
     const spec = defaultSets(e);
     const on = helperSelected(e.name);
     const badge = e.custom ? " · Custom" : "";
-    return '<button type="button" class="helperhit'+(on?" sel":"")+'" data-helper="'+esc(e.name)+'" aria-pressed="'+(on?"true":"false")+'"><span class="mark" aria-hidden="true"></span><span class="grow"><span class="name">'+esc(e.name)+'</span><span class="meta">'+esc(groupLabel(e.group))+" · "+esc(spec.target)+badge+'</span></span></button>';
+    return '<button type="button" class="helperhit gtile'+(on?" sel":"")+'" data-helper="'+esc(e.name)+'" aria-pressed="'+(on?"true":"false")+'">'+groupPhotoImg(e.group)+'<span class="mark" aria-hidden="true"></span><span class="grow"><span class="name">'+esc(e.name)+'</span><span class="meta">'+esc(groupLabel(e.group))+" · "+esc(spec.target)+badge+'</span></span></button>';
   }).join("") : '<div class="empty">No exercises match.</div>';
   listEl.querySelectorAll("[data-helper]").forEach(b=>b.onclick=()=>toggleHelperMove(b.dataset.helper));
   listEl.scrollTop = scroll;

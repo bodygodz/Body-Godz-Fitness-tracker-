@@ -56,6 +56,17 @@ Training — Pexels. These show Black women and Black men working out.
 - images/work/tire.jpg — man flipping a tire — https://www.pexels.com/photo/4720841/
 - images/work/weights.jpg — dumbbells and kettlebells on a rack, no people — https://www.pexels.com/photo/949126/
 
+Muscle-group photos — files supplied for this app and stored in the repo. They are the exercise-library backgrounds, one file per group. An exercise with no group uses fullbody.jpg.
+- images/groups/chest.jpg
+- images/groups/back.jpg
+- images/groups/shoulders.jpg
+- images/groups/arms.jpg
+- images/groups/legs.jpg
+- images/groups/glutes.jpg
+- images/groups/core.jpg
+- images/groups/cardio.jpg
+- images/groups/fullbody.jpg
+
 Owner photos — files supplied for this app and stored in the repo.
 - images/welcome-rooftop.jpg — class on a rooftop, used for one welcome bubble. The poster headline was removed before it was saved.
 - images/library-step.jpg — step class on green turf, shown on the exercise library card
