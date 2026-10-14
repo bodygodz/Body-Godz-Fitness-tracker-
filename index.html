@@ -1425,6 +1425,8 @@ body:not(.welcome-on) #todayPick svg{width:16px; height:16px}
 #clientFile > .toolbar{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
 #clientFile > .toolbar .sm{flex:1 1 120px; min-width:0}
 .scrim{position:fixed; inset:0; background:rgba(11,11,57,.48); z-index:40}
+body:not(.welcome-on):has(#dayMenu:not([hidden])) header,
+body:not(.welcome-on):has(.toolpanel:not([hidden])) header{z-index:50 !important}
 .scrim[hidden]{display:none !important}
 .toolpanel:not([hidden]){
   position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
@@ -1567,6 +1569,10 @@ details summary::-webkit-details-marker{display:none}
 #helperLib .helperhit.sel{background:#F3F0FF;border-color:#563DD2;box-shadow:inset 0 0 0 1px #563DD2}
 #helperLib .helperhit.sel .mark{background:#563DD2;border-color:#563DD2;box-shadow:inset 0 0 0 3px #fff}
 #helperAdd{flex:none}
+body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#563DD2 !important;box-shadow:inset 0 0 0 1px #563DD2}
+#woSaved{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+#woSaved h2{margin:8px 0 0}
+#woRestRead{font-weight:700;color:#563DD2;margin:8px 0 0}
 
 </style>
 </head>
@@ -2199,21 +2205,24 @@ details summary::-webkit-details-marker{display:none}
       <button type="button" class="chip" data-woidea="none">No equipment</button>
     </div>
     <div class="worow">
-      <div class="field"><label class="f" for="woPrompt">Prompt</label><textarea id="woPrompt" class="woprompt" maxlength="240" placeholder="Write one prompt"></textarea></div>
+      <div class="field"><label class="f" for="woPrompt">Prompt</label><textarea id="woPrompt" class="woprompt" maxlength="240" placeholder="Write one prompt"></textarea><button type="button" class="full" id="woPromptBtn">Build from prompt</button></div>
       <div id="woClients" class="woclients"></div>
     </div>
     <div class="field"><label class="f" for="woPlanName">Workout name</label><input id="woPlanName" maxlength="60" placeholder="Name this workout"></div>
     <p class="f">How this plan is built</p>
     <div class="wotypes" id="woTypes">
-      <button type="button" class="wotype sel" data-wotype="regular"><b>Regular</b><span>A list of moves. Sets stay blank.</span></button>
-      <button type="button" class="wotype" data-wotype="circuit"><b>Circuit</b><span>One round of the moves. Rounds stay blank.</span></button>
-      <button type="button" class="wotype" data-wotype="interval"><b>Interval</b><span>Timed work. Times stay blank.</span></button>
+      <button type="button" class="wotype sel" data-wotype="regular"><b>Regular</b><span>A list of moves with sets and reps.</span></button>
+      <button type="button" class="wotype" data-wotype="circuit"><b>Circuit</b><span>Each move is 4 rounds.</span></button>
+      <button type="button" class="wotype" data-wotype="interval"><b>Interval</b><span>Each move is 30 seconds.</span></button>
     </div>
     <div class="woactions">
       <button type="button" class="primary full" id="woDraftBtn">Build with the helper</button>
       <button type="button" class="full" id="woHandBtn">Build by hand</button>
+      <button type="button" class="primary full" id="woSaveBtn">Save workout</button>
+      <button type="button" class="full" id="woAssignBtn">Assign to client</button>
     </div>
     <div class="card wodraft" id="woDraft" hidden></div>
+    <div id="woSaved"></div>
   </div>
   <div id="woHome">
     <div class="toolbar">
@@ -2247,6 +2256,8 @@ details summary::-webkit-details-marker{display:none}
       </div>
       <div class="field" style="margin-top:10px" id="woNotesWrap"><label class="f">Notes</label><input id="woNotes" placeholder="How did it feel? Anything to change next time?"></div>
       <button class="primary full" id="woDoneBtn"></button>
+      <button type="button" class="full" id="woRestBtn">Rest timer 60s</button>
+      <p class="note" id="woRestRead" hidden></p>
     </div>
     <div id="customScheduled"></div>
     <div id="customUnscheduled"></div>
@@ -3359,7 +3370,10 @@ function normalizeCustomWorkouts(list){
       if(!e || typeof e!=="object" || !String(e.name||"").trim()) return null;
       return {id:String(e.id||nid()), name:String(e.name).trim(), target:String(e.target||""), kind:e.kind==="time"?"time":"reps"};
     }).filter(Boolean):[];
-    return {id:String(w.id||nid()), name, days, exercises};
+    const saved={id:String(w.id||nid()), name, days, exercises};
+    if(w.clientId) saved.clientId=String(w.clientId);
+    if(w.clientName) saved.clientName=String(w.clientName);
+    return saved;
   }).filter(Boolean);
 }
 function normalizeCustomExercises(list){
@@ -3699,6 +3713,7 @@ function mealsOn(date){ return S.meals.filter(m=>m.date===date); }
 function totals(date){ return mealsOn(date).reduce((a,m)=>({cal:a.cal+(+m.cal||0), protein:a.protein+(+m.protein||0), carbs:a.carbs+(+m.carbs||0), fat:a.fat+(+m.fat||0)}),{cal:0,protein:0,carbs:0,fat:0}); }
 function ensureMealPlans(){ if(!S.mealPlans || typeof S.mealPlans!=="object" || Array.isArray(S.mealPlans)) S.mealPlans={}; }
 const CLIENT_PLANS_KEY = "curlyGirlFitness.clientMealPlans.v1";
+const CLIENT_WORKOUTS_KEY = "curlyGirlFitness.clientWorkouts.v1";
 let trainerMealMode = "";
 let trainerMealPick = "";
 let trainerMealKind = "";
@@ -3906,9 +3921,9 @@ function syncMenu(){
   const split = document.querySelector("#navMenu .navsplit");
   if(split) split.hidden = client;
   if(client) $("libSub").hidden = true;
-  $("menuCheck").hidden = client;
+  $("menuCheck").hidden = false;
   $("menuBell").hidden = client;
-  $("menuAction").hidden = client;
+  $("menuAction").hidden = false;
   const canEdit = memberCanStyle();
   $("menuEdit").hidden = !canEdit;
   if(!canEdit){
@@ -5080,18 +5095,25 @@ $("todayPick").onclick = (e) => {
   $("todayPick").setAttribute("aria-expanded", menu.hidden?"false":"true");
   if($("toolScrim")) $("toolScrim").hidden = menu.hidden;
 };
-document.querySelectorAll("#dayMenu [data-shift]").forEach(b=>b.onclick=()=>{
-  diaryDate=addDays(todayStr(), +b.dataset.shift);
-  mealDate=diaryDate;
+function closeDayMenu(){
   $("dayMenu").hidden=true;
-  if(currentTab!=="today") go("today"); else render();
+  $("todayPick").setAttribute("aria-expanded","false");
+  if($("toolScrim") && $("addPanel").hidden && $("checkPanel").hidden && $("bellPanel").hidden) $("toolScrim").hidden=true;
+}
+function setDiaryDate(date){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date||"")) return;
+  diaryDate=date;
+  mealDate=date;
+  if(currentTab==="workout") woDate=date;
+  closeDayMenu();
+  render();
+}
+document.querySelectorAll("#dayMenu [data-shift]").forEach(b=>b.onclick=()=>{
+  setDiaryDate(addDays(todayStr(), +b.dataset.shift));
 });
 $("dayPick").onchange=()=>{
   if(!$("dayPick").value) return;
-  diaryDate=$("dayPick").value;
-  mealDate=diaryDate;
-  $("dayMenu").hidden=true;
-  if(currentTab!=="today") go("today"); else render();
+  setDiaryDate($("dayPick").value);
 };
 document.querySelectorAll("#tabbar [data-tabgo]").forEach(b=>b.onclick=()=>{
   const g=b.dataset.tabgo;
@@ -6250,8 +6272,18 @@ function mountHubPhoto(btn, src, alt){
 function mealIdeaHtml(attr){
   return MEAL_IDEAS.map(([type,label,key])=>`<button type="button" ${attr}="${type}">${photoTag(foodSrc(key), "", "strip")}<span>${label}</span></button>`).join("");
 }
+function workSeconds(target){
+  const text=String(target||"");
+  const secs=text.match(/(\d+)\s*s\b/i);
+  if(secs) return +secs[1];
+  const mins=text.match(/(\d+)\s*min/i);
+  if(mins) return (+mins[1])*60;
+  return 0;
+}
 function exerciseLogHtml(ex, state, token){
-  return `<div class="ex ${state.checked?"done":""}">${photoTag(workFileForName(ex.name),"","thumb")}<input type="checkbox" data-chk="${esc(token)}" ${state.checked?"checked":""} aria-label="Done: ${esc(ex.name)}"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div>${howtoLink(ex.name)}</div><div class="target">${esc(ex.target||"")}</div><input type="text" data-log="${esc(token)}" value="${esc(state.log||"")}" placeholder="${esc(logPlaceholder(ex.name))}"></div></div>`;
+  const secs=workSeconds(ex.target);
+  const timer=secs?`<button type="button" class="sm" data-wotimer="${secs}">Start ${secs}s</button>`:"";
+  return `<div class="ex ${state.checked?"done":""}">${photoTag(workFileForName(ex.name),"","thumb")}<input type="checkbox" data-chk="${esc(token)}" ${state.checked?"checked":""} aria-label="Done: ${esc(ex.name)}"><div class="grow"><div class="topline"><div class="name">${esc(ex.name)}</div>${howtoLink(ex.name)}</div><div class="target">${esc(ex.target||"")}</div>${timer}<input type="text" data-log="${esc(token)}" value="${esc(state.log||"")}" placeholder="${esc(logPlaceholder(ex.name))}"></div></div>`;
 }
 function ensurePlan(){
   if(S.plan) return S.plan;
@@ -6288,6 +6320,7 @@ function renderWorkout(){
   if(woView==="build" && !signedInTrainer()) woView="home";
   if(!signedInTrainer() && $("woClients")){ $("woClients").hidden = true; $("woClients").innerHTML = ""; woClientId = ""; woClientName = ""; }
   showWoViews();
+  pullAssignedWorkouts();
   if(woView==="editor") renderEditor();
   else if(signedInTrainer() && woView==="build") renderWoBuild();
   else renderWorkoutHome();
@@ -6336,6 +6369,8 @@ function renderWorkoutHome(){
     $("woDoneBtn").className = done ? "full" : "primary full";
   }
   if(document.activeElement!==$("woNotes")) $("woNotes").value = w.notes||"";
+  if($("woRestBtn")) $("woRestBtn").hidden = $("woDoneBtn").style.display==="none";
+  paintWoTimer();
   renderCustomCards();
 }
 function customCard(wo, date){
@@ -6694,6 +6729,10 @@ $("page-workout").addEventListener("click", e=>{
     editorDraft.exercises=editorDraft.exercises.filter(ex=>ex.id!==edrm.dataset.edrm);
     renderEditor(); return;
   }
+  const timed=e.target.closest("[data-wotimer]");
+  if(timed){ startWoTimer(+timed.dataset.wotimer||30); return; }
+  const load=e.target.closest("[data-woload]");
+  if(load){ loadSavedWorkout(load.dataset.woload); return; }
 });
 
 const WO_IDEA_NAMES = {upper:"Upper body strength", loss:"Weight-loss workout", none:"No equipment"};
@@ -6703,10 +6742,140 @@ const WO_PROMPTS = {
   none:"No-equipment workout"
 };
 const WO_TYPE_NOTES = {
-  regular:"Regular. A list of moves. Sets are not set.",
-  circuit:"Circuit. One round. Rounds are not set.",
-  interval:"Interval. Timed work. Times are not set."
+  regular:"Regular. Each move has sets and reps.",
+  circuit:"Circuit. Each move is 4 rounds.",
+  interval:"Interval. Each move is 30 seconds."
 };
+let woTimer = null;
+let woTimerLeft = 0;
+function paintWoTimer(){
+  const read=$("woRestRead");
+  const btn=$("woRestBtn");
+  if(read){
+    read.hidden = woTimerLeft<=0;
+    read.textContent = woTimerLeft>0 ? "Timer "+woTimerLeft+"s" : "";
+  }
+  if(btn && btn.style.display!=="none") btn.textContent = woTimerLeft>0 ? "Stop timer" : "Rest timer 60s";
+}
+function stopWoTimer(){
+  if(woTimer) clearInterval(woTimer);
+  woTimer = null;
+  woTimerLeft = 0;
+  paintWoTimer();
+}
+function startWoTimer(secs){
+  const n = Math.round(+secs||0);
+  if(n<=0) return;
+  if(woTimer) clearInterval(woTimer);
+  woTimerLeft = n;
+  paintWoTimer();
+  woTimer = setInterval(()=>{
+    woTimerLeft -= 1;
+    if(woTimerLeft<=0){ stopWoTimer(); toast("Time is up"); return; }
+    paintWoTimer();
+  }, 1000);
+}
+function clientWorkoutBucket(){
+  const raw = readStore(localStorage, CLIENT_WORKOUTS_KEY);
+  return raw && typeof raw==="object" && !Array.isArray(raw) ? raw : {};
+}
+function pullAssignedWorkouts(){
+  if(!ID.activePairId || signedInTrainer()) return;
+  const list = clientWorkoutBucket()[ID.activePairId];
+  if(!Array.isArray(list) || !list.length) return;
+  let changed = false;
+  list.forEach(row=>{
+    if(!row || !String(row.name||"").trim()) return;
+    const id = String(row.id||"");
+    if(S.customWorkouts.some(w=>w.id===id || String(w.name).toLowerCase()===String(row.name).toLowerCase())) return;
+    const exercises = Array.isArray(row.exercises) ? row.exercises.map(e=>({
+      id:String(e.id||uid()), name:String(e.name||"").trim(), target:String(e.target||""), kind:e.kind==="time"?"time":"reps"
+    })).filter(e=>e.name) : [];
+    S.customWorkouts.push({id:id||uid(), name:String(row.name).trim(), days:[], exercises:exercises});
+    changed = true;
+  });
+  if(changed) save();
+}
+function typedMove(ex){
+  if(woType==="circuit") return {name:ex.name, group:ex.group||"", target:"4 rounds", kind:"reps", custom:!!ex.custom};
+  if(woType==="interval") return {name:ex.name, group:ex.group||"", target:"30 s", kind:"time", custom:!!ex.custom};
+  const spec = defaultSets(ex);
+  return {name:ex.name, group:ex.group||"", target:spec.target, kind:spec.kind, custom:!!ex.custom};
+}
+function movesFromNames(names){
+  const seen = {};
+  const out = [];
+  (names||[]).forEach(n=>{
+    const key = String(n||"").trim().toLowerCase();
+    if(!key || seen[key]) return;
+    const ex = allExercises().find(e=>e.name.toLowerCase()===key);
+    if(!ex) return;
+    seen[key] = 1;
+    out.push(typedMove(ex));
+  });
+  return out;
+}
+function applyTypeToDraft(){
+  woDraftMoves = woDraftMoves.map(m=>{
+    const ex = allExercises().find(e=>e.name.toLowerCase()===moveName(m).toLowerCase()) || {name:moveName(m), group:(m&&m.group)||""};
+    return typedMove(ex);
+  });
+}
+function draftRecord(){
+  const name = ($("woPlanName") && $("woPlanName").value||"").trim() || ($("woPrompt") && $("woPrompt").value||"").trim() || "Workout";
+  const exercises = woDraftMoves.map(m=>({
+    id:uid(),
+    name:moveName(m),
+    target:(m&&m.target)||"",
+    kind:m&&m.kind==="time"?"time":"reps"
+  })).filter(e=>e.name);
+  return {name:name, exercises:exercises};
+}
+function saveDraftWorkout(){
+  const draft = draftRecord();
+  if(!draft.exercises.length){ toast("Add exercises first"); return null; }
+  const wo = {id:uid(), name:draft.name, days:[], clientId:woClientId||"", clientName:woClientName||"", exercises:draft.exercises};
+  const at = S.customWorkouts.findIndex(w=>w.name.toLowerCase()===wo.name.toLowerCase() && String(w.clientId||"")===String(wo.clientId||""));
+  if(at>=0){ wo.id = S.customWorkouts[at].id; S.customWorkouts[at] = wo; }
+  else S.customWorkouts.push(wo);
+  save();
+  return wo;
+}
+function assignDraftWorkout(){
+  if(!woClientId){ toast("Choose a client"); return; }
+  const wo = saveDraftWorkout();
+  if(!wo) return;
+  const all = clientWorkoutBucket();
+  const list = Array.isArray(all[woClientId]) ? all[woClientId].slice() : [];
+  const row = {id:wo.id, name:wo.name, exercises:wo.exercises, type:woType, assignedAt:Date.now()};
+  const i = list.findIndex(item=>String(item.name||"").toLowerCase()===wo.name.toLowerCase());
+  if(i>=0) list[i] = row; else list.push(row);
+  all[woClientId] = list;
+  localStorage.setItem(CLIENT_WORKOUTS_KEY, JSON.stringify(all));
+  toast("Assigned to "+(woClientName||"client"));
+  renderWoBuild();
+}
+function loadSavedWorkout(id){
+  const wo = S.customWorkouts.find(w=>w.id===id);
+  if(!wo) return;
+  if($("woPlanName")) $("woPlanName").value = wo.name;
+  woClientId = wo.clientId || "";
+  woClientName = wo.clientName || "";
+  woDraftMoves = (wo.exercises||[]).map(e=>({name:e.name, group:(findExercise(e.name)||{}).group||"", target:e.target||"", kind:e.kind||"reps"}));
+  woView = "build";
+  render();
+  toast("Opened "+wo.name);
+}
+function renderSavedWorkouts(){
+  const box = $("woSaved");
+  if(!box) return;
+  const list = S.customWorkouts||[];
+  if(!list.length){ box.innerHTML = ""; return; }
+  box.innerHTML = '<h2>Saved workouts</h2>'+list.map(w=>{
+    const who = w.clientName ? ' · '+esc(w.clientName) : "";
+    return '<button type="button" class="full" data-woload="'+esc(w.id)+'">'+esc(w.name)+who+'</button>';
+  }).join("");
+}
 let woClientName = "";
 function libraryMoves(idea){
   const list = allExercises();
@@ -6744,6 +6913,7 @@ function renderWoBuild(){
     $("woDraftEdit").onclick = () => useDraftInEditor();
   }
   paintWoClients();
+  renderSavedWorkouts();
 }
 async function paintWoClients(){
   const box = $("woClients");
@@ -6798,8 +6968,8 @@ async function draftFromLibrary(){
   const known = {};
   allExercises().forEach(e=>{ known[e.name.toLowerCase()] = e.name; });
   moves = moves.map(n=>known[String(n).toLowerCase()]).filter(Boolean);
-  if(!moves.length){ woDraftMoves = []; renderWoBuild(); toast("No library exercise matched"); return; }
-  woDraftMoves = moves.slice(0,6);
+  woDraftMoves = movesFromNames(moves).slice(0,6);
+  if(!woDraftMoves.length){ renderWoBuild(); toast("No library exercise matched"); return; }
   renderWoBuild();
 }
 function buildByHand(){
@@ -6828,11 +6998,13 @@ document.querySelectorAll("[data-woidea]").forEach(b=>b.onclick=()=>{
   if(prompt) prompt.value = WO_PROMPTS[woIdea] || "";
   const input = $("woPlanName");
   if(input && !input.value.trim()) input.value = WO_IDEA_NAMES[woIdea] || "";
-  woDraftMoves = [];
+  woDraftMoves = movesFromNames(libraryMoves(woIdea));
+  if(!woDraftMoves.length) toast("No library exercise matched");
   renderWoBuild();
 });
 document.querySelectorAll("[data-wotype]").forEach(b=>b.onclick=()=>{
   woType = b.dataset.wotype || "regular";
+  applyTypeToDraft();
   renderWoBuild();
 });
 const HELPER_CHIPS = [
@@ -6935,6 +7107,32 @@ $("helperSearch").oninput = () => renderHelperLibrary();
 $("helperLib").addEventListener("click", e=>{ if(e.target===$("helperLib")) finishHelper(false); });
 $("woDraftBtn").onclick = () => openHelperLibrary();
 $("woHandBtn").onclick = () => buildByHand();
+function namesFromPrompt(text){
+  const q = String(text||"").toLowerCase();
+  let chip = "";
+  if(/glute/.test(q)) chip = "glutes";
+  else if(/cardio|walk|run|loss/.test(q)) chip = "cardio";
+  else if(/core|\babs?\b/.test(q)) chip = "core";
+  else if(/upper|chest|back|shoulder|arm/.test(q)) chip = "upper";
+  else if(/lower|leg|squat/.test(q)) chip = "lower";
+  else if(/full/.test(q)) chip = "full";
+  if(chip) return allExercises().filter(e=>helperInChip(e, chip) && !e.custom).slice(0,6).map(e=>e.name);
+  return allExercises().filter(e=>e.name.toLowerCase().indexOf(q)>=0).slice(0,6).map(e=>e.name);
+}
+function buildFromPrompt(){
+  const prompt = ($("woPrompt").value||"").trim();
+  if(!prompt){ toast("Write a prompt"); $("woPrompt").focus(); return; }
+  woIdea = "";
+  const names = namesFromPrompt(prompt);
+  woDraftMoves = movesFromNames(names);
+  if(!woDraftMoves.length){ renderWoBuild(); toast("No library exercise matched"); return; }
+  if($("woPlanName") && !$("woPlanName").value.trim()) $("woPlanName").value = prompt.slice(0,60);
+  renderWoBuild();
+}
+$("woPromptBtn").onclick = () => buildFromPrompt();
+$("woSaveBtn").onclick = () => { if(saveDraftWorkout()){ toast("Workout saved"); renderWoBuild(); } };
+$("woAssignBtn").onclick = () => assignDraftWorkout();
+$("woRestBtn").onclick = () => { if(woTimerLeft>0) stopWoTimer(); else startWoTimer(60); };
 
 /* ---------- Weight ---------- */
 let chart=null;
