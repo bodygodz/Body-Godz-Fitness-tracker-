@@ -686,6 +686,12 @@ button.card{border-radius:var(--radius);overflow:hidden}
 .toolpanel .addpick:last-child{border-bottom:none}
 .checkrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);color:#0B0B39}
 .checkrow input{width:22px;height:22px;accent-color:#16a34a;flex:none;margin-top:2px}
+#page-checklist .tcheck{min-height:44px;align-items:center}
+#page-checklist .tcheck small{display:block;font-weight:600;color:#5c5878}
+#page-checklist .chkhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+#page-checklist .chkhead h2{margin:0}
+#page-checklist .chkmeta{font:600 13px/18px var(--font);color:#5c5878;flex:none}
+#page-checklist .bar{background:#FFFFFF}
 .checkrow b{display:block}
 .checkrow small{color:#0B0B39;font-weight:600}
 .eventfilters{display:flex;background:#FFFFFF;border-radius:8px;overflow:hidden;margin:0 0 12px}
@@ -2795,6 +2801,14 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
   </div>
 </section>
 
+<section class="page" id="page-checklist">
+  <div class="card">
+    <h2>Client care</h2>
+    <p class="note" id="checkCadence">Daily items clear each morning. Weekly items clear on Sunday. The rest stay checked until you clear them.</p>
+  </div>
+  <div id="trainerChecks"></div>
+</section>
+
 <!-- ============ EVENTS ============ -->
 <section class="page" id="page-events">
   <div class="card">
@@ -3931,7 +3945,7 @@ function customProgress(date, c){
 }
 
 /* ---------- Navigation ---------- */
-const TITLES = {overview:"Clients", clients:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You", librarynote:"Habits"};
+const TITLES = {overview:"Clients", clients:"Clients", today:"Today", meals:"Meals", workout:"Workout", library:"Library", weight:"Weight", photos:"Photos", checkin:"Check-in", bmi:"BMI", coach:"Coach", settings:"Settings", checklist:"Checklist", events:"Events", calendar:"Calendar", videos:"Videos", sessions:"Sessions", ask:"Ask AI", you:"You", librarynote:"Habits"};
 let currentTab = "today";
 let libraryNote = "habits";
 let diaryDate = todayStr();
@@ -3959,6 +3973,7 @@ function go(tab){
   if((tab==="overview" || tab==="clients" || tab==="librarynote") && !signedInTrainer()) tab="today";
   if(tab==="sessions" && !sessionsVisible()) tab="today";
   if(tab==="ask" && !signedInTrainer()) tab="today";
+  if(tab==="checklist" && !signedInTrainer()) tab="today";
   if(clientView() && !clientAllows(tab)) tab="today";
   currentTab = tab;
   document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active", p.id==="page-"+tab));
@@ -5289,7 +5304,7 @@ function chooseMenuRole(role){
   else render();
 }
 $("tabPlus").onclick = e => { e.stopPropagation(); openTool("add"); };
-$("menuCheck").onclick = (e) => { e.stopPropagation(); closeMenu(); openTool("check"); };
+$("menuCheck").onclick = (e) => { e.stopPropagation(); closeMenu(); if(signedInTrainer()) go("checklist"); else openTool("check"); };
 $("menuBell").onclick = (e) => { e.stopPropagation(); closeMenu(); openTool("bell"); };
 $("photosToCoach").onclick = () => go("coach");
 
@@ -10734,6 +10749,7 @@ function paintTools(){
   const ups=upcomingToday();
   $("toolDot").hidden=!ups.length;
   $("toolBell").setAttribute("aria-label", ups.length?`Notifications, ${ups.length} today`:"Notifications");
+  if($("toolCheck")) $("toolCheck").setAttribute("aria-label", signedInTrainer() ? "Trainer checklist" : "Today's workout checklist");
   if(!$("bellPanel").hidden) paintBell(ups);
   if(!$("checkPanel").hidden) paintCheck();
 }
@@ -10759,7 +10775,7 @@ if($("toolScrim")) $("toolScrim").onclick = () => {
   if($("ovAddForm")) $("ovAddForm").hidden = true;
 };
 $("toolPlus").onclick=e=>{ e.stopPropagation(); openTool("add"); };
-$("toolCheck").onclick=e=>{ e.stopPropagation(); openTool("check"); };
+$("toolCheck").onclick=e=>{ e.stopPropagation(); if(signedInTrainer()) go("checklist"); else openTool("check"); };
 $("toolBell").onclick=e=>{ e.stopPropagation(); openTool("bell"); };
 document.querySelectorAll("#addPanel [data-add]").forEach(b=>b.onclick=()=>{
   const which=b.dataset.add;
@@ -12743,6 +12759,145 @@ function onYouClick(e){
 }
 $("youBody").addEventListener("submit", onYouSubmit);
 $("youBody").addEventListener("click", onYouClick);
+const TRAINER_CHECK_KEY = "curlyGirlFitness.trainerChecklist.v1";
+const TRAINER_CHECK_SECTIONS = [
+  {id:"onboard", title:"New client onboarding"},
+  {id:"care", title:"Weekly client care"},
+  {id:"program", title:"Programming and progression"},
+  {id:"nutrition", title:"Nutrition support"},
+  {id:"talk", title:"Communication and accountability"},
+  {id:"safety", title:"Safety and liability"},
+  {id:"business", title:"Business and growth"},
+  {id:"grow", title:"Professional development"}
+];
+const TRAINER_CHECKS = [
+  {id:"on-welcome", sec:"onboard", cadence:"week", text:"Send a welcome note the day someone signs up"},
+  {id:"on-screen", sec:"onboard", cadence:"week", text:"Finish a health screen before the first workout"},
+  {id:"on-hold", sec:"onboard", cadence:"week", text:"Hold the first session if a yes needs a doctor’s OK"},
+  {id:"on-goals", sec:"onboard", cadence:"week", text:"Write their goal in their words, plus one clear target"},
+  {id:"on-measure", sec:"onboard", cadence:"week", text:"Take the baseline measurements they agree to"},
+  {id:"on-photos", sec:"onboard", cadence:"week", text:"Take starting photos only after a clear yes"},
+  {id:"on-limits", sec:"onboard", cadence:"week", text:"Note injuries, medications, and what a doctor already said"},
+  {id:"on-app", sec:"onboard", cadence:"week", text:"Show how to open the app, log a workout, and message you"},
+  {id:"on-week", sec:"onboard", cadence:"week", text:"Agree on session times, how you reply, and week one"},
+  {id:"on-book", sec:"onboard", cadence:"week", text:"Book the first real session before you hang up"},
+  {id:"care-read", sec:"care", cadence:"week", text:"Read each client’s check-in"},
+  {id:"care-reply", sec:"care", cadence:"week", text:"Reply to check-ins within a day"},
+  {id:"care-logs", sec:"care", cadence:"week", text:"Look through workout logs for missed sessions"},
+  {id:"care-flags", sec:"care", cadence:"week", text:"Notice pain, poor sleep, or a drop in effort"},
+  {id:"care-plan", sec:"care", cadence:"week", text:"Adjust next week’s plan from what you saw"},
+  {id:"care-note", sec:"care", cadence:"week", text:"Send one personal note that is not a template"},
+  {id:"care-win", sec:"care", cadence:"week", text:"Name one win, even a small one"},
+  {id:"care-miss", sec:"care", cadence:"week", text:"Reach out if a check-in or session was missed"},
+  {id:"pr-goal", sec:"program", cadence:"week", text:"Match the plan to the written goal"},
+  {id:"pr-learn", sec:"program", cadence:"week", text:"Keep a new client at a load they can learn"},
+  {id:"pr-progress", sec:"program", cadence:"week", text:"Add load only when recent sessions looked solid"},
+  {id:"pr-swap", sec:"program", cadence:"week", text:"Swap a move that hurts or that they dread"},
+  {id:"pr-warm", sec:"program", cadence:"week", text:"Plan a warm-up that matches the first exercise"},
+  {id:"pr-easy", sec:"program", cadence:"week", text:"Leave one easier day in the week"},
+  {id:"pr-write", sec:"program", cadence:"week", text:"Write loads and reps in the app before the session"},
+  {id:"pr-month", sec:"program", cadence:"week", text:"Revisit the goal once a month and change the plan if it no longer fits"},
+  {id:"nu-ask", sec:"nutrition", cadence:"week", text:"Ask what they actually eat before suggesting a change"},
+  {id:"nu-goal", sec:"nutrition", cadence:"week", text:"Tie food advice to the goal in plain language"},
+  {id:"nu-pro", sec:"nutrition", cadence:"week", text:"Suggest a simple protein portion at meals when protein is low"},
+  {id:"nu-water", sec:"nutrition", cadence:"week", text:"Remind them to drink water on training days"},
+  {id:"nu-scope", sec:"nutrition", cadence:"week", text:"Skip medical diets, disease meal plans, and supplements as treatment"},
+  {id:"nu-rd", sec:"nutrition", cadence:"week", text:"Send clinical nutrition questions to a registered dietitian"},
+  {id:"tk-inbox", sec:"talk", cadence:"day", text:"Clear unread client messages"},
+  {id:"tk-today", sec:"talk", cadence:"day", text:"Confirm today’s sessions are still on"},
+  {id:"tk-checkin", sec:"talk", cadence:"week", text:"Send the weekly check-in on the same day each week"},
+  {id:"tk-channel", sec:"talk", cadence:"week", text:"Answer in the channel you agreed on"},
+  {id:"tk-hard", sec:"talk", cadence:"week", text:"Tell them what to expect before a hard session"},
+  {id:"tk-coach", sec:"talk", cadence:"week", text:"Ask how coaching is going, not only the workouts"},
+  {id:"tk-quiet", sec:"talk", cadence:"week", text:"Note when someone goes quiet for several days"},
+  {id:"sf-cpr", sec:"safety", cadence:"keep", text:"CPR and AED card is current"},
+  {id:"sf-ins", sec:"safety", cadence:"keep", text:"Liability insurance is paid and covers how you train"},
+  {id:"sf-ice", sec:"safety", cadence:"keep", text:"Emergency contact is on file for each client"},
+  {id:"sf-plan", sec:"safety", cadence:"keep", text:"You know the facility emergency plan"},
+  {id:"sf-stop", sec:"safety", cadence:"keep", text:"Stop a session for chest pain, dizziness, or sharp joint pain"},
+  {id:"sf-scope", sec:"safety", cadence:"keep", text:"Do not diagnose pain or change a doctor’s limits"},
+  {id:"bz-lead", sec:"business", cadence:"week", text:"Follow up with a quiet prospect"},
+  {id:"bz-quote", sec:"business", cadence:"week", text:"Ask a happy client for a short testimonial"},
+  {id:"bz-refer", sec:"business", cadence:"week", text:"Ask one client if they know someone who wants training"},
+  {id:"bz-post", sec:"business", cadence:"week", text:"Post one useful tip, not a hard sell"},
+  {id:"bz-pack", sec:"business", cadence:"week", text:"Check who is near the end of their package"},
+  {id:"bz-thanks", sec:"business", cadence:"week", text:"Thank a client who referred someone"},
+  {id:"bz-quiet", sec:"business", cadence:"week", text:"Review who you have not heard from this week"},
+  {id:"gr-cert", sec:"grow", cadence:"keep", text:"Certification is inside its renewal window"},
+  {id:"gr-ceu", sec:"grow", cadence:"keep", text:"CEUs are logged toward the next renewal"},
+  {id:"gr-skill", sec:"grow", cadence:"keep", text:"Read or watch one coaching skill this month"},
+  {id:"gr-cue", sec:"grow", cadence:"keep", text:"Practice one cue you want to say more clearly"},
+  {id:"gr-line", sec:"grow", cadence:"keep", text:"Know the line between training and medical care"},
+  {id:"gr-copy", sec:"grow", cadence:"keep", text:"Keep a copy of your certificate where you can find it"}
+];
+function checklistWeekKey(dateStr){
+  const d = parseYmd(dateStr || todayStr());
+  d.setDate(d.getDate() - d.getDay());
+  return ymd(d);
+}
+function loadTrainerChecks(){
+  const raw = readStore(localStorage, TRAINER_CHECK_KEY);
+  const bag = raw && typeof raw==="object" && !Array.isArray(raw) ? raw : {};
+  const key = avatarOwnerKey();
+  const row = bag[key] && typeof bag[key]==="object" ? bag[key] : {};
+  row.days = row.days && typeof row.days==="object" && !Array.isArray(row.days) ? row.days : {};
+  row.weeks = row.weeks && typeof row.weeks==="object" && !Array.isArray(row.weeks) ? row.weeks : {};
+  row.keep = row.keep && typeof row.keep==="object" && !Array.isArray(row.keep) ? row.keep : {};
+  return {bag, key, row};
+}
+function checklistSlot(row, item, create){
+  if(item.cadence==="day"){
+    const k = todayStr();
+    if(create && (!row.days[k] || typeof row.days[k]!=="object")) row.days[k] = {};
+    return row.days[k] || {};
+  }
+  if(item.cadence==="week"){
+    const k = checklistWeekKey();
+    if(create && (!row.weeks[k] || typeof row.weeks[k]!=="object")) row.weeks[k] = {};
+    return row.weeks[k] || {};
+  }
+  return row.keep;
+}
+function pruneTrainerChecks(row){
+  const cutoff = addDays(todayStr(), -21);
+  Object.keys(row.days).forEach(k=>{ if(k < cutoff) delete row.days[k]; });
+  Object.keys(row.weeks).forEach(k=>{ if(k < cutoff) delete row.weeks[k]; });
+}
+function saveTrainerChecks(bag){
+  try { localStorage.setItem(TRAINER_CHECK_KEY, JSON.stringify(bag)); } catch(e){}
+}
+function renderChecklist(){
+  if(!signedInTrainer()){ if(currentTab==="checklist") go("today"); return; }
+  $("hdrSub").textContent = "How you take care of clients";
+  const host = $("trainerChecks");
+  if(!host) return;
+  const {row} = loadTrainerChecks();
+  host.innerHTML = TRAINER_CHECK_SECTIONS.map(sec=>{
+    const items = TRAINER_CHECKS.filter(it=>it.sec===sec.id);
+    const done = items.filter(it=>!!checklistSlot(row, it)[it.id]).length;
+    const pct = items.length ? Math.round(done / items.length * 100) : 0;
+    const rows = items.map(it=>{
+      const on = !!checklistSlot(row, it)[it.id];
+      const label = it.cadence==="day" ? "Today" : it.cadence==="week" ? "This week" : "Stays checked";
+      return `<label class="checkrow tcheck"><input type="checkbox" data-tcheck="${esc(it.id)}" ${on?"checked":""}><span><b>${esc(it.text)}</b><small>${label}</small></span></label>`;
+    }).join("");
+    return `<div class="card"><div class="chkhead"><h2>${esc(sec.title)}</h2><span class="chkmeta">${done} of ${items.length}</span></div><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${items.length}" aria-valuenow="${done}" aria-label="${esc(sec.title)}"><div style="width:${pct}%"></div></div>${rows}</div>`;
+  }).join("");
+}
+if($("trainerChecks")) $("trainerChecks").addEventListener("change", e=>{
+  const t = e.target;
+  if(!t.matches || !t.matches("[data-tcheck]")) return;
+  const item = TRAINER_CHECKS.find(it=>it.id===t.dataset.tcheck);
+  if(!item || !signedInTrainer()) return;
+  const loaded = loadTrainerChecks();
+  pruneTrainerChecks(loaded.row);
+  const slot = checklistSlot(loaded.row, item, true);
+  if(t.checked) slot[item.id] = true;
+  else delete slot[item.id];
+  loaded.bag[loaded.key] = loaded.row;
+  saveTrainerChecks(loaded.bag);
+  renderChecklist();
+});
 function render(){
   if(currentTab!=="coach") document.body.classList.remove("client-file");
   document.body.classList.toggle("ov-home", currentTab==="overview" && signedInTrainer());
@@ -12751,7 +12906,7 @@ function render(){
   paintHeader();
   paintSubbar();
   applyMemberLook();
-  ({overview:renderOverview, clients:renderClientGroups, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou, librarynote:renderLibraryNote})[currentTab]();
+  ({overview:renderOverview, clients:renderClientGroups, today:renderToday, meals:renderMeals, workout:renderWorkout, library:renderLibraryPage, weight:renderWeight, photos:renderPhotos, checkin:renderCheckin, bmi:renderBmi, coach:renderCoach, settings:renderSettings, checklist:renderChecklist, events:renderEvents, calendar:renderCalendar, videos:renderVideos, sessions:renderSessions, ask:renderAsk, you:renderYou, librarynote:renderLibraryNote})[currentTab]();
   if(typeof updateDemoBanner==="function") updateDemoBanner();
   paintTools();
 }
