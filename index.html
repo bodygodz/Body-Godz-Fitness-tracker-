@@ -1471,8 +1471,8 @@ body:not(.welcome-on) .card h2{font:600 18px/24px var(--font) !important; text-t
   font:600 14px/20px var(--font) !important; color:#0B0B39 !important;
 }
 .chip.sel,button.chip.sel,.chip[aria-pressed="true"]{background:#563DD2 !important; border-color:#563DD2 !important; color:#fff !important}
-.segment button.chip,.segment button.chip.sel{border-color:transparent !important; min-height:44px}
-.segment button.chip.sel{background:#fff !important; color:#0B0B39 !important}
+.segment button.chip{background:transparent !important; color:#0B0B39 !important; border-color:transparent !important; box-shadow:none !important; min-height:44px}
+.segment button.chip.sel{background:#fff !important; color:#0B0B39 !important; border-color:transparent !important; box-shadow:0 1px 2px rgba(11,11,57,.18), 0 0 0 1px rgba(11,11,57,.12) !important}
 .pill.ok,.badge--done{background:var(--accent-16) !important; color:#563DD2 !important}
 .pill.no,.badge--todo{background:var(--fill-1) !important; color:var(--text-2) !important}
 .foodrow .mark{display:none !important}
@@ -12775,10 +12775,20 @@ $("welcomeWeek").onclick = () => { showWelcome("login"); toast("Log in to open t
 $("welcomeTrainer").onclick = () => showWelcome("signup");
 $("welcomeStudio").onclick = () => showWelcome("signup");
 document.querySelectorAll("#signupRoles [data-role]").forEach(btn=>{
-  btn.onclick = () => { signupRole = btn.dataset.role; paintSignupRole(); };
+  btn.onclick = () => {
+    signupRole = btn.dataset.role;
+    loginRole = signupRole;
+    paintSignupRole();
+    paintLoginRole();
+  };
 });
 document.querySelectorAll("#loginRoles [data-loginrole]").forEach(btn=>{
-  btn.onclick = () => { loginRole = btn.dataset.loginrole; paintLoginRole(); };
+  btn.onclick = () => {
+    loginRole = btn.dataset.loginrole;
+    signupRole = loginRole;
+    paintLoginRole();
+    paintSignupRole();
+  };
 });
 $("signupForm").onsubmit = (e) => {
   e.preventDefault();
