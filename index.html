@@ -704,7 +704,7 @@ button.card{border-radius:var(--radius);overflow:hidden}
 .calgrid button.today{box-shadow:inset 0 0 0 2px #563DD2}
 .calgrid button.sel{background:#563DD2;color:#fff}
 .calgrid button.mark::after{content:"";position:absolute;left:50%;bottom:4px;width:6px;height:6px;border-radius:50%;background:#563DD2;transform:translateX(-50%)}
-.calgrid button.sel.mark::after{background:#0B0B39}
+.calgrid button.sel.mark::after{background:#fff}
 body.welcome-on #tabbar,body.welcome-on #subbar,body.welcome-on .streak,body.welcome-on #todayPick,body.welcome-on #dayMenu{display:none !important}
 body:not(.welcome-on) .brandline{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
@@ -1569,6 +1569,14 @@ details summary::-webkit-details-marker{display:none}
 #helperLib .helperhit.sel{background:#F3F0FF;border-color:#563DD2;box-shadow:inset 0 0 0 1px #563DD2}
 #helperLib .helperhit.sel .mark{background:#563DD2;border-color:#563DD2;box-shadow:inset 0 0 0 3px #fff}
 #helperAdd{flex:none}
+#calSheet{z-index:80}
+#calSheet .modalbox{display:flex;flex-direction:column;gap:10px;max-height:min(88dvh,760px)}
+#calSheetList{display:flex;flex-direction:column}
+.calitem{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;background:#fff;color:#0B0B39;border:1px solid #E4E2EB;border-radius:14px;padding:12px 14px;margin:0 0 8px;min-height:44px;box-shadow:none}
+.calitem b{font:600 15px/20px var(--font);color:#0B0B39}
+.calitem small{display:block;font:500 13px/18px var(--font);color:#5c5878}
+#calForm[hidden],#calDeleteBtn[hidden],#calClientWrap[hidden]{display:none !important}
+#calDayAdd{margin-top:8px}
 body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#563DD2 !important;box-shadow:inset 0 0 0 1px #563DD2}
 #woSaved{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 #woSaved h2{margin:8px 0 0}
@@ -2778,6 +2786,7 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
   <div class="card" id="calDayCard">
     <h2 id="calDayTitle"></h2>
     <div id="calDayBody"></div>
+    <button type="button" class="btn-secondary full" id="calDayAdd">Add</button>
   </div>
 </section>
 
@@ -3180,6 +3189,35 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
     <p class="note" id="helperNote">Tap an exercise to add it to this workout.</p>
     <div id="helperList"></div>
     <button type="button" class="primary full" id="helperAdd">Add selected</button>
+  </div>
+</div>
+
+<div class="modalback" id="calSheet" role="dialog" aria-modal="true" aria-labelledby="calSheetTitle">
+  <div class="modalbox">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="calSheetTitle"></h2>
+      <button type="button" class="sm ghost" id="calSheetClose">Done</button>
+    </div>
+    <div id="calSheetList"></div>
+    <button type="button" class="primary full" id="calAddBtn">Add</button>
+    <form id="calForm" hidden>
+      <p class="note" id="calFormTitle">Add</p>
+      <div class="field"><label class="f" for="calItemTitle">Title</label><input id="calItemTitle" maxlength="80" placeholder="What you need to do" autocomplete="off"></div>
+      <div class="row">
+        <div class="field"><label class="f" for="calStart">Start</label><input type="time" id="calStart" value="09:00"></div>
+        <div class="field"><label class="f" for="calEnd">End</label><input type="time" id="calEnd"></div>
+      </div>
+      <div class="field"><label class="f" for="calNotes">Notes</label><textarea id="calNotes" maxlength="400" rows="3" placeholder="Optional"></textarea></div>
+      <div class="field" id="calClientWrap" hidden>
+        <label class="f" for="calClient">Client</label>
+        <select id="calClient"><option value="">No client</option></select>
+      </div>
+      <div class="row">
+        <button type="button" class="full" id="calFormCancel">Cancel</button>
+        <button type="submit" class="primary full" id="calSaveBtn">Save</button>
+      </div>
+      <button type="button" class="danger full" id="calDeleteBtn" hidden>Delete</button>
+    </form>
   </div>
 </div>
 
@@ -10134,45 +10172,244 @@ function showEventForm(open){
   if(!$("evDate").value) $("evDate").value=todayStr();
   $("evName").focus();
 }
+const CAL_KEY = "curlyGirlFitness.calendar.v1";
+let calEditing = "";
+let calPullStarted = false;
+let calClientToken = 0;
+function calOwnerKey(){
+  const auth = typeof currentAuth==="function" ? currentAuth() : null;
+  if(auth && auth.email) return String(auth.email).toLowerCase()+":"+(auth.role||"account");
+  if(auth && auth.id) return "acct:"+auth.id;
+  const device = (typeof ID!=="undefined" && ID && ID.deviceId) ? ID.deviceId : "local";
+  return "device:"+device;
+}
+function normalizeCalItem(raw){
+  if(!raw || typeof raw!=="object") return null;
+  const title = String(raw.title||"").trim().slice(0,80);
+  const date = String(raw.date||"");
+  if(!title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const st = String(raw.start||"").match(/^(\d{2}):(\d{2})/);
+  if(!st) return null;
+  const en = String(raw.end||"").match(/^(\d{2}):(\d{2})/);
+  const id = String(raw.id||"").trim() || (Date.now().toString(36)+Math.random().toString(36).slice(2,7));
+  return {
+    id:id.slice(0,40),
+    date,
+    title,
+    start:st[1]+":"+st[2],
+    end:en ? en[1]+":"+en[2] : "",
+    notes:String(raw.notes||"").trim().slice(0,400),
+    clientId:String(raw.clientId||"").slice(0,80),
+    clientName:String(raw.clientName||"").slice(0,80)
+  };
+}
+function calBag(){
+  const raw = readStore(localStorage, CAL_KEY);
+  return raw && typeof raw==="object" && !Array.isArray(raw) ? raw : {};
+}
+function loadCalItems(){
+  const list = calBag()[calOwnerKey()];
+  return Array.isArray(list) ? list.map(normalizeCalItem).filter(Boolean) : [];
+}
+function writeCalItems(list, push){
+  const bag = calBag();
+  bag[calOwnerKey()] = list;
+  try { localStorage.setItem(CAL_KEY, JSON.stringify(bag)); } catch(e){}
+  try { localStorage.setItem("curlyGirlFitness.lastSave.v1", String(Date.now())); } catch(e){}
+  if(push) pushCalendarItems(list);
+}
+function calItemsOn(date){
+  return loadCalItems().filter(it=>it.date===date).sort((a,b)=>a.start.localeCompare(b.start)||a.title.localeCompare(b.title));
+}
+function calWhen(it){
+  const start = fmtTime(it.start);
+  return it.end ? start+" – "+fmtTime(it.end) : start;
+}
+function calFromRow(row){
+  if(!row) return null;
+  return normalizeCalItem({
+    id:row.id,
+    date:String(row.day||"").slice(0,10),
+    title:row.title,
+    start:row.start_time,
+    end:row.end_time,
+    notes:row.notes,
+    clientId:row.client_id,
+    clientName:row.client_name
+  });
+}
+function pushCalendarItems(list){
+  Promise.resolve().then(()=>pushCalendarItemsAsync(list)).catch(()=>{});
+}
+async function pushCalendarItemsAsync(list){
+  if(typeof authKeyReady!=="function" || !authKeyReady()) return;
+  const session = await authSession();
+  if(!session || !session.user) return;
+  const owner = session.user.id;
+  const rows = list.map(it=>({
+    id:it.id, owner_id:owner, day:it.date, title:it.title,
+    start_time:it.start, end_time:it.end||"", notes:it.notes||"",
+    client_id:it.clientId||"", client_name:it.clientName||""
+  }));
+  if(rows.length){
+    await sbAuth("calendar_items?on_conflict=id", {method:"POST", prefer:"resolution=merge-duplicates", body:rows});
+  }
+  const existing = await sbAuth("calendar_items?owner_id=eq."+encodeURIComponent(owner)+"&select=id");
+  if(!Array.isArray(existing)) return;
+  const keep = {};
+  list.forEach(it=>{ keep[it.id]=true; });
+  for(const row of existing){
+    if(row && row.id && !keep[row.id]) await sbAuth("calendar_items?id=eq."+encodeURIComponent(row.id), {method:"DELETE"});
+  }
+}
+async function pullCalendarItems(){
+  try{
+    if(typeof authKeyReady!=="function" || !authKeyReady()) return;
+    const session = await authSession();
+    if(!session || !session.user) return;
+    const rows = await sbAuth("calendar_items?owner_id=eq."+encodeURIComponent(session.user.id)+"&select=*");
+    if(!Array.isArray(rows) || !rows.length) return;
+    const byId = {};
+    loadCalItems().forEach(it=>{ byId[it.id]=it; });
+    rows.forEach(row=>{ const it=calFromRow(row); if(it) byId[it.id]=it; });
+    writeCalItems(Object.keys(byId).map(k=>byId[k]), false);
+    if(typeof currentTab!=="undefined" && currentTab==="calendar"){
+      renderCalendar();
+      if($("calSheet") && $("calSheet").style.display==="flex") paintCalList();
+    }
+  }catch(e){}
+}
+function closeCalSheet(){
+  const sheet=$("calSheet");
+  if(sheet) sheet.style.display="none";
+  calEditing="";
+  if($("calForm")) $("calForm").hidden=true;
+}
+function paintCalList(){
+  const box=$("calSheetList");
+  if(!box) return;
+  const items=calItemsOn(calSelected);
+  if(!items.length){
+    box.innerHTML='<div class="empty"><p class="empty__body">Nothing on this day yet.</p></div>';
+    return;
+  }
+  box.innerHTML=items.map(it=>{
+    const who=it.clientName ? " · "+esc(it.clientName) : "";
+    const notes=it.notes ? "<small>"+esc(it.notes)+"</small>" : "";
+    return '<button type="button" class="calitem" data-calitem="'+esc(it.id)+'"><b>'+esc(it.title)+'</b><small>'+esc(calWhen(it))+who+'</small>'+notes+'</button>';
+  }).join("");
+  box.querySelectorAll("[data-calitem]").forEach(b=>{ b.onclick=()=>fillCalForm(b.dataset.calitem); });
+}
+async function paintCalClients(preferId){
+  const wrap=$("calClientWrap");
+  if(!wrap) return;
+  if(typeof signedInTrainer!=="function" || !signedInTrainer()){ wrap.hidden=true; return; }
+  wrap.hidden=false;
+  const token=++calClientToken;
+  let pairs=[];
+  try{ pairs=await Link.pairsForTrainer(); }catch(e){ pairs=[]; }
+  if(token!==calClientToken) return;
+  const sel=$("calClient");
+  const cur=preferId!=null ? preferId : (sel.value||"");
+  sel.innerHTML='<option value="">No client</option>'+pairs.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.clientName||"Client")+'</option>').join("");
+  if(cur && Array.from(sel.options).some(o=>o.value===cur)) sel.value=cur;
+}
+function fillCalForm(id){
+  const item=id ? loadCalItems().find(x=>x.id===id) : null;
+  calEditing=item ? item.id : "";
+  $("calForm").hidden=false;
+  $("calFormTitle").textContent=item ? "Edit" : "Add";
+  $("calItemTitle").value=item ? item.title : "";
+  $("calStart").value=item ? item.start : "09:00";
+  $("calEnd").value=item && item.end ? item.end : "";
+  $("calNotes").value=item ? item.notes : "";
+  $("calDeleteBtn").hidden=!item;
+  paintCalClients(item ? item.clientId : "");
+  $("calItemTitle").focus();
+}
+function openCalSheet(mode){
+  if(!$("calSheet") || !calSelected) return;
+  $("calSheetTitle").textContent=fmtDate(calSelected,{weekday:"long",month:"long",day:"numeric"});
+  paintCalList();
+  $("calSheet").style.display="flex";
+  if(mode && mode.editId) fillCalForm(mode.editId);
+  else if(mode && mode.add) fillCalForm("");
+  else { calEditing=""; $("calForm").hidden=true; }
+}
+function saveCalForm(e){
+  if(e) e.preventDefault();
+  const title=$("calItemTitle").value.trim();
+  const start=String($("calStart").value||"").slice(0,5);
+  const end=String($("calEnd").value||"").slice(0,5);
+  if(!title){ toast("Add a title"); $("calItemTitle").focus(); return; }
+  if(!/^\d{2}:\d{2}$/.test(start)){ toast("Pick a start time"); $("calStart").focus(); return; }
+  if(end && !/^\d{2}:\d{2}$/.test(end)){ toast("Check the end time"); return; }
+  if(end && end<=start){ toast("End time needs to be later"); $("calEnd").focus(); return; }
+  let clientId="", clientName="";
+  if($("calClientWrap") && !$("calClientWrap").hidden){
+    clientId=$("calClient").value||"";
+    const opt=$("calClient").selectedOptions && $("calClient").selectedOptions[0];
+    if(clientId && opt) clientName=opt.textContent||"";
+  }
+  const item=normalizeCalItem({id:calEditing, date:calSelected, title, start, end, notes:$("calNotes").value, clientId, clientName});
+  if(!item){ toast("Check the title and time"); return; }
+  const list=loadCalItems().filter(x=>x.id!==item.id);
+  list.push(item);
+  writeCalItems(list, true);
+  calEditing="";
+  $("calForm").hidden=true;
+  renderCalendar();
+  paintCalList();
+  toast("Saved");
+}
+function deleteCalItem(){
+  if(!calEditing) return;
+  writeCalItems(loadCalItems().filter(x=>x.id!==calEditing), true);
+  calEditing="";
+  $("calForm").hidden=true;
+  renderCalendar();
+  paintCalList();
+  toast("Deleted");
+}
 function renderCalendar(){
   if(!calCursor){ const n=new Date(); calCursor=new Date(n.getFullYear(), n.getMonth(), 1); }
   if(!calSelected) calSelected=todayStr();
+  if(!calPullStarted){ calPullStarted=true; pullCalendarItems(); }
   const y=calCursor.getFullYear(), m=calCursor.getMonth();
   $("hdrTitle").textContent="Calendar";
-  $("hdrSub").textContent="Events and logged workouts";
+  $("hdrSub").textContent="Tap a day to plan it";
   $("calTitle").textContent=calCursor.toLocaleDateString(undefined,{month:"long",year:"numeric"});
   const first=new Date(y,m,1).getDay();
   const days=new Date(y,m+1,0).getDate();
   const today=todayStr();
+  const agenda=loadCalItems();
   let html=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map(d=>`<div class="dow">${d}</div>`).join("");
   for(let i=0;i<first;i++) html+='<button type="button" class="out" tabindex="-1"></button>';
   for(let day=1;day<=days;day++){
     const date=y+"-"+pad(m+1)+"-"+pad(day);
-    const mark=eventsOn(date).length || hasLoggedWorkout(date);
+    const mark=eventsOn(date).length || hasLoggedWorkout(date) || agenda.some(it=>it.date===date);
     const cls=(date===today?" today":"")+(date===calSelected?" sel":"")+(mark?" mark":"");
     html+=`<button type="button" class="${cls.trim()}" data-calday="${date}">${day}</button>`;
   }
   $("calGrid").innerHTML=html;
-  $("calGrid").querySelectorAll("[data-calday]").forEach(b=>b.onclick=()=>{ calSelected=b.dataset.calday; renderCalendar(); });
+  $("calGrid").querySelectorAll("[data-calday]").forEach(b=>b.onclick=()=>{ calSelected=b.dataset.calday; renderCalendar(); openCalSheet(); });
   const p=planFor(calSelected);
   const w=woEntry(calSelected);
   const evs=eventsOn(calSelected);
-  const workoutBits=[];
-  if(p.rest && !scheduledCustoms(calSelected).length) workoutBits.push("Rest day");
-  else {
-    const done=p.exercises.filter(ex=>exState(w, ex.id).checked).length;
-    workoutBits.push(esc(p.title)+(p.exercises.length?` · ${done}/${p.exercises.length} checked`:""));
-  }
-  scheduledCustoms(calSelected).forEach(c=>workoutBits.push(esc(customProgress(calSelected, c))));
   $("calDayTitle").textContent=fmtDate(calSelected,{weekday:"long",month:"long",day:"numeric"});
   const items=[];
+  calItemsOn(calSelected).forEach(it=>{
+    const who=it.clientName ? " · "+esc(it.clientName) : "";
+    items.push('<button type="button" class="calitem" data-calopen="'+esc(it.id)+'"><b>'+esc(it.title)+'</b><small>'+esc(calWhen(it))+who+'</small></button>');
+  });
   if(!(p.rest && !scheduledCustoms(calSelected).length)){
     const done=p.exercises.filter(ex=>exState(w, ex.id).checked).length;
     items.push(`<div class="checkrow"><span><b>${esc(p.title||"Workout")}</b><small>${p.exercises.length?done+"/"+p.exercises.length+" checked":"Scheduled"}</small></span></div>`);
   }
   scheduledCustoms(calSelected).forEach(c=>items.push(`<div class="checkrow"><span><b>${esc(c.name||"Workout")}</b><small>${esc(customProgress(calSelected, c))}</small></span></div>`));
   evs.forEach(ev=>items.push(`<div class="checkrow"><span><b>${esc(ev.name)}</b><small>${esc(fmtTime(ev.time))} · ${ev.length} min · ${ev.mode==="virtual"?"Virtual":"In person"} · ${ev.spots} spots</small></span></div>`));
-  $("calDayBody").innerHTML = items.length ? items.join("") : '<div class="empty"><p class="empty__body">No workouts or events.</p></div>';
+  $("calDayBody").innerHTML = items.length ? items.join("") : '<div class="empty"><p class="empty__body">Nothing on this day yet.</p></div>';
+  $("calDayBody").querySelectorAll("[data-calopen]").forEach(b=>{ b.onclick=()=>openCalSheet({editId:b.dataset.calopen}); });
 }
 function closeTools(){
   ["addPanel","checkPanel","bellPanel"].forEach(id=>{ $(id).hidden=true; });
@@ -10296,8 +10533,15 @@ $("page-events").addEventListener("click", e=>{
   toast("Event deleted");
   render();
 });
-$("calPrev").onclick=()=>{ calCursor=new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1); renderCalendar(); };
-$("calNext").onclick=()=>{ calCursor=new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1); renderCalendar(); };
+$("calPrev").onclick=()=>{ calCursor=new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1); closeCalSheet(); renderCalendar(); };
+$("calNext").onclick=()=>{ calCursor=new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1); closeCalSheet(); renderCalendar(); };
+$("calDayAdd").onclick=()=>{ if(!calSelected) calSelected=todayStr(); openCalSheet({add:true}); };
+$("calAddBtn").onclick=()=>fillCalForm("");
+$("calFormCancel").onclick=()=>{ calEditing=""; $("calForm").hidden=true; };
+$("calForm").onsubmit=saveCalForm;
+$("calDeleteBtn").onclick=deleteCalItem;
+$("calSheetClose").onclick=closeCalSheet;
+$("calSheet").addEventListener("click", e=>{ if(e.target===$("calSheet")) closeCalSheet(); });
 document.addEventListener("click", e=>{
   if(e.target.closest("#appTools") || e.target.closest("#tabPlus")) return;
   closeTools();
