@@ -1407,7 +1407,13 @@ body:not(.welcome-on) #todayPick svg{width:16px; height:16px}
 }
 #page-overview .ovbar{display:none !important}
 #page-overview.active{display:flex; flex-direction:column}
-#page-overview .ovsections{order:-1; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px; padding:4px; margin:16px 16px 0; background:var(--fill-1); border-radius:12px; height:48px}
+#page-overview .ovsections{order:-2; display:grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:4px; padding:4px; margin:16px 16px 0; background:var(--fill-1); border-radius:12px; height:48px}
+#page-overview .ovfilterwrap{order:-1; display:flex; flex-direction:column; margin:12px 16px 0}
+#page-overview .ovfilterbtn{display:flex; align-items:center; gap:8px; width:100%; min-height:48px; padding:0 14px; border:1.5px solid #E6E2F0 !important; border-radius:12px; background:#fff; color:#0B0B39; font:600 15px/20px var(--font); text-align:left}
+#page-overview .ovfilterbtn svg{width:22px; height:22px; stroke:currentColor; fill:none; flex:none}
+#page-overview .ovfilterbtn[aria-expanded="true"]{border-color:#6E5F96 !important; color:#6E5F96}
+#page-overview .ovfilterwrap .ovfilter{margin-top:8px}
+#page-overview .ovfilter button{min-height:44px; padding:0 10px; font:600 15px/20px var(--font)}
 #page-overview .ovsections button{border:0 !important; border-radius:8px; background:transparent; font:600 14px/20px var(--font); color:var(--text-2); text-transform:none; min-height:40px}
 #page-overview .ovsections button.sel{background:#fff; color:#0B0B39; box-shadow:var(--e-1)}
 #page-overview .ovlead{font:600 18px/24px var(--font); margin:0 0 4px}
@@ -2049,7 +2055,6 @@ body:not(.welcome-on) .wotype.sel{background:#E6E2F0 !important;border-color:#6E
     <button type="button" class="ovicon" id="ovMenu" aria-label="Open menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
     <h1 class="ovtitle">Clients</h1>
     <button type="button" class="ovadd" id="ovAdd" aria-label="Add a client"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-    <button type="button" class="ovicon" id="ovFilter" aria-label="Filter groups" aria-expanded="false" aria-controls="ovFilterMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/><circle cx="9" cy="7" r="1.7" fill="#0B0B39" stroke="none"/><circle cx="16" cy="12" r="1.7" fill="#0B0B39" stroke="none"/><circle cx="11" cy="17" r="1.7" fill="#0B0B39" stroke="none"/></svg></button>
     <button type="button" class="ovicon" id="ovBell" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15L6 16z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span class="bellbadge" id="ovBadge" hidden>0</span></button>
     <button type="button" class="ovicon ovhelp" id="ovHelp" aria-label="Help">?</button>
     <img class="ovme" id="ovMe" alt="" hidden>
@@ -2061,11 +2066,14 @@ body:not(.welcome-on) .wotype.sel{background:#E6E2F0 !important;border-color:#6E
     <button class="primary full" type="submit">Create and copy invite</button>
     <button type="button" class="full" id="ovAddCancel">Cancel</button>
   </form>
-  <div class="ovfilter" id="ovFilterMenu" hidden>
-    <button type="button" data-ovfilter="all">All needs</button>
-    <button type="button" data-ovfilter="phase">Need a new training phase</button>
-    <button type="button" data-ovfilter="best" hidden>New exercise personal bests</button>
-    <button type="button" data-ovfilter="quiet">Not messaged lately</button>
+  <div class="ovfilterwrap">
+    <button type="button" class="ovfilterbtn" id="ovFilter" aria-label="Filter groups" aria-expanded="false" aria-controls="ovFilterMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h10M4 17h13"/><circle cx="9" cy="7" r="1.7" fill="#0B0B39" stroke="none"/><circle cx="16" cy="12" r="1.7" fill="#0B0B39" stroke="none"/><circle cx="11" cy="17" r="1.7" fill="#0B0B39" stroke="none"/></svg><span id="ovFilterLabel">All needs</span></button>
+    <div class="ovfilter" id="ovFilterMenu" hidden>
+      <button type="button" data-ovfilter="all">All needs</button>
+      <button type="button" data-ovfilter="phase">Need a new training phase</button>
+      <button type="button" data-ovfilter="best">New exercise personal bests</button>
+      <button type="button" data-ovfilter="quiet">Not messaged lately</button>
+    </div>
   </div>
   <div class="ovcard">
     <h2 class="card__title">Clients</h2><p class="card__meta">Grouped by what they need.</p>
@@ -4061,7 +4069,7 @@ function signedInTrainer(){
   return !!(account && account.role==="trainer" && ID.role==="trainer");
 }
 function clientView(){ return ID.role==="client"; }
-function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="workout" || tab==="events" || tab==="calendar" || tab==="checkin" || tab==="photos" || tab==="coach" || tab==="sessions" || tab==="you" || tab==="settings" || tab==="weight" || tab==="bmi" || tab==="library" || tab==="notifications"; }
+function clientAllows(tab){ return tab==="today" || tab==="meals" || tab==="workout" || tab==="events" || tab==="calendar" || tab==="checkin" || tab==="photos" || tab==="coach" || tab==="sessions" || tab==="videos" || tab==="you" || tab==="settings" || tab==="weight" || tab==="bmi" || tab==="library" || tab==="notifications"; }
 function sessionsVisible(){ return trainerHere() || clientView(); }
 function go(tab){
   if(!TITLES[tab]) tab="today";
@@ -4142,10 +4150,12 @@ function syncMenu(){
     if(b.dataset.tab==="sessions"){ b.hidden = !sessionsVisible(); return; }
     if((b.dataset.tab==="today" || b.dataset.tab==="meals") && signedInTrainer()){ b.hidden = true; return; }
     if(!client){ b.hidden = false; return; }
-    b.hidden = !clientAllows(b.dataset.tab) || !!b.dataset.lib;
+    const libSub = b.dataset.lib && b.dataset.lib!=="home";
+    b.hidden = !clientAllows(b.dataset.tab) || libSub;
   });
   const split = document.querySelector("#navMenu .navsplit");
-  if(split) split.hidden = client;
+  if(split) split.hidden = false;
+  if($("libToggle")) $("libToggle").hidden = client;
   if(client) $("libSub").hidden = true;
   $("menuCheck").hidden = false;
   $("menuBell").hidden = false;
@@ -4305,9 +4315,14 @@ document.querySelectorAll("#navMenu [data-tab]").forEach(b=>b.addEventListener("
   if(b.dataset.tab==="workout" && signedInTrainer()) woView = "build";
   if(b.dataset.tab==="library"){
     const lib = b.dataset.lib || "home";
-    libSection = lib==="cookbook" || lib==="exercises" ? lib : "home";
-    if(lib==="cookbook"){ cookView="list"; cookOpenId=null; mealCookReturn=false; }
-    returnView = "home";
+    if(clientView()){
+      libSection = "exercises";
+      returnView = "home";
+    } else {
+      libSection = lib==="cookbook" || lib==="exercises" ? lib : "home";
+      if(lib==="cookbook"){ cookView="list"; cookOpenId=null; mealCookReturn=false; }
+      returnView = "home";
+    }
   }
   closeMenu();
   go(b.dataset.tab);
@@ -6067,12 +6082,14 @@ $("tmPdf").addEventListener("change", ()=>{
 let scanControls = null;
 let scanHit = null;
 let scanLock = false;
+let scanGen = 0;
 function showScanNote(msg){
   const note = $("scanNote");
   note.hidden = false;
   note.textContent = msg;
 }
 function stopFoodScan(){
+  scanGen++;
   if(scanControls && typeof scanControls.stop==="function"){
     try { scanControls.stop(); } catch(e){}
   }
@@ -6084,6 +6101,42 @@ function stopFoodScan(){
     video.srcObject = null;
   }
   if($("scanBox")) $("scanBox").hidden = true;
+}
+function barcodeDigits(value){
+  const clean = String(value||"").replace(/\D/g,"");
+  return /^\d{8,14}$/.test(clean) ? clean : "";
+}
+function acceptBarcode(code){
+  const clean = barcodeDigits(code);
+  if(!clean || scanLock) return;
+  scanLock = true;
+  stopFoodScan();
+  applyBarcode(clean);
+}
+function startNativeBarcode(video){
+  if(typeof window.BarcodeDetector!=="function") return null;
+  let detector;
+  try {
+    const formats = ["ean_13","ean_8","upc_a","upc_e","code_128"];
+    detector = new window.BarcodeDetector({formats:formats});
+  } catch(e){
+    try { detector = new window.BarcodeDetector(); }
+    catch(err){ return null; }
+  }
+  let timer = 0;
+  let stopped = false;
+  const stop = () => { stopped = true; if(timer) clearTimeout(timer); };
+  const tick = async () => {
+    if(stopped || scanLock) return;
+    try {
+      const codes = await detector.detect(video);
+      const hit = (codes||[]).map(c=>barcodeDigits(c && (c.rawValue||c.raw||""))).find(Boolean);
+      if(hit){ acceptBarcode(hit); return; }
+    } catch(e){}
+    if(!stopped) timer = setTimeout(tick, 250);
+  };
+  timer = setTimeout(tick, 250);
+  return {stop:stop};
 }
 function loadZXing(){
   if(window.ZXing && window.ZXing.BrowserMultiFormatReader) return Promise.resolve();
@@ -6167,11 +6220,18 @@ function paintScanHit(){
   ].map(([label, v, suffix])=>`<li><div class="grow"><div class="name">${label}</div></div><div class="meta">${v==null?"Not listed":(label==="Calories"?Math.round(v):Math.round(v*10)/10)+suffix}</div></li>`).join("");
   $("scanScaled").textContent = grams==null ? "Enter how much you ate." : "This amount ("+trimAmount($("scanAmount").value)+" "+unitWord+"): "+nutBits(scaled);
   if(grams!=null){
-    $("fName").value = scanHit.name+" · "+trimAmount($("scanAmount").value)+" "+unitWord;
+    const label = scanHit.name+" · "+trimAmount($("scanAmount").value)+" "+unitWord;
+    $("fName").value = label;
     $("fCal").value = scaled.cal==null ? "" : String(Math.round(scaled.cal));
     $("fCarb").value = scaled.carbs==null ? "" : String(Math.round(scaled.carbs*10)/10);
     $("fFat").value = scaled.fat==null ? "" : String(Math.round(scaled.fat*10)/10);
     $("fPro").value = scaled.protein==null ? "" : String(Math.round(scaled.protein*10)/10);
+    const log = $("foodLog");
+    if(log && !log.hidden){
+      if($("quickName")) $("quickName").value = scanHit.name;
+      if($("quickAmount")) $("quickAmount").value = trimAmount($("scanAmount").value)+" "+unitWord;
+      if($("quickCal")) $("quickCal").value = scaled.cal==null ? "" : String(Math.round(scaled.cal));
+    }
   }
 }
 async function applyBarcode(code){
@@ -6215,47 +6275,72 @@ async function applyBarcode(code){
     scanLock = false;
   }
 }
+async function startZXingScan(video){
+  await loadZXing();
+  const hints = new Map();
+  hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+    ZXing.BarcodeFormat.EAN_13,
+    ZXing.BarcodeFormat.EAN_8,
+    ZXing.BarcodeFormat.UPC_A,
+    ZXing.BarcodeFormat.UPC_E,
+    ZXing.BarcodeFormat.CODE_128
+  ]);
+  const reader = new ZXing.BrowserMultiFormatReader(hints);
+  return reader.decodeFromVideoElement(video, (result) => {
+    if(!result || scanLock) return;
+    const code = String(result.getText ? result.getText() : result.text || "");
+    acceptBarcode(code);
+  });
+}
 async function startFoodScan(){
-  stopFoodScan();
+  if(scanControls && typeof scanControls.stop==="function"){
+    try { scanControls.stop(); } catch(e){}
+  }
+  scanControls = null;
+  const video = $("scanVideo");
+  if(video && video.srcObject){
+    const tracks = video.srcObject.getTracks ? video.srcObject.getTracks() : [];
+    tracks.forEach(t=>{ try { t.stop(); } catch(e){} });
+    video.srcObject = null;
+  }
+  const gen = ++scanGen;
+  scanLock = false;
   scanHit = null;
   $("scanResult").hidden = true;
   $("scanNote").hidden = true;
-  const video = $("scanVideo");
   video.setAttribute("playsinline","true");
   video.playsInline = true;
   video.muted = true;
-  $("scanBox").hidden = false;
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    $("scanBox").hidden = true;
+    showScanNote("This phone can't open the camera here. Type the food instead.");
+    return;
+  }
+  let stream;
   try {
-    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-      throw new Error("This phone can't open the camera here. Type the food instead.");
-    }
-    await loadZXing();
-    const hints = new Map();
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
-      ZXing.BarcodeFormat.EAN_13,
-      ZXing.BarcodeFormat.EAN_8,
-      ZXing.BarcodeFormat.UPC_A,
-      ZXing.BarcodeFormat.UPC_E,
-      ZXing.BarcodeFormat.CODE_128
-    ]);
-    const reader = new ZXing.BrowserMultiFormatReader(hints);
-    scanControls = await reader.decodeFromConstraints(
-      {audio:false, video:{facingMode:{ideal:"environment"}}},
-      video,
-      (result) => {
-        if(!result || scanLock) return;
-        const code = String(result.getText ? result.getText() : result.text || "");
-        if(!/^\d{8,14}$/.test(code.replace(/\D/g,""))) return;
-        scanLock = true;
-        stopFoodScan();
-        applyBarcode(code);
-      }
-    );
+    stream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode:{ideal:"environment"}}});
   } catch(err) {
-    stopFoodScan();
+    if(gen!==scanGen) return;
+    $("scanBox").hidden = true;
+    showScanNote("The camera didn't open. Type the food instead.");
+    return;
+  }
+  if(gen!==scanGen){
+    stream.getTracks().forEach(t=>{ try { t.stop(); } catch(e){} });
+    return;
+  }
+  video.srcObject = stream;
+  $("scanBox").hidden = false;
+  try { await video.play(); } catch(e){}
+  if(gen!==scanGen) return;
+  const native = startNativeBarcode(video);
+  if(native){ scanControls = native; return; }
+  try {
+    scanControls = await startZXingScan(video);
+  } catch(err) {
+    if(gen!==scanGen) return;
     const raw = err && err.message ? err.message : "";
-    const plain = /didn't load|Type the food|can't open the camera/.test(raw) ? raw : "The camera didn't open. Type the food instead.";
-    showScanNote(plain);
+    showScanNote(/didn't load|Type the food/.test(raw) ? raw : "The scanner didn't load. Type the food instead.");
   }
 }
 function addScannedAmount(){
@@ -6624,6 +6709,8 @@ function filteredExercises(group, q){
 function renderLibrary(){
   $("hdrTitle").textContent = "Exercise library";
   $("hdrSub").textContent = LIBRARY.length+" built-in · searchable how-tos";
+  if($("libAddOpen")) $("libAddOpen").hidden = clientView();
+  if(clientView() && $("libAddCard")) $("libAddCard").hidden = true;
   if(!$("libGroup").options.length){
     $("libGroup").innerHTML = GROUPS.map(g=>`<option value="${g[0]}">${g[1]}</option>`).join("");
   }
@@ -6638,7 +6725,7 @@ function renderLibrary(){
     const items=list.filter(e=>e.group===id);
     if(!items.length) return;
     parts.push(`<div class="libgroup"><h3>${label}</h3>`+items.map(e=>{
-      const del=e.custom?`<button class="x" data-dellib="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">×</button>`:"";
+      const del=e.custom && !clientView()?`<button class="x" data-dellib="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">×</button>`:"";
       const badge=e.custom?'<span class="badge">Custom</span>':"";
       const cue=e.cue?`<div class="cue">${esc(e.cue)}</div>`:"";
       return `<div class="libitem gtile" data-libitem="${esc(e.name)}">${groupPhotoImg(e.group)}<div class="grow"><div class="name">${esc(e.name)}${badge}</div>${cue}<div>${howtoLink(e.name)}</div></div>${del}</div>`;
@@ -6886,6 +6973,7 @@ $("btnResetPlan").onclick = () => {
 };
 $("libSearch").oninput = () => { if(currentTab==="library" && libSection==="exercises") renderLibrary(); };
 $("libAdd").onclick = () => {
+  if(clientView()) return;
   const name=$("libName").value.trim();
   const group=$("libGroup").value;
   const cue=$("libCue").value.trim();
@@ -6905,7 +6993,7 @@ $("libAdd").onclick = () => {
   render();
   toast("Added to library");
 };
-if($("libAddOpen")) $("libAddOpen").onclick = () => { if($("libAddCard")) $("libAddCard").hidden = !$("libAddCard").hidden; };
+if($("libAddOpen")) $("libAddOpen").onclick = () => { if(clientView()) return; if($("libAddCard")) $("libAddCard").hidden = !$("libAddCard").hidden; };
 $("edCancel").onclick = () => { leaveEditor(); render(); };
 $("edSave").onclick = () => saveEditor();
 $("edAdd").onclick = () => { syncEditorFromDom(); openPicker("editor"); };
@@ -7794,7 +7882,7 @@ function macroGrid(r){
 function renderCookDetail(){
   const r=findRecipe(cookOpenId);
   if(!r){ cookView="list"; renderCookList(); $("cookDetailView").style.display="none"; $("cookListView").style.display=""; return; }
-  const actions=r.custom?`<div class="toolbar" style="margin-top:10px"><button class="sm" id="cookEditBtn">Edit</button><button class="sm danger" id="cookDelBtn">Delete</button></div>`:"";
+  const actions=r.custom && !clientView()?`<div class="toolbar" style="margin-top:10px"><button class="sm" id="cookEditBtn">Edit</button><button class="sm danger" id="cookDelBtn">Delete</button></div>`:"";
   const cookToPlan = mealCookReturn && effectiveAddMode()==="plan";
   const cookBtn = cookToPlan ? "Add to meal plan" : "Log this meal";
   const cookNote = cookToPlan
@@ -7803,13 +7891,15 @@ function renderCookDetail(){
   $("cookDetailView").innerHTML = `<div class="toolbar"><button class="sm" id="cookDetailBack"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg> Recipes</button></div><div class="card">${photoTag(foodFileForRecipe(r), r.name, "shot", true)}<div class="row" style="justify-content:space-between;align-items:flex-start"><div style="min-width:0"><div style="font-size:16px;font-weight:700">${esc(r.name)}</div><div class="note">${esc(cookCatLabel(r.category))}${r.custom?" · Custom":""} · Serves ${r.servings}</div></div></div>${macroGrid(r)}<h2>Ingredients</h2><div class="note">Amounts for the whole recipe.</div><ul class="ing">${(r.ingredients||[]).map(i=>`<li>${esc(i)}</li>`).join("")||'<li>None listed</li>'}</ul><h2 style="margin-top:12px">Steps</h2><ol class="steps">${(r.steps||[]).map(s=>`<li>${esc(s)}</li>`).join("")||"<li>No steps yet.</li>"}</ol><button class="primary full" id="cookLog" style="margin-top:14px">${cookBtn}</button><div class="note" style="margin-top:6px">${cookNote}</div>${actions}</div>`;
   $("cookDetailBack").onclick=()=>{ cookView="list"; renderCookbook(); window.scrollTo(0,0); };
   $("cookLog").onclick=()=>logRecipe(r);
-  if(r.custom){
+  if(r.custom && !clientView()){
     $("cookEditBtn").onclick=()=>openRecipeEditor(r);
     $("cookDelBtn").onclick=()=>deleteRecipe(r.id);
   }
 }
 function renderCookbook(){
+  if(clientView() && cookView==="edit") cookView = "list";
   $("hdrTitle").textContent = cookView==="edit" ? (cookDraft&&cookDraft.isNew?"New recipe":"Edit recipe") : "Cookbook";
+  if($("cookNew")) $("cookNew").hidden = clientView();
   $("hdrSub").textContent = "Keto, bulking, and lean";
   $("cookListView").style.display = cookView==="list"?"":"none";
   $("cookDetailView").style.display = cookView==="detail"?"":"none";
@@ -7833,6 +7923,7 @@ function renderRecipeEditor(){
   if(document.activeElement!==$("rcSteps")) $("rcSteps").value=(cookDraft.steps||[]).join("\n");
 }
 function openRecipeEditor(existing){
+  if(clientView()) return;
   if(existing){
     cookDraft=JSON.parse(JSON.stringify(existing));
     delete cookDraft.custom;
@@ -7921,6 +8012,7 @@ $("page-library").addEventListener("click", e=>{
   if(hit){ cookOpenId=hit.dataset.recipe; cookView="detail"; renderCookbook(); window.scrollTo(0,0); return; }
   const dellib=e.target.closest("[data-dellib]");
   if(dellib){
+    if(clientView()) return;
     const item=S.customExercises.find(x=>x.id===dellib.dataset.dellib);
     if(!item) return;
     if(!confirm('Delete "'+item.name+'" from your library?')) return;
@@ -8859,12 +8951,18 @@ const Link = {
     await sbFetch("photos", {method:"POST", body:{id:id, pair_id:pairId, angle:angle, storage_path:path}});
   },
   async listVideos(pairId){
-    if(linkMode()==="demo"){
+    const local = () => {
       const pair = demoLoad().pairs.find(p=>p.id===pairId);
       return pair && Array.isArray(pair.videos) ? pair.videos.map(v=>Object.assign({}, v)) : [];
+    };
+    if(linkMode()==="demo") return local();
+    try {
+      const rows = await sbFetch("videos?pair_id=eq."+encodeURIComponent(pairId)+"&select=*&order=created_at.desc");
+      return (rows||[]).map(mapVideoRow);
+    } catch(e){
+      if(e && e.code==="missing") return local();
+      throw e;
     }
-    const rows = await sbFetch("videos?pair_id=eq."+encodeURIComponent(pairId)+"&select=*&order=created_at.desc");
-    return (rows||[]).map(mapVideoRow);
   },
   async sendVideo(pairId, payload){
     if(ID.role!=="trainer") throw new Error("Only the trainer can send a video");
@@ -9507,6 +9605,9 @@ function paintOverviewChrome(){
   document.querySelectorAll("#ovFilterMenu [data-ovfilter]").forEach(btn=>{
     btn.classList.toggle("sel", btn.dataset.ovfilter===overviewFilter);
   });
+  const filterLabel = $("ovFilterLabel");
+  const filterNames = {all:"All needs", phase:"Need a new training phase", best:"New exercise personal bests", quiet:"Not messaged lately"};
+  if(filterLabel) filterLabel.textContent = filterNames[overviewFilter] || "All needs";
   const onOverview = overviewTab==="overview";
   $("ovTabOverview").classList.toggle("sel", onOverview);
   $("ovTabActivity").classList.toggle("sel", !onOverview);
@@ -11120,7 +11221,7 @@ async function collectVideos(){
     const pair = await Link.loadPair(ID.activePairId);
     if(!pair || pair.clientDevice!==ID.deviceId) return [];
     const videos = linkMode()==="demo" ? (pair.videos||[]) : await Link.listVideos(pair.id);
-    const items = videos.map(v=>Object.assign({}, v, {clientName:pair.clientName||"Client", pairId:pair.id}));
+    const items = videos.filter(v=>!v || !v.pairId || v.pairId===pair.id).map(v=>Object.assign({}, v, {clientName:pair.clientName||"Client", pairId:pair.id}));
     items.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     await attachVideoPlay(items);
     return items;
