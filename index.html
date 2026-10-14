@@ -718,8 +718,12 @@ body:not(.welcome-on) #hdrTitle[hidden]{display:none !important}
 .profilebtn{width:36px;height:36px;padding:0;border:none;border-radius:50%;background:transparent;overflow:hidden}
 .profilebtn .ham{display:none;width:26px;height:26px;stroke:#0B0B39;fill:none;stroke-width:2.2;stroke-linecap:round}
 .headside{display:flex;align-items:center;gap:2px;flex:none}
-.profilepic{width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:center 22%;flex:none;background:#FFFFFF}
-body.welcome-on .profilepic{display:none !important}
+.profilepic{width:36px;height:36px;border-radius:50%;object-fit:cover;object-position:center;flex:none;background:#fff}
+body.welcome-on .profilepic,body.welcome-on #profileBtn{display:none !important}
+#profileBtn{width:44px;height:44px;min-height:44px;padding:0;border:0 !important;border-radius:50%;background:transparent !important;box-shadow:none !important;overflow:hidden;display:inline-grid;place-items:center;flex:none}
+#profileBtn .profilepic,#avatarPreview,#bubblePreview{pointer-events:none;object-position:center !important}
+#avatarSheet{z-index:80}
+#avatarPreview{width:96px;height:96px;border-radius:50%;object-fit:cover;object-position:center;display:block;margin:4px auto 8px;background:#fff}
 .daymenu{background:#FFFFFF;border-radius:var(--radius);padding:8px;margin:4px 0 8px;display:flex;flex-direction:column;gap:6px;color:#0B0B39;overflow:hidden}
 .daymenu[hidden]{display:none !important}
 .daymenu button{text-align:left;background:transparent;border:none;color:#0B0B39}
@@ -999,7 +1003,7 @@ body.theme-dark:not(.welcome-on) .devpick{color:#0B0B39}
 .lookpicks button.sel{border-color:#563DD2;color:#563DD2}
 .lookswatch{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
 .bubbleedit{display:flex;gap:12px;align-items:center}
-.bubbleedit img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center 22%;background:#FFFFFF;flex:none}
+.bubbleedit img{width:64px;height:64px;border-radius:50%;object-fit:cover;object-position:center;background:#FFFFFF;flex:none}
 .bubbleedit .grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
 #scanVideo{width:100%;height:220px;background:#0B0B39;border-radius:12px;display:block;object-fit:cover;margin:0 0 8px}
 #scanResult{margin-top:12px}
@@ -1598,7 +1602,9 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
     <div class="topgap"></div>
     <div class="streak" id="streak" aria-label="Streak"><span id="streakCount">0</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg></div>
     <div class="headside">
-      <img class="profilepic" id="profilePic" src="images/real_keyta_gym_portrait_4x5_1080w.webp" alt="">
+      <button type="button" class="profilebtn" id="profileBtn" aria-label="Profile photo" aria-haspopup="dialog">
+        <img class="profilepic" id="profilePic" src="images/default-avatar.png" alt="">
+      </button>
       <button type="button" class="btn-ghost headlogin" id="headLogin">Log in</button>
       <nav class="nav-inline" id="frontNav" aria-label="Account">
         <button type="button" class="btn-ghost" id="deskLogin">Log in</button>
@@ -2995,7 +3001,7 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
       <button type="button" data-look="night" aria-pressed="false"><span class="lookswatch" style="background:#FFFFFF"></span>Night</button>
     </div>
     <div class="bubbleedit">
-      <img id="bubblePreview" src="images/real_keyta_gym_portrait_4x5_1080w.webp" alt="Coach Keyta (Marquita Foster)">
+      <img id="bubblePreview" src="images/default-avatar.png" alt="Profile photo">
       <div class="grow">
         <button type="button" id="bubbleCamBtn">Take photo</button>
         <button type="button" id="bubbleLibBtn">Choose photo</button>
@@ -3218,6 +3224,19 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
       </div>
       <button type="button" class="danger full" id="calDeleteBtn" hidden>Delete</button>
     </form>
+  </div>
+</div>
+
+<div class="modalback" id="avatarSheet" role="dialog" aria-modal="true" aria-labelledby="avatarTitle">
+  <div class="modalbox">
+    <div class="row" style="justify-content:space-between">
+      <h2 id="avatarTitle">Profile photo</h2>
+      <button type="button" class="sm ghost" id="avatarClose">Done</button>
+    </div>
+    <img id="avatarPreview" src="images/default-avatar.png" alt="Profile photo">
+    <button type="button" class="primary full" id="avatarChange">Change photo</button>
+    <button type="button" class="full" id="avatarRemove">Remove photo</button>
+    <input id="avatarFile" type="file" accept="image/*" hidden>
   </div>
 </div>
 
@@ -8485,6 +8504,25 @@ function blobToDataUrl(blob){
     rd.readAsDataURL(blob);
   });
 }
+function cropSquare(file, size){
+  return new Promise((resolve, reject)=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const side = Math.min(img.width, img.height);
+      const sx = Math.max(0, Math.round((img.width-side)/2));
+      const sy = Math.max(0, Math.round((img.height-side)/2));
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      canvas.getContext("2d").drawImage(img, sx, sy, side, side, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error("Could not read that photo")), "image/jpeg", 0.82);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("Could not read that photo")); };
+    img.src = url;
+  });
+}
 function compressImage(file, maxEdge, quality){
   return new Promise((resolve, reject)=>{
     const img = new Image();
@@ -8936,8 +8974,7 @@ function writeAutoMessages(row){
   localStorage.setItem(AUTO_MSG_KEY, JSON.stringify(bag));
 }
 function trainerPhotoSrc(){
-  const mine = readMyLook();
-  return mine.bubble && mine.bubble.indexOf("data:image/")===0 ? mine.bubble : "";
+  return storedAvatar();
 }
 function needsPhase(log){
   const program = log && log.program && typeof log.program==="object" ? log.program : null;
@@ -12572,7 +12609,72 @@ async function passHash(pw){
 }
 const MEMBER_LOOK_KEY = "curlyGirlFitness.memberLook.v1";
 const MEMBER_LOOKS = {purple:"#FFFFFF", plum:"#FFFFFF", rose:"#FFFFFF", night:"#FFFFFF"};
-const BUBBLE_FALLBACK = "images/real_keyta_gym_portrait_4x5_1080w.webp";
+const BUBBLE_FALLBACK = "images/default-avatar.png";
+const AVATAR_KEY = "curlyGirlFitness.avatar.v1";
+let avatarPullStarted = false;
+function avatarOwnerKey(){
+  const auth = typeof currentAuth==="function" ? currentAuth() : null;
+  if(auth && auth.email) return String(auth.email).toLowerCase()+":"+(auth.role||"account");
+  if(auth && auth.id) return "acct:"+auth.id;
+  const device = (typeof ID!=="undefined" && ID && ID.deviceId) ? ID.deviceId : "local";
+  return "device:"+device;
+}
+function avatarSrcOk(value){
+  return typeof value==="string" && (value.indexOf("data:image/")===0 || /^https?:\/\//.test(value));
+}
+function storedAvatar(){
+  const bag = readStore(localStorage, AVATAR_KEY);
+  const key = avatarOwnerKey();
+  const row = bag && key && typeof bag==="object" ? bag[key] : "";
+  if(avatarSrcOk(row)) return row;
+  const legacy = readMyLook().bubble;
+  return legacy || "";
+}
+function currentAvatar(){
+  return storedAvatar() || BUBBLE_FALLBACK;
+}
+function writeAvatar(dataUrl, push){
+  const raw = readStore(localStorage, AVATAR_KEY);
+  const bag = raw && typeof raw==="object" && !Array.isArray(raw) ? raw : {};
+  const key = avatarOwnerKey();
+  if(!key) return;
+  if(avatarSrcOk(dataUrl)) bag[key] = dataUrl;
+  else delete bag[key];
+  try { localStorage.setItem(AVATAR_KEY, JSON.stringify(bag)); }
+  catch(e){ throw new Error("That photo is too large for this phone"); }
+  if(typeof memberCanStyle==="function" && memberCanStyle()){
+    try { writeMyLook({bubble: avatarSrcOk(dataUrl) ? dataUrl : ""}); }
+    catch(e){}
+  }
+  applyMemberLook();
+  if($("avatarPreview")) $("avatarPreview").src = currentAvatar();
+  if($("bubblePreview")) $("bubblePreview").src = currentAvatar();
+  if(push!==false) pushAvatar(avatarSrcOk(dataUrl) ? dataUrl : "");
+}
+function pushAvatar(dataUrl){
+  Promise.resolve().then(()=>pushAvatarAsync(dataUrl)).catch(()=>{});
+}
+async function pushAvatarAsync(dataUrl){
+  if(typeof authKeyReady!=="function" || !authKeyReady()) return;
+  const session = await authSession();
+  if(!session || !session.user) return;
+  await sbAuth("profiles?id=eq."+encodeURIComponent(session.user.id), {
+    method:"PATCH",
+    body:{avatar_url: dataUrl || ""}
+  });
+}
+async function pullAvatar(){
+  try{
+    if(typeof authKeyReady!=="function" || !authKeyReady()) return;
+    if(storedAvatar()) return;
+    const session = await authSession();
+    if(!session || !session.user) return;
+    const rows = await sbAuth("profiles?id=eq."+encodeURIComponent(session.user.id)+"&select=avatar_url");
+    const url = rows && rows[0] && rows[0].avatar_url;
+    if(!avatarSrcOk(url) || storedAvatar()) return;
+    writeAvatar(url, false);
+  }catch(e){}
+}
 function memberCanStyle(){
   return !document.body.classList.contains("welcome-on") && (ID.role==="client" || ID.role==="solo");
 }
@@ -12619,9 +12721,10 @@ function applyMemberLook(){
   applyTheme();
   const img = document.getElementById("profilePic");
   if(img){
-    const next = styling && mine.bubble ? mine.bubble : BUBBLE_FALLBACK;
+    const next = currentAvatar();
     if(img.getAttribute("src")!==next) img.src = next;
   }
+  if(!avatarPullStarted){ avatarPullStarted = true; pullAvatar(); }
 }
 function paintMyPage(){
   if(!memberCanStyle() || !$("lookPicks")) return;
@@ -12632,7 +12735,7 @@ function paintMyPage(){
     btn.setAttribute("aria-pressed", sel ? "true" : "false");
   });
   const prev = $("bubblePreview");
-  if(prev) prev.src = mine.bubble || BUBBLE_FALLBACK;
+  if(prev) prev.src = currentAvatar();
 }
 function paintChrome(){
   applyMemberLook();
@@ -13474,13 +13577,25 @@ $("lookPicks").onclick = (e) => {
   applyMemberLook();
   paintMyPage();
 };
+function openAvatarSheet(){
+  if(document.body.classList.contains("welcome-on") || !currentAuth()) return;
+  if($("avatarPreview")) $("avatarPreview").src = currentAvatar();
+  if($("avatarSheet")) $("avatarSheet").style.display = "flex";
+}
+function closeAvatarSheet(){
+  if($("avatarSheet")) $("avatarSheet").style.display = "none";
+}
 async function onBubbleFile(file){
-  if(!file || !memberCanStyle()) return;
+  if(!file || !currentAuth()) return;
+  if(file.type && file.type.indexOf("image/")!==0){ toast("Choose a photo"); return; }
   try {
-    const blob = await compressImage(file, 480, 0.72);
+    const blob = await cropSquare(file, 256);
     const url = await blobToDataUrl(blob);
-    writeMyLook({bubble:url});
-    applyMemberLook();
+    const img = $("profilePic");
+    if(img) img.src = url;
+    if($("avatarPreview")) $("avatarPreview").src = url;
+    if($("bubblePreview")) $("bubblePreview").src = url;
+    writeAvatar(url);
     paintMyPage();
     toast("Photo updated");
   } catch(err) {
@@ -13500,10 +13615,26 @@ $("bubbleLibFile").onchange = () => {
   onBubbleFile(file);
 };
 $("bubbleClear").onclick = () => {
-  if(!memberCanStyle()) return;
-  writeMyLook({bubble:""});
-  applyMemberLook();
+  if(!currentAuth()) return;
+  writeAvatar("");
   paintMyPage();
+  toast("Photo removed");
+};
+$("profileBtn").onclick = () => openAvatarSheet();
+$("avatarClose").onclick = () => closeAvatarSheet();
+$("avatarSheet").addEventListener("click", e=>{ if(e.target===$("avatarSheet")) closeAvatarSheet(); });
+$("avatarChange").onclick = () => $("avatarFile").click();
+$("avatarFile").onchange = () => {
+  const file = $("avatarFile").files && $("avatarFile").files[0];
+  $("avatarFile").value = "";
+  onBubbleFile(file);
+};
+$("avatarRemove").onclick = () => {
+  if(!currentAuth()) return;
+  writeAvatar("");
+  if($("avatarPreview")) $("avatarPreview").src = currentAvatar();
+  paintMyPage();
+  toast("Photo removed");
 };
 (function(){
   const side = sideFromMenu();
