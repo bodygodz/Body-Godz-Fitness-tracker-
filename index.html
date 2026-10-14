@@ -1614,6 +1614,21 @@ body:not(.welcome-on) .wotype.sel{background:#E6E2F0 !important;border-color:#6E
 #woSaved{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 #woSaved h2{margin:8px 0 0}
 #woRestRead{font-weight:700;color:#8A7BB0;margin:8px 0 0}
+.wearintro{margin-bottom:12px}
+.wearlist{display:flex;flex-direction:column;gap:12px}
+.wearcard{background:#fff;border:1px solid #E6E2F0;border-radius:18px;padding:14px;box-shadow:0 1px 2px rgba(11,11,57,.08)}
+.wearhead{display:flex;gap:12px;align-items:flex-start}
+.wearico{width:44px;height:44px;border-radius:14px;background:#E6E2F0;color:#6E5F96;display:flex;align-items:center;justify-content:center;flex:none}
+.wearico svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.wearcard b{display:block;color:#0B0B39;font-size:16px;line-height:1.25}
+.wearstate{display:block;margin-top:2px;color:#6E5F96;font-size:13px;font-weight:650;line-height:1.3}
+.wearcard p{margin:8px 0 0;color:#5C5278;font-size:13px;line-height:1.4}
+.wearacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.wearacts button{min-height:44px;border-radius:12px;padding:0 14px}
+.wearform{margin-top:12px;padding-top:12px;border-top:1px solid #E6E2F0}
+.wearentry{display:flex;align-items:center;gap:8px;padding-top:10px;margin-top:10px;border-top:1px solid #E6E2F0;color:#0B0B39}
+.wearentry .name{font-weight:650}
+.wearnamed{margin-top:12px}
 
 </style>
 
@@ -12476,7 +12491,8 @@ function loadYou(){
     community: String(row.community||""),
     friends: Array.isArray(row.friends) ? row.friends : [],
     messages: String(row.messages||""),
-    devices: cleanDevices(row.devices)
+    devices: cleanDevices(row.devices),
+    wearables: cleanWearables(row.wearables)
   };
 }
 function saveYou(patch){
@@ -12602,16 +12618,253 @@ async function readBrowserHeart(){
     toast("Heart rate cannot come through this page yet");
   }
 }
+const WEAR_OAUTH_KEY = "curlyGirlFitness.wearOauth.v1";
+const WEARABLE_OAUTH = {
+  strava: {clientId:"", authorize:"https://www.strava.com/oauth/authorize", scope:"read,activity:read"},
+  garmin: {clientId:"", authorize:"https://connect.garmin.com/oauth2Confirm", scope:""},
+  fitbit: {clientId:"", authorize:"https://www.fitbit.com/oauth2/authorize", scope:"activity heartrate sleep profile"}
+};
+const WEARABLES = [
+  {id:"apple", name:"Apple Watch / Apple Health", kind:"phone", blurb:"Apple Health stays on the iPhone. This page cannot read it."},
+  {id:"healthconnect", name:"Android / Wear OS watches (Google Health Connect)", kind:"phone", blurb:"Health Connect stays on the Android phone. This page cannot read it."},
+  {id:"samsung", name:"Samsung Galaxy Watch", kind:"phone", blurb:"Galaxy Watch readings stay in Samsung Health on the phone. This page cannot read them."},
+  {id:"garmin", name:"Garmin", kind:"oauth", blurb:"Connect opens Garmin's sign-in. Workouts are not copied until the token exchange is set up."},
+  {id:"fitbit", name:"Fitbit", kind:"oauth", blurb:"Connect opens Fitbit's sign-in. Steps and heart rate are not copied until the token exchange is set up."},
+  {id:"strava", name:"Strava", kind:"oauth", blurb:"Connect opens Strava's sign-in. Activities are not copied until the token exchange is set up."},
+  {id:"oura", name:"Oura", kind:"soon", blurb:"Oura readings stay in the Oura app. This page does not read them yet."},
+  {id:"whoop", name:"WHOOP", kind:"soon", blurb:"WHOOP readings stay in the WHOOP app. This page does not read them yet."}
+];
+const WEAR_ICONS = {
+  apple:'<rect x="7" y="5" width="10" height="14" rx="3"/><path d="M9 5l.8-2h4.4L15 5M9 19l.8 2h4.4L15 19"/>',
+  healthconnect:'<rect x="8" y="2.5" width="8" height="19" rx="2"/><path d="M10 12h1.2l1-2 1.4 4 1-2H16"/>',
+  samsung:'<circle cx="12" cy="12" r="5.5"/><path d="M10 3.5h4M10 20.5h4"/>',
+  garmin:'<circle cx="12" cy="13" r="5.5"/><path d="M12 13l2.4-2.2M12 4.5v2"/>',
+  fitbit:'<rect x="8" y="6" width="8" height="12" rx="4"/><path d="M10 3.5h4M10 20.5h4"/>',
+  strava:'<path d="M4 16c2.2-4 4-6 6-6s2.6 2 4 2 2.2-3.2 6-6"/><circle cx="5" cy="16" r="1"/><circle cx="18.5" cy="7" r="1"/>',
+  oura:'<circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2.4"/>',
+  whoop:'<path d="M8 8h8v8H8z"/><path d="M9.5 8V4.5h5V8M9.5 16v3.5h5V16"/>'
+};
+let wearOpenId = "";
+function wearableById(id){ return WEARABLES.find(item=>item.id===id) || null; }
+function wearableClientId(id){
+  const cfg = WEARABLE_OAUTH[id];
+  return cfg ? String(cfg.clientId||"").trim() : "";
+}
+function cleanWearEntry(row){
+  if(!row || typeof row!=="object") return null;
+  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(row.date||"")) ? String(row.date) : "";
+  const steps = hasNum(row.steps) && +row.steps>=0 && +row.steps<=200000 ? Math.round(+row.steps) : null;
+  const heart = hasNum(row.heart) && +row.heart>=30 && +row.heart<=230 ? Math.round(+row.heart) : null;
+  const sleep = hasNum(row.sleep) && +row.sleep>=0 && +row.sleep<=24 ? r1(+row.sleep) : null;
+  const note = String(row.note||"").trim().slice(0,140);
+  if(!date && steps==null && heart==null && sleep==null && !note) return null;
+  return {id:String(row.id||"").trim()||uid(), date:date, steps:steps, heart:heart, sleep:sleep, note:note};
+}
+function cleanWearables(raw){
+  const out = {};
+  if(!raw || typeof raw!=="object" || Array.isArray(raw)) return out;
+  WEARABLES.forEach(item=>{
+    const row = raw[item.id];
+    if(!row || typeof row!=="object") return;
+    const status = row.status==="interest" || row.status==="manual" || row.status==="pending" || row.status==="connected" ? row.status : "";
+    if(!status) return;
+    out[item.id] = {
+      status: status,
+      at: Number(row.at)||Date.now(),
+      entries: Array.isArray(row.entries) ? row.entries.map(cleanWearEntry).filter(Boolean).slice(0, 30) : []
+    };
+  });
+  return out;
+}
+function writeWearables(next){
+  const clean = cleanWearables(next);
+  saveYou({wearables: clean});
+  if(typeof pushMemberProfile==="function") pushMemberProfile({wearables: clean});
+  return clean;
+}
+function wearState(item, link){
+  if(link && link.status==="connected") return "Connected";
+  if(link && link.status==="pending") return "Sign-in started. The token exchange is not finished.";
+  if(item.kind==="phone") return "Needs the phone app (coming soon)";
+  if(item.kind==="oauth" && wearableClientId(item.id)) return link && link.status==="interest" ? "Interest saved" : "Not connected";
+  if(link && link.status==="interest") return "Coming soon · interest saved";
+  return "Coming soon";
+}
+function wearEntryLine(entry){
+  const bits = [];
+  if(entry.date) bits.push(fmtDate(entry.date));
+  if(entry.steps!=null) bits.push(entry.steps.toLocaleString("en-US")+" steps");
+  if(entry.heart!=null) bits.push(entry.heart+" bpm");
+  if(entry.sleep!=null) bits.push(entry.sleep+" h sleep");
+  if(entry.note) bits.push(entry.note);
+  return bits.join(" · ") || "Entry saved";
+}
+function wearManualForm(item){
+  const id = item.id;
+  return '<form class="wearform" data-youform="wearmanual" data-wearid="'+esc(id)+'"><p>This is what you type. It does not come from the watch.</p><div class="field"><label class="f" for="wearDate-'+esc(id)+'">Date</label><input id="wearDate-'+esc(id)+'" name="date" type="date" value="'+esc(todayStr())+'"></div><div class="field"><label class="f" for="wearSteps-'+esc(id)+'">Steps</label><input id="wearSteps-'+esc(id)+'" name="steps" type="number" inputmode="numeric" min="0" max="200000" placeholder="Optional"></div><div class="field"><label class="f" for="wearHeart-'+esc(id)+'">Heart rate</label><input id="wearHeart-'+esc(id)+'" name="heart" type="number" inputmode="numeric" min="30" max="230" placeholder="bpm, optional"></div><div class="field"><label class="f" for="wearSleep-'+esc(id)+'">Sleep hours</label><input id="wearSleep-'+esc(id)+'" name="sleep" type="number" inputmode="decimal" min="0" max="24" step="0.1" placeholder="Optional"></div><div class="field"><label class="f" for="wearNote-'+esc(id)+'">Note</label><input id="wearNote-'+esc(id)+'" name="note" maxlength="140" placeholder="Optional" autocomplete="off"></div><button class="primary full" type="submit">Save entry</button></form>';
+}
+function wearCard(item, link){
+  const icon = WEAR_ICONS[item.id] || WEAR_ICONS.apple;
+  const ready = item.kind==="oauth" && !!wearableClientId(item.id);
+  const asked = link && link.status==="interest";
+  const buttons = [];
+  if(item.kind==="phone"){
+    const open = wearOpenId===item.id;
+    buttons.push('<button type="button" data-wearmanual="'+esc(item.id)+'" aria-expanded="'+(open?"true":"false")+'">'+(open?"Hide entry":"Enter manually")+'</button>');
+  } else if(link && link.status==="connected"){
+    buttons.push('<button type="button" data-wearclear="'+esc(item.id)+'">Disconnect</button>');
+  } else if(ready){
+    buttons.push('<button type="button" class="primary" data-wearconnect="'+esc(item.id)+'">Connect</button>');
+    if(link && link.status==="pending") buttons.push('<button type="button" data-wearclear="'+esc(item.id)+'">Clear</button>');
+  } else if(asked){
+    buttons.push('<button type="button" data-wearclear="'+esc(item.id)+'">Remove interest</button>');
+  } else {
+    buttons.push('<button type="button" data-wearask="'+esc(item.id)+'">Ask to Connect</button>');
+  }
+  const action = buttons.join("");
+  const entries = link && link.entries ? link.entries.map(entry=>'<div class="wearentry"><div class="grow"><div class="name">'+esc(wearEntryLine(entry))+'</div><div class="meta">Entered by you</div></div><button type="button" class="x" data-weardel="'+esc(entry.id)+'" data-wearprov="'+esc(item.id)+'" aria-label="Remove entry">×</button></div>').join("") : "";
+  const form = item.kind==="phone" && wearOpenId===item.id ? wearManualForm(item) : "";
+  return '<article class="wearcard" data-wearcard="'+esc(item.id)+'"><div class="wearhead"><span class="wearico" aria-hidden="true"><svg viewBox="0 0 24 24">'+icon+'</svg></span><div class="grow"><b>'+esc(item.name)+'</b><span class="wearstate">'+esc(wearState(item, link))+'</span></div></div><p>'+esc(item.blurb)+'</p>'+(action?'<div class="wearacts">'+action+'</div>':"")+form+entries+'</article>';
+}
 function devicesHtml(y){
-  const cloud = "The trainer adds a client and copies the invite code. The client signs in, opens Join your trainer, and enters that code.";
-  const rows = y.devices.map(d=>{
+  const links = cleanWearables(y.wearables);
+  const cards = WEARABLES.map(item=>wearCard(item, links[item.id])).join("");
+  const named = (y.devices||[]).map(d=>{
     const picks = [d.steps?"Steps":"", d.heart?"Heart rate":""].filter(Boolean).join(" and ");
     return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+(picks?esc(picks)+" chosen":"Saved")+'</div><p data-devid="'+esc(d.id)+'">'+esc(deviceStatus(d))+'</p></div><button type="button" class="x" data-youdel="devices" data-id="'+esc(d.id)+'" aria-label="Remove">×</button></li>';
   }).join("");
-  const readBtn = browserHeartApi()
-    ? '<button type="button" data-devread="heart">Read heart rate from a Bluetooth sensor</button><p class="note">That reads a heart-rate sensor this browser can see.</p>'
-    : "";
-  return '<form class="card" data-youform="device"><div class="field"><label class="f" for="devName">Device</label><input id="devName" name="name" maxlength="60" placeholder="Device name" autocomplete="off"></div><label class="devpick"><input type="checkbox" name="steps"> Steps</label><label class="devpick"><input type="checkbox" name="heart"> Heart rate</label>'+(readBtn?readBtn:"")+'<button class="primary full" type="submit">Save device</button></form>'+(rows?'<ul class="list card">'+rows+'</ul>':'<div class="empty"><p class="empty__body">No devices connected.</p></div>');
+  const legacy = named ? '<div class="card wearnamed"><p>Devices you named earlier.</p><ul class="list">'+named+'</ul></div>' : "";
+  return '<div class="card wearintro"><p>A web page cannot read Apple Health or Health Connect. Strava, Garmin, and Fitbit can connect when a client ID is set. Nothing here is marked connected until that service finishes its token exchange.</p></div><div class="wearlist">'+cards+'</div>'+legacy;
+}
+function wearableRedirectUri(){
+  return location.origin + location.pathname;
+}
+function wearRandom(){
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b=>("0"+b.toString(16)).slice(-2)).join("");
+}
+async function wearCodeChallenge(verifier){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+  let s = "";
+  new Uint8Array(buf).forEach(b=>{ s += String.fromCharCode(b); });
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+async function startWearableOAuth(id){
+  const cfg = WEARABLE_OAUTH[id];
+  const clientId = wearableClientId(id);
+  if(!cfg || !clientId){
+    askWearable(id);
+    return;
+  }
+  const state = id+"."+wearRandom().slice(0, 24);
+  const verifier = wearRandom();
+  const challenge = id==="strava" ? "" : await wearCodeChallenge(verifier);
+  sessionStorage.setItem(WEAR_OAUTH_KEY, JSON.stringify({provider:id, state:state, verifier:verifier, at:Date.now()}));
+  const url = new URL(cfg.authorize);
+  url.searchParams.set("client_id", clientId);
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("redirect_uri", wearableRedirectUri());
+  url.searchParams.set("state", state);
+  if(cfg.scope) url.searchParams.set("scope", cfg.scope);
+  if(id==="strava") url.searchParams.set("approval_prompt", "auto");
+  if(id==="fitbit") url.searchParams.set("expires_in", "604800");
+  if(challenge){
+    url.searchParams.set("code_challenge", challenge);
+    url.searchParams.set("code_challenge_method", "S256");
+  }
+  location.assign(url.toString());
+}
+function askWearable(id){
+  const links = cleanWearables(loadYou().wearables);
+  const prev = links[id] || {entries:[]};
+  links[id] = {status:"interest", at:Date.now(), entries:prev.entries||[]};
+  writeWearables(links);
+  refreshYou();
+  toast("Interest saved");
+}
+function clearWearable(id){
+  const links = cleanWearables(loadYou().wearables);
+  delete links[id];
+  writeWearables(links);
+  if(wearOpenId===id) wearOpenId = "";
+  refreshYou();
+  toast("Cleared");
+  Promise.resolve().then(async ()=>{
+    if(typeof authSession!=="function" || typeof authKeyReady!=="function" || !authKeyReady()) return;
+    const live = await authSession();
+    if(!live) return;
+    await fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/functions/v1/wearable-oauth", {
+      method:"POST",
+      headers:{
+        apikey: AUTH_PUBLISHABLE_KEY,
+        Authorization: "Bearer "+live.access_token,
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({action:"disconnect", provider:id})
+    });
+  }).catch(()=>{});
+}
+async function resumeWearableOAuth(){
+  const params = new URLSearchParams(location.search);
+  const code = params.get("code") || "";
+  const state = params.get("state") || "";
+  const oauthError = params.get("error") || "";
+  if(!code && !oauthError) return;
+  let pending = null;
+  try { pending = JSON.parse(sessionStorage.getItem(WEAR_OAUTH_KEY)||"null"); } catch(e){ pending = null; }
+  sessionStorage.removeItem(WEAR_OAUTH_KEY);
+  history.replaceState({}, "", location.pathname + location.hash);
+  const provider = pending && pending.provider && state===pending.state ? pending.provider : (state.split(".")[0] || "");
+  const item = wearableById(provider);
+  if(!item || item.kind!=="oauth"){
+    toast("That connection could not be matched");
+    return;
+  }
+  youView = "devices";
+  const body = $("youBody");
+  if(body) body.dataset.view = "";
+  if(oauthError || !code){
+    toast("The connection was not finished");
+    if(currentAuth() && currentAuth().email) go("you");
+    return;
+  }
+  const links = cleanWearables(loadYou().wearables);
+  const prev = links[provider] || {entries:[]};
+  let status = "pending";
+  let note = "Sign-in came back. The token exchange is not set up yet.";
+  try {
+    if(typeof authKeyReady==="function" && authKeyReady() && typeof authSession==="function"){
+      const live = await authSession();
+      if(live && live.access_token){
+        const res = await fetch(AUTH_PROJECT_URL.replace(/\/$/,"")+"/functions/v1/wearable-oauth", {
+          method:"POST",
+          headers:{
+            apikey: AUTH_PUBLISHABLE_KEY,
+            Authorization: "Bearer "+live.access_token,
+            "Content-Type":"application/json"
+          },
+          body: JSON.stringify({
+            action:"exchange",
+            provider:provider,
+            code:code,
+            redirectUri: wearableRedirectUri(),
+            codeVerifier: pending && pending.verifier ? pending.verifier : ""
+          })
+        });
+        if(res.ok){
+          status = "connected";
+          note = "";
+        }
+      }
+    }
+  } catch(e){ status = "pending"; }
+  links[provider] = {status:status, at:Date.now(), entries:prev.entries||[]};
+  writeWearables(links);
+  if(currentAuth() && currentAuth().email){
+    go("you");
+    toast(status==="connected" ? item.name+" connected" : note);
+  } else toast("Sign in to finish connecting");
 }
 const FAST_MARKS = [
   {h:4, note:"Around 4 hours, digestion of the last meal is winding down."},
@@ -12983,6 +13236,44 @@ function onYouSubmit(e){
     return;
   }
   if(kind==="messages"){ saveYou({messages: form.note.value}); toast("Saved"); return; }
+  if(kind==="wearmanual"){
+    const id = form.dataset.wearid || "";
+    const item = wearableById(id);
+    if(!item || item.kind!=="phone") return;
+    const stepsRaw = form.steps.value.trim();
+    const heartRaw = form.heart.value.trim();
+    const sleepRaw = form.sleep.value.trim();
+    const note = form.note.value.trim().slice(0,140);
+    let steps = null;
+    let heart = null;
+    let sleep = null;
+    if(stepsRaw){
+      steps = num(stepsRaw);
+      if(steps==null || steps<0 || steps>200000){ toast("Enter steps from 0 to 200000, or leave them blank"); return; }
+      steps = Math.round(steps);
+    }
+    if(heartRaw){
+      heart = num(heartRaw);
+      if(heart==null || heart<30 || heart>230){ toast("Enter a heart rate from 30 to 230, or leave it blank"); return; }
+      heart = Math.round(heart);
+    }
+    if(sleepRaw){
+      sleep = num(sleepRaw);
+      if(sleep==null || sleep<0 || sleep>24){ toast("Enter sleep hours from 0 to 24, or leave them blank"); return; }
+      sleep = r1(sleep);
+    }
+    const date = /^\d{4}-\d{2}-\d{2}$/.test(form.date.value) ? form.date.value : "";
+    if(steps==null && heart==null && sleep==null && !note){ toast("Enter steps, heart rate, sleep, or a note"); return; }
+    const links = cleanWearables(loadYou().wearables);
+    const prev = links[id] || {entries:[]};
+    const entries = (prev.entries||[]).concat([{id:uid(), date:date, steps:steps, heart:heart, sleep:sleep, note:note}]);
+    links[id] = {status:"manual", at:Date.now(), entries:entries};
+    writeWearables(links);
+    wearOpenId = id;
+    refreshYou();
+    toast("Entry saved");
+    return;
+  }
   if(kind==="device"){
     const name = form.name.value.trim();
     if(!name){ toast("Enter a device name"); return; }
@@ -13006,6 +13297,32 @@ function onYouClick(e){
     return;
   }
   if(e.target.closest("[data-devread]")){ readBrowserHeart(); return; }
+  const wearManual = e.target.closest("[data-wearmanual]");
+  if(wearManual){
+    wearOpenId = wearOpenId===wearManual.dataset.wearmanual ? "" : wearManual.dataset.wearmanual;
+    refreshYou();
+    return;
+  }
+  const wearAsk = e.target.closest("[data-wearask]");
+  if(wearAsk){ askWearable(wearAsk.dataset.wearask); return; }
+  const wearConnect = e.target.closest("[data-wearconnect]");
+  if(wearConnect){ startWearableOAuth(wearConnect.dataset.wearconnect); return; }
+  const wearClear = e.target.closest("[data-wearclear]");
+  if(wearClear){ clearWearable(wearClear.dataset.wearclear); return; }
+  const wearDel = e.target.closest("[data-weardel]");
+  if(wearDel){
+    const id = wearDel.dataset.wearprov;
+    const links = cleanWearables(loadYou().wearables);
+    const prev = links[id];
+    if(!prev) return;
+    prev.entries = (prev.entries||[]).filter(entry=>entry.id!==wearDel.dataset.weardel);
+    if(!prev.entries.length && prev.status==="manual") delete links[id];
+    else links[id] = prev;
+    writeWearables(links);
+    refreshYou();
+    toast("Removed");
+    return;
+  }
   const del = e.target.closest("[data-youdel]");
   if(del){
     const y = loadYou();
@@ -14594,7 +14911,10 @@ document.addEventListener("visibilitychange", () => {
 window.addEventListener("pagehide", markAway);
 window.addEventListener("pageshow", e => { if(e.persisted) onReturn(); });
 if(sessionStorage.getItem(RETURN_LOGIN_KEY)==="1") sessionStorage.removeItem(RETURN_LOGIN_KEY);
-restoreRememberedSession().then(ok => { if(!ok) showWelcome("home"); });
+restoreRememberedSession().then(ok => {
+  if(!ok) showWelcome("home");
+  resumeWearableOAuth();
+});
 window.__fitness = {get state(){return S;}, KEY, applyBarcode};
 })();
 </script>
