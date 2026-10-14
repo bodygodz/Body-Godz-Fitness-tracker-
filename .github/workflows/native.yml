@@ -1,0 +1,118 @@
+name: Native apps
+
+on:
+  push:
+    branches:
+      - native/capacitor
+  pull_request:
+    branches:
+      - preview/login-phone
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    name: Android debug APK and unsigned bundle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Copy the website into the app
+        run: node native/scripts/copy-web.mjs
+
+      - name: Install Capacitor
+        working-directory: native
+        run: npm ci
+
+      - name: Sync the Android project
+        working-directory: native
+        run: npx cap sync android
+
+      - name: Install the Android 36 SDK used by this project
+        run: |
+          if [ -z "${ANDROID_HOME:-}" ] && [ -d /usr/local/lib/android/sdk ]; then
+            echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> "$GITHUB_ENV"
+            export ANDROID_HOME=/usr/local/lib/android/sdk
+          fi
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          if command -v sdkmanager >/dev/null 2>&1; then
+            SM=sdkmanager
+          elif [ -x "$SDK/cmdline-tools/latest/bin/sdkmanager" ]; then
+            SM="$SDK/cmdline-tools/latest/bin/sdkmanager"
+          else
+            SM=""
+          fi
+          if [ -n "$SM" ]; then
+            yes | "$SM" --licenses >/dev/null || true
+            "$SM" --install "platforms;android-36" "build-tools;36.0.0"
+          else
+            echo "sdkmanager is not on this runner. Gradle will use the SDK that is already installed."
+          fi
+
+      - name: Build a debug APK and an unsigned release bundle
+        working-directory: native/android
+        run: ./gradlew assembleDebug bundleRelease --no-daemon --stacktrace
+
+      - name: Upload the APK and the unsigned bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: curly-gurl-android
+          if-no-files-found: error
+          path: |
+            native/android/app/build/outputs/apk/debug/app-debug.apk
+            native/android/app/build/outputs/bundle/release/app-release.aab
+
+  ios:
+    name: iOS simulator compile without signing
+    runs-on: macos-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: native/package-lock.json
+
+      - name: Copy the website into the app
+        run: node native/scripts/copy-web.mjs
+
+      - name: Install Capacitor
+        working-directory: native
+        run: npm ci
+
+      - name: Sync the iOS project
+        working-directory: native
+        run: npx cap sync ios
+
+      - name: Compile for the iOS Simulator without a signing certificate
+        working-directory: native/ios/App
+        run: >
+          xcodebuild
+          -project App.xcodeproj
+          -scheme App
+          -sdk iphonesimulator
+          -destination 'generic/platform=iOS Simulator'
+          -configuration Debug
+          CODE_SIGNING_ALLOWED=NO
+          CODE_SIGNING_REQUIRED=NO
+          CODE_SIGN_IDENTITY=""
+          build
