@@ -724,6 +724,10 @@ body.welcome-on .profilepic,body.welcome-on #profileBtn{display:none !important}
 #profileBtn .profilepic,#avatarPreview,#bubblePreview{pointer-events:none;object-position:center !important}
 #avatarSheet{z-index:80}
 #avatarPreview{width:96px;height:96px;border-radius:50%;object-fit:cover;object-position:center;display:block;margin:4px auto 8px;background:#fff}
+.setavatar{display:flex;gap:12px;align-items:center;margin:0 0 12px}
+.setavatar img{width:72px;height:72px;border-radius:50%;object-fit:cover;object-position:center;background:#fff;flex:none}
+.setavatar .grow{display:flex;flex-direction:column;gap:8px}
+#setHeightUs[hidden],#setHeightMetric[hidden]{display:none !important}
 .daymenu{background:#FFFFFF;border-radius:var(--radius);padding:8px;margin:4px 0 8px;display:flex;flex-direction:column;gap:6px;color:#0B0B39;overflow:hidden}
 .daymenu[hidden]{display:none !important}
 .daymenu button{text-align:left;background:transparent;border:none;color:#0B0B39}
@@ -2697,6 +2701,61 @@ body:not(.welcome-on) .wotype.sel{background:#F3F0FF !important;border-color:#56
     <h2>Account</h2>
     <p id="accountWho"></p>
   </div>
+  <form class="card" id="setProfileCard">
+    <h2>Edit profile</h2>
+    <div class="setavatar">
+      <img id="setAvatar" src="images/default-avatar.png" alt="Profile photo">
+      <div class="grow">
+        <button type="button" class="full" id="setAvatarChange">Change photo</button>
+        <button type="button" class="full" id="setAvatarRemove">Remove photo</button>
+      </div>
+    </div>
+    <div class="field"><label class="f" for="setName">Name</label><input id="setName" maxlength="60" autocomplete="name"></div>
+    <div class="field"><label class="f" for="setPhone">Phone</label><input id="setPhone" type="tel" maxlength="40" autocomplete="tel" placeholder="Optional"></div>
+    <div class="field"><label class="f" for="setBirthday">Birthday</label><input id="setBirthday" type="date"></div>
+    <div class="field"><label class="f" for="setGender">Gender</label>
+      <select id="setGender">
+        <option value="">Not set</option>
+        <option value="woman">Woman</option>
+        <option value="man">Man</option>
+        <option value="nonbinary">Nonbinary</option>
+        <option value="other">Another</option>
+        <option value="unspecified">Prefer not to say</option>
+      </select>
+    </div>
+    <div class="field"><label class="f" for="setUnits">Units</label>
+      <select id="setUnits">
+        <option value="lb">Pounds and feet</option>
+        <option value="kg">Kilograms and centimeters</option>
+      </select>
+    </div>
+    <div id="setHeightUs">
+      <div class="row">
+        <div class="field"><label class="f" for="setFt">Height (ft)</label><input id="setFt" type="number" inputmode="numeric" min="0" max="8" placeholder="ft"></div>
+        <div class="field"><label class="f" for="setIn">Height (in)</label><input id="setIn" type="number" inputmode="decimal" min="0" max="11.9" step="0.1" placeholder="in"></div>
+      </div>
+    </div>
+    <div class="field" id="setHeightMetric" hidden><label class="f" for="setCm">Height (cm)</label><input id="setCm" type="number" inputmode="decimal" min="0" max="250" step="0.1" placeholder="cm"></div>
+    <div class="field"><label class="f" for="setGoal" id="setGoalLabel">Goal weight (lb)</label><input id="setGoal" type="number" inputmode="decimal" min="0" step="0.1" placeholder="Not set"></div>
+    <div class="field"><label class="f" for="setGoals">Goals</label><textarea id="setGoals" maxlength="500" placeholder="What you are working toward"></textarea></div>
+    <div class="field"><label class="f" for="setBio">Bio</label><textarea id="setBio" maxlength="500" placeholder="A short note about you"></textarea></div>
+    <p class="note" id="setProfileMsg" hidden></p>
+    <button type="submit" class="primary full" id="setProfileSave">Save profile</button>
+  </form>
+  <form class="card" id="setPassCard">
+    <h2>Change password</h2>
+    <div class="field"><label class="f" for="setPass">New password</label><input id="setPass" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
+    <div class="field"><label class="f" for="setPass2">Confirm password</label><input id="setPass2" type="password" autocomplete="new-password" placeholder="Type it again"></div>
+    <p class="note" id="setPassMsg" hidden></p>
+    <button type="submit" class="primary full" id="setPassSave">Update password</button>
+  </form>
+  <form class="card" id="setEmailCard">
+    <h2>Change email</h2>
+    <div class="field"><label class="f" for="setEmailNow">Current email</label><input id="setEmailNow" type="email" readonly></div>
+    <div class="field"><label class="f" for="setEmailNext">New email</label><input id="setEmailNext" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"></div>
+    <p class="note" id="setEmailMsg" hidden></p>
+    <button type="submit" class="primary full" id="setEmailSave">Update email</button>
+  </form>
   <div class="card">
     <h2>Mode</h2>
     <div class="note" id="modeCaption" style="margin-bottom:8px">Pick how you use this app.</div>
@@ -7259,12 +7318,110 @@ $("wAdd").onclick = () => {
 };
 
 /* ---------- Settings ---------- */
+const MEMBER_PROFILE_KEY = "curlyGirlFitness.memberProfile.v1";
+const PROFILE_GENDERS = ["", "woman", "man", "nonbinary", "other", "unspecified"];
+function memberProfileKey(){
+  return typeof avatarOwnerKey==="function" ? avatarOwnerKey() : "";
+}
+function loadMemberProfile(){
+  const bag = readStore(localStorage, MEMBER_PROFILE_KEY);
+  const row = bag && memberProfileKey() && bag[memberProfileKey()] && typeof bag[memberProfileKey()]==="object" ? bag[memberProfileKey()] : {};
+  const birthday = String(row.birthday||"");
+  return {
+    phone: String(row.phone||"").trim().slice(0,40),
+    birthday: /^\d{4}-\d{2}-\d{2}$/.test(birthday) ? birthday : "",
+    gender: PROFILE_GENDERS.indexOf(row.gender)>=0 ? row.gender : "",
+    goals: String(row.goals||"").slice(0,500),
+    bio: String(row.bio||"").slice(0,500),
+    units: row.units==="kg" ? "kg" : "lb"
+  };
+}
+function writeMemberProfile(row){
+  const raw = readStore(localStorage, MEMBER_PROFILE_KEY);
+  const bag = raw && typeof raw==="object" && !Array.isArray(raw) ? raw : {};
+  const key = memberProfileKey();
+  if(!key) return;
+  bag[key] = row;
+  localStorage.setItem(MEMBER_PROFILE_KEY, JSON.stringify(bag));
+}
+function settingsMsg(id, text){
+  const el = $(id);
+  if(!el) return;
+  el.hidden = !text;
+  el.textContent = text || "";
+}
+function heightParts(inches){
+  if(!(inches>0)) return {ft:"", inch:"", cm:""};
+  const ft = Math.floor(inches/12);
+  const inch = Math.round((inches-ft*12)*10)/10;
+  return {ft:String(ft), inch:String(inch), cm:String(Math.round(inches*2.54*10)/10)};
+}
+function goalShown(lb, units){
+  if(!(lb>0)) return "";
+  if(units==="kg") return String(Math.round((lb/2.2046226218)*10)/10);
+  return String(r1(lb));
+}
+function readSettingsHeight(units){
+  if(units==="kg"){
+    const cm = num($("setCm").value);
+    return cm>0 ? cm/2.54 : null;
+  }
+  const ft = num($("setFt").value);
+  const inch = num($("setIn").value);
+  const total = (ft>0?ft:0)*12 + (inch>0?inch:0);
+  return total>0 ? total : null;
+}
+function readSettingsGoal(units){
+  const n = num($("setGoal").value);
+  if(!(n>0)) return null;
+  return units==="kg" ? n*2.2046226218 : n;
+}
+function paintSettingsBody(inches, lb, units){
+  const metric = units==="kg";
+  $("setHeightUs").hidden = metric;
+  $("setHeightMetric").hidden = !metric;
+  $("setGoalLabel").textContent = metric ? "Goal weight (kg)" : "Goal weight (lb)";
+  const parts = heightParts(inches);
+  $("setFt").value = metric ? "" : parts.ft;
+  $("setIn").value = metric ? "" : parts.inch;
+  $("setCm").value = metric ? parts.cm : "";
+  $("setGoal").value = goalShown(lb, units);
+  $("setUnits").dataset.shown = units;
+}
+function fillSettingsProfile(){
+  const auth = currentAuth();
+  const account = auth ? accountForAuth(auth) : null;
+  const on = !!account;
+  ["setProfileCard","setPassCard","setEmailCard"].forEach(id=>{ if($(id)) $(id).hidden = !on; });
+  if(!on) return;
+  const profile = loadMemberProfile();
+  $("setName").value = account.name||"";
+  $("setPhone").value = profile.phone;
+  $("setBirthday").value = profile.birthday;
+  $("setGender").value = profile.gender;
+  $("setGoals").value = profile.goals;
+  $("setBio").value = profile.bio;
+  $("setUnits").value = profile.units;
+  $("setEmailNow").value = account.email||"";
+  if($("setAvatar")) $("setAvatar").src = currentAvatar();
+  const st = S.settings || {};
+  paintSettingsBody(num(st.heightIn), num(st.goalWeight), profile.units);
+}
+function pushMemberProfile(body){
+  Promise.resolve().then(async ()=>{
+    if(typeof authKeyReady!=="function" || !authKeyReady()) return;
+    const session = await authSession();
+    if(!session || !session.user) return;
+    await sbAuth("profiles?id=eq."+encodeURIComponent(session.user.id), {method:"PATCH", body:body});
+  }).catch(()=>{});
+}
 function renderSettings(){
-  $("hdrSub").textContent = "Targets, presets & backup";
+  $("hdrSub").textContent = "Profile, password, and targets";
   const auth = currentAuth();
   const account = auth ? accountForAuth(auth) : null;
   $("accountCard").hidden = !account;
   if(account) $("accountWho").textContent = account.name+" · "+account.email;
+  fillSettingsProfile();
   const st=S.settings;
   $("sCal").value = st.calTarget??""; $("sPro").value = st.proteinTarget??""; $("sGoal").value = st.goalWeight??"";
   renderPresetEditor(S.presets);
@@ -7290,6 +7447,99 @@ $("sSave").onclick = () => {
   S.settings.proteinTarget = p&&p>0?Math.round(p):null;
   S.settings.goalWeight = g&&g>0?r1(g):null;
   save(); render(); toast("Targets saved");
+};
+$("setUnits").onchange = () => {
+  const next = $("setUnits").value==="kg" ? "kg" : "lb";
+  const prev = $("setUnits").dataset.shown==="kg" ? "kg" : "lb";
+  if(next===prev) return;
+  const inches = readSettingsHeight(prev);
+  const lb = readSettingsGoal(prev);
+  paintSettingsBody(inches, lb, next);
+};
+$("setProfileCard").onsubmit = (e) => {
+  e.preventDefault();
+  const auth = currentAuth();
+  const account = auth ? accountForAuth(auth) : null;
+  if(!account){ settingsMsg("setProfileMsg", "Sign in to save your profile"); return; }
+  const name = $("setName").value.trim();
+  if(!name){ settingsMsg("setProfileMsg", "Enter your name"); $("setName").focus(); return; }
+  const units = $("setUnits").value==="kg" ? "kg" : "lb";
+  const phone = $("setPhone").value.trim().slice(0,40);
+  const birthday = /^\d{4}-\d{2}-\d{2}$/.test($("setBirthday").value) ? $("setBirthday").value : "";
+  const gender = PROFILE_GENDERS.indexOf($("setGender").value)>=0 ? $("setGender").value : "";
+  const goals = $("setGoals").value.trim().slice(0,500);
+  const bio = $("setBio").value.trim().slice(0,500);
+  const inches = readSettingsHeight(units);
+  const goalLb = readSettingsGoal(units);
+  rememberAccount(Object.assign({}, account, {name:name}));
+  writeMemberProfile({phone:phone, birthday:birthday, gender:gender, goals:goals, bio:bio, units:units});
+  S.settings.heightIn = inches ? r1(inches) : null;
+  S.settings.goalWeight = goalLb ? r1(goalLb) : null;
+  save();
+  pushMemberProfile({
+    name:name,
+    phone:phone,
+    birthday:birthday || null,
+    gender:gender,
+    height_in: inches ? r1(inches) : null,
+    goal_weight: goalLb ? r1(goalLb) : null,
+    goals:goals,
+    bio:bio,
+    units:units
+  });
+  render();
+  settingsMsg("setProfileMsg", "Profile saved");
+  toast("Profile saved");
+};
+$("setAvatarChange").onclick = () => $("avatarFile").click();
+$("setAvatarRemove").onclick = () => {
+  if(!currentAuth()) return;
+  writeAvatar("");
+  settingsMsg("setProfileMsg", "Photo removed");
+  toast("Photo removed");
+};
+$("setPassCard").onsubmit = (e) => {
+  e.preventDefault();
+  const next = $("setPass").value;
+  const again = $("setPass2").value;
+  settingsMsg("setPassMsg", "");
+  if(next.length<8){ settingsMsg("setPassMsg", "Use at least 8 characters."); $("setPass").focus(); return; }
+  if(next!==again){ settingsMsg("setPassMsg", "Those passwords do not match."); $("setPass2").focus(); return; }
+  if(!currentAuth()){ settingsMsg("setPassMsg", "Sign in to change your password."); return; }
+  (async () => {
+    try {
+      const client = await authClient();
+      const { error } = await client.auth.updateUser({ password: next });
+      if(error) throw new Error(error.message || "Could not change the password.");
+      $("setPass").value = "";
+      $("setPass2").value = "";
+      settingsMsg("setPassMsg", "Password updated.");
+      toast("Password updated");
+    } catch(err) {
+      settingsMsg("setPassMsg", err && err.message ? err.message : "Could not change the password.");
+    }
+  })();
+};
+$("setEmailCard").onsubmit = (e) => {
+  e.preventDefault();
+  const email = $("setEmailNext").value.trim().toLowerCase();
+  const current = ($("setEmailNow").value||"").trim().toLowerCase();
+  settingsMsg("setEmailMsg", "");
+  if(!emailOk(email)){ settingsMsg("setEmailMsg", "Enter a valid email."); $("setEmailNext").focus(); return; }
+  if(email===current){ settingsMsg("setEmailMsg", "That is already your email."); return; }
+  if(!currentAuth()){ settingsMsg("setEmailMsg", "Sign in to change your email."); return; }
+  (async () => {
+    try {
+      const client = await authClient();
+      const { error } = await client.auth.updateUser({ email: email });
+      if(error) throw new Error(error.message || "Could not change the email.");
+      $("setEmailNext").value = "";
+      settingsMsg("setEmailMsg", "Check your email to confirm the new address.");
+      toast("Check your email to confirm the new address");
+    } catch(err) {
+      settingsMsg("setEmailMsg", err && err.message ? err.message : "Could not change the email.");
+    }
+  })();
 };
 $("exportBtn").onclick = () => {
   const blob = new Blob([JSON.stringify({app:"nic-fitness-tracker", exportedAt:new Date().toISOString(), data:S}, null, 2)], {type:"application/json"});
@@ -12720,10 +12970,10 @@ function applyMemberLook(){
   if(meta) meta.setAttribute("content", page);
   applyTheme();
   const img = document.getElementById("profilePic");
-  if(img){
-    const next = currentAvatar();
-    if(img.getAttribute("src")!==next) img.src = next;
-  }
+  const next = currentAvatar();
+  if(img && img.getAttribute("src")!==next) img.src = next;
+  const setAv = document.getElementById("setAvatar");
+  if(setAv && setAv.getAttribute("src")!==next) setAv.src = next;
   if(!avatarPullStarted){ avatarPullStarted = true; pullAvatar(); }
 }
 function paintMyPage(){
