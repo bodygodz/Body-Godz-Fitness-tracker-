@@ -2351,9 +2351,9 @@ details summary::-webkit-details-marker{display:none}
     <h2>Log weight</h2>
     <div class="row">
       <div class="field"><label class="f">Date</label><input type="date" id="wDate"></div>
-      <div class="field"><label class="f">Weight (lb)</label><input type="number" inputmode="decimal" step="0.1" id="wVal" placeholder="0.0"></div>
+      <div class="field"><label class="f">Weight (lb)</label><input type="number" inputmode="decimal" step="0.1" min="0.1" id="wVal" placeholder="Enter weight" value=""></div>
     </div>
-    <button class="primary full" id="wAdd">Save weight</button>
+    <button class="primary full" id="wAdd" type="button" disabled>Save weight</button>
   </div>
   <div class="card">
     <h2>History</h2>
@@ -3616,7 +3616,12 @@ function normalize(d){
     presets:Array.isArray(d.presets)&&d.presets.length ? d.presets : b.presets,
     meals:Array.isArray(d.meals)?d.meals:[],
     mealPlans:normalizeMealPlans(d.mealPlans),
-    weights:Array.isArray(d.weights)?d.weights:[],
+    weights:Array.isArray(d.weights)?d.weights.filter(w=>{
+      if(!w || typeof w!=="object") return false;
+      const raw = w.lbs!=null && w.lbs!=="" ? w.lbs : w.weight;
+      const n = parseFloat(raw);
+      return isFinite(n) && n>0 && n<=1000;
+    }):[],
     steps:(d.steps&&typeof d.steps==="object")?d.steps:{},
     water:(d.water&&typeof d.water==="object"&&!Array.isArray(d.water))?d.water:{},
     dayNotes:(d.dayNotes&&typeof d.dayNotes==="object"&&!Array.isArray(d.dayNotes))?d.dayNotes:{},
@@ -4394,13 +4399,34 @@ function foodQueryMatch(query, label){
   const tokens = new Set(foodKey(label).split(" ").filter(Boolean));
   return words.every(w=>foodWordHit(tokens, w));
 }
-function foodRank(query, name){
-  const q = foodKey(query);
-  const k = foodKey(name);
-  if(!q || !k) return 2;
+function foodSingular(word){
+  const w = String(word||"");
+  if(w.length>4 && w.endsWith("ies")) return w.slice(0,-3)+"y";
+  if(w.length>3 && /(ch|sh|ss|x|z)es$/.test(w)) return w.slice(0,-2);
+  if(w.length>3 && w.endsWith("s") && !w.endsWith("ss")) return w.slice(0,-1);
+  return w;
+}
+function foodNameRank(query, name){
+  const qWords = foodKey(query).split(" ").filter(Boolean).map(foodSingular);
+  const kWords = foodKey(name).split(" ").filter(Boolean).map(foodSingular);
+  if(!qWords.length || !kWords.length) return 4;
+  const q = qWords.join(" ");
+  const k = kWords.join(" ");
   if(k===q) return 0;
-  if(k.indexOf(q)===0) return 1;
+  if(qWords.length===1 && kWords[0]===qWords[0] && /(?:^| )raw$/.test(k) && kWords.length<=3) return 1;
+  if(k.indexOf(q)===0 || kWords[0]===qWords[0]) return 2;
+  if(qWords.every(w=>kWords.indexOf(w)>=0)) return 3;
+  return 4;
+}
+function foodWholeRank(food){
+  const type = food && food.dataType || "";
+  if(type==="Foundation" || type==="SR Legacy") return 0;
+  if(type==="Survey (FNDDS)") return 1;
+  if(food && food.source==="USDA" && !food.brand) return 0;
   return 2;
+}
+function foodRank(query, name){
+  return foodNameRank(query, name);
 }
 function packListed(name, brand, cal, protein, carbs, fat, amount, source){
   const bits = [Math.round(cal)+" cal"];
@@ -4415,6 +4441,53 @@ function nutById(list, id){
   const n = Number(row.value);
   return Number.isFinite(n) && n>=0 ? n : null;
 }
+function plainPortion(name){
+  const key = foodKey(name);
+  if(key==="bananas raw" || key==="banana raw") return {label:"1 medium", grams:118};
+  return null;
+}
+function applyFoodPortion(food, label, grams){
+  const cal = scaleNut(food.per100Cal, grams);
+  if(cal==null || !(cal>0)) return;
+  const next = packListed(food.name, food.brand||"", cal, scaleNut(food.per100Protein, grams), scaleNut(food.per100Carbs, grams), scaleNut(food.per100Fat, grams), label, food.source);
+  food.detail = next.detail;
+  food.cal = next.cal;
+  food.protein = next.protein;
+  food.carbs = next.carbs;
+  food.fat = next.fat;
+  food.amount = next.amount;
+}
+function householdPortion(portions){
+  const choices = [];
+  (portions||[]).forEach(p=>{
+    const grams = Number(p && p.gramWeight);
+    const mod = String((p && (p.modifier || p.portionDescription)) || "").trim();
+    if(!(grams>0) || !mod || /nlea/i.test(mod)) return;
+    const size = mod.match(/^(extra small|extra large|medium|large|small)\b/i);
+    const label = size ? "1 "+size[1].toLowerCase() : ((Number(p.amount)>0 ? String(p.amount).replace(/\.0$/,"") : "1")+" "+mod.split("(")[0].trim());
+    const s = label.toLowerCase();
+    let rank = 5;
+    if(/\bmedium\b/.test(s)) rank = 0;
+    else if(/\b(whole|fruit)\b/.test(s)) rank = 1;
+    else if(/\blarge\b/.test(s)) rank = 2;
+    else if(/\bsmall\b/.test(s)) rank = 3;
+    else if(/\bcup\b/.test(s)) rank = 4;
+    else if(/\b(tbsp|tsp|tablespoon|teaspoon)\b/.test(s)) rank = 9;
+    choices.push({label:label, grams:grams, rank:rank});
+  });
+  choices.sort((a,b)=>a.rank-b.rank || a.grams-b.grams);
+  return choices[0] || null;
+}
+async function enrichWholePortions(foods){
+  const targets = (foods||[]).filter(f=>foodWholeRank(f)===0 && f.fdcId && f.amount==="100 g").slice(0, 4);
+  await Promise.all(targets.map(async food=>{
+    try{
+      const data = await fetchFoodJson("https://api.nal.usda.gov/fdc/v1/food/"+encodeURIComponent(food.fdcId)+"?api_key=DEMO_KEY");
+      const best = householdPortion(data && data.foodPortions);
+      if(best) applyFoodPortion(food, best.label, best.grams);
+    }catch(e){}
+  }));
+}
 function listedUsdaFood(food, query){
   const name = String(food.description||"").trim();
   const brand = String(food.brandOwner || food.brandName || "").trim();
@@ -4425,15 +4498,31 @@ function listedUsdaFood(food, query){
   const fat = nutById(food.foodNutrients, 1004);
   const carbs = nutById(food.foodNutrients, 1005);
   let amount = "";
+  let useCal = cal, useProtein = protein, useFat = fat, useCarbs = carbs;
   if(food.dataType==="Branded"){
     amount = String(food.householdServingFullText||"").trim();
     if(!amount && food.servingSize!=null && food.servingSizeUnit) amount = String(food.servingSize)+" "+String(food.servingSizeUnit);
     if(!amount) return null;
   } else {
-    amount = "100 g";
+    const portion = plainPortion(name);
+    if(portion){
+      amount = portion.label;
+      useCal = scaleNut(cal, portion.grams);
+      useProtein = scaleNut(protein, portion.grams);
+      useFat = scaleNut(fat, portion.grams);
+      useCarbs = scaleNut(carbs, portion.grams);
+    } else amount = "100 g";
   }
   const source = food.dataType==="Branded" ? "USDA packaged" : "USDA";
-  return packListed(name, brand, cal, protein, carbs, fat, amount, source);
+  const row = packListed(name, brand, useCal, useProtein, useCarbs, useFat, amount, source);
+  row.brand = brand;
+  row.dataType = food.dataType || "";
+  row.fdcId = food.fdcId || null;
+  row.per100Cal = cal;
+  row.per100Protein = protein;
+  row.per100Carbs = carbs;
+  row.per100Fat = fat;
+  return row;
 }
 function listedFood(product, query){
   const name = String(product.product_name || product.product_name_en || "").trim();
@@ -4478,10 +4567,12 @@ function takeFoodHits(foods, query){
     hits.push(food);
   });
   hits.sort((a,b)=>{
-    const d = foodRank(query, a.name)-foodRank(query, b.name);
+    const w = foodWholeRank(a)-foodWholeRank(b);
+    if(w) return w;
+    const d = foodNameRank(query, a.name)-foodNameRank(query, b.name);
     if(d) return d;
     const raw = (name) => /,\s*raw\b/i.test(name) ? 0 : 1;
-    return raw(a.name)-raw(b.name) || a.name.length-b.name.length;
+    return raw(a.name)-raw(b.name) || a.name.length-b.name.length || String(a.name).localeCompare(String(b.name));
   });
   return hits;
 }
@@ -4565,15 +4656,18 @@ async function lookupPublicFoods(query, seq){
   const still = () => ($("foodLogSearch").value||"").trim().toLowerCase()===query.toLowerCase() && seq===foodLookupSeq;
   if(!still()) return;
   const jobs = [
-    usdaFoodPages(query, "Branded"),
-    usdaFoodPages(query, "SR Legacy"),
-    usdaFoodPages(query, "Survey (FNDDS)"),
-    openFoodPages(query)
+    usdaFoodPages(query, "Foundation", 1),
+    usdaFoodPages(query, "SR Legacy", 1),
+    usdaFoodPages(query, "Survey (FNDDS)", 1),
+    usdaFoodPages(query, "Branded", 1),
+    openFoodPages(query, 1)
   ];
   const settled = await Promise.all(jobs.map(job=>job.then(rows=>({ok:true, rows:rows})).catch(()=>({ok:false, rows:[]}))));
   if(!still()) return;
   const answered = settled.some(item=>item.ok);
   const hits = takeFoodHits(settled.reduce((all, item)=>all.concat(item.rows), []), query);
+  if(!still()) return;
+  await enrichWholePortions(hits);
   if(!still()) return;
   if(hits.length){
     foodLookupHits = hits;
@@ -5355,9 +5449,10 @@ async function runTrainerFoodSearch(query){
   trainerFoodHits = local.slice();
   paintTrainerHits();
   const jobs = [
-    usdaFoodPages(query, "Branded", 1),
+    usdaFoodPages(query, "Foundation", 1),
     usdaFoodPages(query, "SR Legacy", 1),
     usdaFoodPages(query, "Survey (FNDDS)", 1),
+    usdaFoodPages(query, "Branded", 1),
     openFoodPages(query, 1)
   ];
   const settled = await Promise.all(jobs.map(job => job.then(rows=>rows).catch(()=>null)));
@@ -5365,6 +5460,8 @@ async function runTrainerFoodSearch(query){
   const remote = settled.reduce((all, rows)=>all.concat(rows||[]), []);
   const failed = settled.every(rows => rows==null);
   trainerFoodHits = takeFoodHits(local.concat(remote), query).filter(food => food && Number.isFinite(Number(food.cal)));
+  await enrichWholePortions(trainerFoodHits);
+  if(seq!==trainerFoodSeq || trainerMealMode!=="quick" || currentTab!=="meals") return;
   paintTrainerHits(failed && !trainerFoodHits.length);
 }
 function paintPresetChips(){
@@ -6736,12 +6833,28 @@ function drawChart(ws, goal){
   if(chart){ chart.destroy(); }
   chart = new Chart($("wChart"), cfg);
 }
+function weightEntryOk(raw){
+  const v = num(raw);
+  return v!=null && v>0 && v<=1000;
+}
+function syncWeightSave(){
+  const btn = $("wAdd");
+  const input = $("wVal");
+  if(!btn || !input) return;
+  btn.disabled = !weightEntryOk(input.value);
+}
+$("wVal").addEventListener("input", syncWeightSave);
+syncWeightSave();
 $("wAdd").onclick = () => {
   const date=$("wDate").value || todayStr(), v=num($("wVal").value);
-  if(v==null||v<=0||v>1000){ toast("Enter a valid weight"); return; }
+  if(!weightEntryOk(v)){ toast("Enter a weight above 0"); return; }
   const ex = S.weights.find(w=>w.date===date);
   if(ex) ex.lbs=r1(v); else S.weights.push({id:uid(), date, lbs:r1(v)});
-  save(); $("wVal").value=""; render(); toast(ex?"Updated "+fmtDate(date,{month:"short",day:"numeric"}):"Weight saved");
+  save();
+  $("wVal").value = "";
+  syncWeightSave();
+  render();
+  toast(ex?"Updated "+fmtDate(date,{month:"short",day:"numeric"}):"Weight saved");
 };
 
 /* ---------- Settings ---------- */
@@ -10782,13 +10895,15 @@ async function askLookupOne(query){
   const q = String(query||"").trim();
   if(q.length<2) return {query:q, name:q, cal:null, protein:null, carbs:null, fat:null, amount:"", source:"", missing:true, answered:false};
   const jobs = [
-    usdaFoodPages(q, "Branded", 1),
+    usdaFoodPages(q, "Foundation", 1),
     usdaFoodPages(q, "SR Legacy", 1),
     usdaFoodPages(q, "Survey (FNDDS)", 1),
+    usdaFoodPages(q, "Branded", 1),
     openFoodPages(q, 1)
   ];
   const settled = await Promise.all(jobs.map(job=>askDeadline(job, 7000).then(rows=>({ok:true, rows:rows||[]})).catch(()=>({ok:false, rows:[]}))));
   const hits = takeFoodHits(settled.reduce((all, item)=>all.concat(item.rows), []), q);
+  await enrichWholePortions(hits);
   const answered = settled.some(item=>item.ok);
   if(!hits.length || askNum(hits[0].cal)==null) return {query:q, name:q, cal:null, protein:null, carbs:null, fat:null, amount:"", source:"", missing:true, answered:answered};
   const hit = hits[0];
