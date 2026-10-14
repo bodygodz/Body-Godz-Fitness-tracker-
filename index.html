@@ -1553,6 +1553,20 @@ details summary::-webkit-details-marker{display:none}
 .stat .label{font:500 13px/18px var(--font); color:var(--text-2); text-transform:none}
 .stat .big{font:700 22px/28px var(--font)}
 @media (prefers-reduced-motion:reduce){.scrim,.toolpanel,.modalbox{animation:none}}
+#helperLib{z-index:70}
+#helperLib .modalbox{display:flex;flex-direction:column;gap:8px;max-height:min(88dvh,760px);overflow:hidden}
+#helperChips{flex-wrap:nowrap;overflow-x:auto;margin:0;padding-bottom:2px}
+#helperChips .chip{flex:none;min-height:44px}
+#helperList{flex:1 1 auto;min-height:0;overflow:auto;padding-bottom:4px}
+#helperLib .helperhit{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1px solid #E4E2EB;border-radius:14px;padding:10px 12px;margin:0 0 8px;min-height:64px;box-shadow:none}
+#helperLib .helperhit .grow{flex:1;min-width:0;display:flex;flex-direction:column}
+#helperLib .helperhit .name,#helperLib .helperhit .meta{display:block}
+#helperLib .helperhit .name{font-weight:700;color:#0B0B39;font-size:15px;line-height:1.25}
+#helperLib .helperhit .meta{color:#5c5878;font-size:12px;font-weight:600;margin-top:2px}
+#helperLib .helperhit .mark{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(11,11,57,.28);flex:none;background:#fff}
+#helperLib .helperhit.sel{background:#F3F0FF;border-color:#563DD2;box-shadow:inset 0 0 0 1px #563DD2}
+#helperLib .helperhit.sel .mark{background:#563DD2;border-color:#563DD2;box-shadow:inset 0 0 0 3px #fff}
+#helperAdd{flex:none}
 
 </style>
 </head>
@@ -3141,6 +3155,20 @@ details summary::-webkit-details-marker{display:none}
         <button type="button" class="primary" id="pickerAdd" style="flex:1">Add to workout</button>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="modalback" id="helperLib" role="dialog" aria-modal="true" aria-labelledby="helperTitle">
+  <div class="modalbox">
+    <div class="row" style="justify-content:space-between;margin-bottom:2px">
+      <h2 id="helperTitle">Exercise library</h2>
+      <button type="button" class="sm ghost" id="helperClose">Done</button>
+    </div>
+    <div class="field"><input id="helperSearch" placeholder="Search exercises" autocomplete="off" enterkeyhint="search"></div>
+    <div class="chips" id="helperChips"></div>
+    <p class="note" id="helperNote">Tap an exercise to add it to this workout.</p>
+    <div id="helperList"></div>
+    <button type="button" class="primary full" id="helperAdd">Add selected</button>
   </div>
 </div>
 
@@ -6250,6 +6278,7 @@ function patchEx(bucket, id, patch){
 function showWoViews(){
   const editor=woView==="editor";
   const build=signedInTrainer() && woView==="build" && !editor;
+  if(!build && $("helperLib")) $("helperLib").style.display = "none";
   $("woBuild").style.display = build?"":"none";
   $("woHome").style.display = (!editor && !build)?"":"none";
   $("woEditor").style.display = editor?"":"none";
@@ -6602,7 +6631,11 @@ $("pickerToLib").onclick = () => {
   libSection="exercises";
   go("library");
 };
-document.addEventListener("keydown", e=>{ if(e.key==="Escape" && $("picker").style.display==="flex") closePicker(); });
+document.addEventListener("keydown", e=>{
+  if(e.key!=="Escape") return;
+  if($("helperLib") && $("helperLib").style.display==="flex"){ finishHelper(false); return; }
+  if($("picker").style.display==="flex") closePicker();
+});
 $("page-workout").addEventListener("change", e=>{
   const t=e.target;
   if(t.matches("[data-log]")){
@@ -6704,8 +6737,10 @@ function renderWoBuild(){
     const name = ($("woPlanName").value||"").trim() || ($("woPrompt").value||"").trim() || "Library draft";
     const forWhom = woClientName ? '<p class="note">For '+esc(woClientName)+'.</p>' : "";
     const blank = woType==="interval" ? "Time not set" : (woType==="circuit" ? "Rounds not set" : "Sets not set");
+    const picked = woDraftMoves.some(m => m && typeof m==="object" && m.target);
+    const lead = picked ? "Picked from the exercise library." : (WO_TYPE_NOTES[woType]||WO_TYPE_NOTES.regular)+" From the exercise library.";
     draft.hidden = false;
-    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">'+esc(WO_TYPE_NOTES[woType]||WO_TYPE_NOTES.regular)+' From the exercise library.</p><ul>'+woDraftMoves.map(n=>'<li><b>'+esc(n)+'</b><div class="note">'+blank+'</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
+    draft.innerHTML = '<div class="wotitle">'+esc(name)+'</div>'+forWhom+'<p class="note">'+esc(lead)+'</p><ul>'+woDraftMoves.map(m=>'<li><b>'+esc(moveName(m))+'</b><div class="note">'+esc(moveMeta(m, blank))+'</div></li>').join("")+'</ul><button type="button" class="full" id="woDraftEdit">Use this draft in the editor</button>';
     $("woDraftEdit").onclick = () => useDraftInEditor();
   }
   paintWoClients();
@@ -6781,7 +6816,10 @@ function useDraftInEditor(){
   if(!editorDraft) return;
   if(name) editorDraft.name = name;
   const kind = woType==="interval" ? "time" : "reps";
-  editorDraft.exercises = woDraftMoves.map(n=>({id:uid(), name:n, target:"", kind:kind}));
+  editorDraft.exercises = woDraftMoves.map(m=>{
+    if(typeof m==="string") return {id:uid(), name:m, target:"", kind:kind};
+    return {id:uid(), name:m.name, target:m.target||"", kind:m.kind==="time"?"time":kind};
+  });
   render();
 }
 document.querySelectorAll("[data-woidea]").forEach(b=>b.onclick=()=>{
@@ -6797,7 +6835,105 @@ document.querySelectorAll("[data-wotype]").forEach(b=>b.onclick=()=>{
   woType = b.dataset.wotype || "regular";
   renderWoBuild();
 });
-$("woDraftBtn").onclick = () => run(()=>draftFromLibrary());
+const HELPER_CHIPS = [
+  ["all","All"],
+  ["upper","Upper"],
+  ["lower","Lower"],
+  ["full","Full body"],
+  ["core","Core"],
+  ["cardio","Cardio"],
+  ["glutes","Glutes"],
+  ["chest","Chest"],
+  ["back","Back"],
+  ["shoulders","Shoulders"],
+  ["arms","Arms"],
+  ["legs","Legs"]
+];
+let helperFilter = "all";
+function moveName(m){ return typeof m==="string" ? m : (m && m.name) || ""; }
+function moveMeta(m, blank){
+  if(typeof m==="string" || !m) return blank;
+  const muscle = groupLabel(m.group);
+  const target = m.target || blank;
+  return muscle ? muscle+" · "+target : target;
+}
+function helperInChip(ex, chip){
+  if(!chip || chip==="all") return true;
+  if(chip==="upper") return ex.group==="chest" || ex.group==="back" || ex.group==="shoulders" || ex.group==="arms";
+  if(chip==="lower") return ex.group==="legs" || ex.group==="glutes";
+  if(chip==="full") return ex.group==="full";
+  return ex.group===chip;
+}
+function defaultSets(ex){
+  const name = String(ex && ex.name || "").toLowerCase();
+  const group = ex && ex.group || "";
+  if(group==="cardio" || /\bwalk\b|\brunn?ing\b|\brun\b|cycl|rowing|jump rope/.test(name)){
+    return {kind:"time", target:/long walk/.test(name) ? "30–45 min" : "20 min"};
+  }
+  if(/plank|dead bug|hollow|wall sit|\bhold\b/.test(name)) return {kind:"time", target:"3 × 30 s"};
+  if(/lunge|split squat|step-up|kickback|donkey|per leg|per side/.test(name)) return {kind:"reps", target:"3 × 10 per side"};
+  if(group==="core") return {kind:"reps", target:"3 × 12"};
+  return {kind:"reps", target:"3 × 10"};
+}
+function helperSelected(name){
+  return woDraftMoves.some(m => moveName(m).toLowerCase()===String(name||"").toLowerCase());
+}
+function toggleHelperMove(name){
+  const ex = allExercises().find(e => e.name===name);
+  if(!ex) return;
+  const i = woDraftMoves.findIndex(m => moveName(m).toLowerCase()===ex.name.toLowerCase());
+  if(i>=0) woDraftMoves.splice(i,1);
+  else {
+    const spec = defaultSets(ex);
+    woDraftMoves.push({name:ex.name, group:ex.group, target:spec.target, kind:spec.kind, custom:!!ex.custom});
+  }
+  renderHelperLibrary();
+}
+function renderHelperLibrary(){
+  const chips = $("helperChips");
+  const listEl = $("helperList");
+  if(!chips || !listEl) return;
+  const scroll = listEl.scrollTop;
+  chips.innerHTML = HELPER_CHIPS.map(([id,label])=>'<button type="button" class="chip'+(helperFilter===id?" sel":"")+'" data-helperchip="'+id+'" aria-pressed="'+(helperFilter===id?"true":"false")+'">'+label+'</button>').join("");
+  chips.querySelectorAll("[data-helperchip]").forEach(b=>b.onclick=()=>{ helperFilter=b.dataset.helperchip; renderHelperLibrary(); });
+  const q = String($("helperSearch").value||"").trim().toLowerCase();
+  const list = allExercises().filter(e => helperInChip(e, helperFilter) && (!q || e.name.toLowerCase().includes(q) || groupLabel(e.group).toLowerCase().includes(q)));
+  const note = $("helperNote");
+  if(note) note.textContent = woDraftMoves.length ? woDraftMoves.length+" selected. Tap again to remove one." : "Tap an exercise to add it to this workout.";
+  listEl.innerHTML = list.length ? list.map(e=>{
+    const spec = defaultSets(e);
+    const on = helperSelected(e.name);
+    const badge = e.custom ? " · Custom" : "";
+    return '<button type="button" class="helperhit'+(on?" sel":"")+'" data-helper="'+esc(e.name)+'" aria-pressed="'+(on?"true":"false")+'"><span class="mark" aria-hidden="true"></span><span class="grow"><span class="name">'+esc(e.name)+'</span><span class="meta">'+esc(groupLabel(e.group))+" · "+esc(spec.target)+badge+'</span></span></button>';
+  }).join("") : '<div class="empty">No exercises match.</div>';
+  listEl.querySelectorAll("[data-helper]").forEach(b=>b.onclick=()=>toggleHelperMove(b.dataset.helper));
+  listEl.scrollTop = scroll;
+  const add = $("helperAdd");
+  if(add) add.textContent = woDraftMoves.length ? "Add selected ("+woDraftMoves.length+")" : "Add selected";
+}
+function openHelperLibrary(){
+  if(!signedInTrainer()) return;
+  helperFilter = "all";
+  const box = $("helperLib");
+  if(!box) return;
+  if($("helperSearch")) $("helperSearch").value = "";
+  box.style.display = "flex";
+  renderHelperLibrary();
+}
+function closeHelperLibrary(){
+  const box = $("helperLib");
+  if(box) box.style.display = "none";
+  renderWoBuild();
+}
+function finishHelper(requirePick){
+  if(requirePick && !woDraftMoves.length){ toast("Select an exercise"); return; }
+  closeHelperLibrary();
+}
+$("helperClose").onclick = () => finishHelper(false);
+$("helperAdd").onclick = () => finishHelper(true);
+$("helperSearch").oninput = () => renderHelperLibrary();
+$("helperLib").addEventListener("click", e=>{ if(e.target===$("helperLib")) finishHelper(false); });
+$("woDraftBtn").onclick = () => openHelperLibrary();
 $("woHandBtn").onclick = () => buildByHand();
 
 /* ---------- Weight ---------- */
