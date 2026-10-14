@@ -1223,8 +1223,19 @@ button svg, .navitem svg, .mlrow svg, .yourow svg, .toolicon svg, .menubtn svg, 
 #welcomeFront .band.lav,#welcomeFront .front-meals.band{background:var(--lav)}
 #welcomeFront .front-block,#welcomeFront .front-dark{padding:64px 0}
 .front-features{display:grid;grid-template-columns:1fr;gap:16px;margin-top:8px}
-.featcard{background:#fff;border:1px solid rgba(11,11,57,.12);border-radius:var(--r-lg);padding:24px;box-shadow:var(--e-1)}
-.featcard p{margin:0}
+.featcard{position:relative;isolation:isolate;overflow:hidden;color:#fff;background:#0B0B39;border:none;border-radius:var(--r-lg);padding:24px;min-height:188px;box-shadow:var(--e-1)}
+.featcard::before{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;background-image:var(--tile);background-size:cover;background-position:var(--tile-pos,center);background-repeat:no-repeat}
+.featcard::after{content:"";position:absolute;inset:0;z-index:0;border-radius:inherit;background:linear-gradient(180deg,rgba(11,11,57,.58) 0%,rgba(11,11,57,.68) 100%)}
+.featcard > *{position:relative;z-index:1}
+#welcomeFront .featcard h3,#welcomeFront .featcard p{color:#fff}
+#welcomeFront .featcard p{margin:0;max-width:none}
+#welcomeFront .featcard .tileico{background:rgba(255,255,255,.18);color:#fff}
+.featcard.tile-workouts{--tile:url("images/real_keyta_dumbbell_row_4x5_1080w.webp");--tile-pos:50% 28%}
+.featcard.tile-video{--tile:url("images/welcome-reel-poster.jpg");--tile-pos:50% 30%}
+.featcard.tile-calendar{--tile:url("images/welcome-reel-poster.jpg");--tile-pos:18% 62%}
+.featcard.tile-today{--tile:url("images/real_keyta_dumbbell_loop_poster.jpg");--tile-pos:50% 42%}
+.featcard.tile-meals{--tile:url("images/real_keyta_gym_portrait_4x5_1080w.webp");--tile-pos:50% 68%}
+.featcard.tile-checkin{--tile:url("images/real_keyta_gym_portrait_4x5_1080w.webp");--tile-pos:50% 14%}
 .front-split{display:grid;grid-template-columns:1fr;gap:24px;align-items:center}
 .front-split img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 20%;border-radius:var(--r-lg);background:var(--lav)}
 #welcomeFront .front-dark .btn-secondary{margin:0 0 24px}
@@ -1655,12 +1666,12 @@ details summary::-webkit-details-marker{display:none}
       <h2>The session goes on their phone.</h2>
       <p>A trainer writes the workout, sends a video that stays with that person, and puts the next class on the calendar.</p>
       <div class="front-features" id="frontWork">
-        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9v6M18 9v6M6 12h12M3 8v8M21 8v8"/></svg></span><h3>Workouts</h3><p>Built in the app and kept on the phone.</p></article>
-        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></span><h3>Video</h3><p>A video can be sent to one client.</p></article>
-        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span><h3>Calendar</h3><p>Classes and bookings sit on the calendar.</p></article>
-        <article class="featcard" id="frontBack"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></span><h3>Today's workout</h3><p>Today shows the workout, meals, and water.</p></article>
-        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 3v6M11 3v6"/><path d="M5 11h10a5 5 0 0 1-10 0z"/><path d="M10 16v4"/></svg></span><h3>Meals and macros</h3><p>Calories, carbs, fat, and protein for the day.</p></article>
-        <article class="featcard"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span><h3>Check-in</h3><p>Photos and weight stay with that person.</p></article>
+        <article class="featcard tile-workouts"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9v6M18 9v6M6 12h12M3 8v8M21 8v8"/></svg></span><h3>Workouts</h3><p>Built in the app and kept on the phone.</p></article>
+        <article class="featcard tile-video"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"/><path d="M10 9.5v5l4.5-2.5z"/></svg></span><h3>Video</h3><p>A video can be sent to one client.</p></article>
+        <article class="featcard tile-calendar"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span><h3>Calendar</h3><p>Classes and bookings sit on the calendar.</p></article>
+        <article class="featcard tile-today" id="frontBack"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg></span><h3>Today's workout</h3><p>Today shows the workout, meals, and water.</p></article>
+        <article class="featcard tile-meals"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 3v6M11 3v6"/><path d="M5 11h10a5 5 0 0 1-10 0z"/><path d="M10 16v4"/></svg></span><h3>Meals and macros</h3><p>Calories, carbs, fat, and protein for the day.</p></article>
+        <article class="featcard tile-checkin"><span class="tileico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 8h14v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span><h3>Check-in</h3><p>Photos and weight stay with that person.</p></article>
       </div>
     </section>
     <section class="front-block" id="frontBusiness">
