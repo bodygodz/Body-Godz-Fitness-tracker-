@@ -1,0 +1,14 @@
+{
+  "appId": "com.curlygurl.fitness",
+  "appName": "Curly Gurl Fitness",
+  "webDir": "www",
+  "android": {
+    "minWebViewVersion": 60
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

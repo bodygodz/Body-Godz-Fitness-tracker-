@@ -12777,11 +12777,13 @@ function cleanWearables(raw){
     if(!row || typeof row!=="object") return;
     const status = row.status==="interest" || row.status==="manual" || row.status==="pending" || row.status==="connected" ? row.status : "";
     if(!status) return;
+    const note = String(row.note||"").trim().slice(0, 240);
     out[item.id] = {
       status: status,
       at: Number(row.at)||Date.now(),
       entries: Array.isArray(row.entries) ? row.entries.map(cleanWearEntry).filter(Boolean).slice(0, 30) : []
     };
+    if(note) out[item.id].note = note;
   });
   return out;
 }
@@ -12791,10 +12793,180 @@ function writeWearables(next){
   if(typeof pushMemberProfile==="function") pushMemberProfile({wearables: clean});
   return clean;
 }
+function nativeHealthApp(){
+  try {
+    return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform==="function" && window.Capacitor.isNativePlatform());
+  } catch(e){ return false; }
+}
+function nativeHealthPlugin(){
+  if(!nativeHealthApp() || typeof window.Capacitor.registerPlugin!=="function") return null;
+  if(!nativeHealthPlugin._p) nativeHealthPlugin._p = window.Capacitor.registerPlugin("Health");
+  return nativeHealthPlugin._p;
+}
+function wearBlurb(item){
+  if(!nativeHealthApp() || item.kind!=="phone") return item.blurb;
+  if(item.id==="apple") return "Connect reads Apple Health, including Apple Watch, for the last 14 days.";
+  if(item.id==="samsung") return "Connect reads Health Connect after Samsung Health shares the Galaxy Watch.";
+  return "Connect reads Health Connect, including Wear OS watches, for the last 14 days.";
+}
+function setDayMarker(date, label, text){
+  if(!S.dayNotes || typeof S.dayNotes!=="object") S.dayNotes = {};
+  const prefix = label+":";
+  const lines = String(S.dayNotes[date]||"").split("\n").filter(line=>line.indexOf(prefix)!==0);
+  if(text) lines.push(prefix+" "+text);
+  const next = lines.join("\n").trim();
+  if(next) S.dayNotes[date] = next;
+  else delete S.dayNotes[date];
+}
+let healthSyncBusy = false;
+async function syncNativeHealth(providerId){
+  const item = wearableById(providerId);
+  if(!item || item.kind!=="phone") return;
+  if(healthSyncBusy) return;
+  const Health = nativeHealthPlugin();
+  if(!Health){
+    toast("Health sync needs the phone app");
+    return;
+  }
+  healthSyncBusy = true;
+  try {
+    const avail = await Health.isAvailable();
+    if(avail && avail.available===false){
+      toast(avail.reason ? String(avail.reason) : "Health data is not available on this phone");
+      return;
+    }
+    const auth = await Health.requestAuthorization({
+      read:["steps","workouts","calories","heartRate","sleep","weight"],
+      write:[],
+      requestHistoryAccess:true
+    });
+    const allowed = auth && Array.isArray(auth.readAuthorized) ? auth.readAuthorized : [];
+    const denied = auth && Array.isArray(auth.readDenied) ? auth.readDenied : [];
+    if(!allowed.length && denied.length){
+      toast("Health access was not granted");
+      return;
+    }
+    const end = new Date();
+    const start = new Date(end.getTime() - 14*24*60*60*1000);
+    const startDate = start.toISOString();
+    const endDate = end.toISOString();
+    let stepsDays = 0, calDays = 0, hrDays = 0, sleepDays = 0, weightDays = 0, workoutCount = 0;
+    try {
+      const steps = await Health.queryAggregated({dataType:"steps", startDate:startDate, endDate:endDate, bucket:"day", aggregation:"sum"});
+      (steps.samples||[]).forEach(sample=>{
+        const date = ymd(new Date(sample.startDate));
+        const value = Math.round(Number(sample.value)||0);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || value<=0 || value>200000) return;
+        S.steps[date] = value;
+        stepsDays++;
+      });
+    } catch(e){}
+    try {
+      const cals = await Health.queryAggregated({dataType:"calories", startDate:startDate, endDate:endDate, bucket:"day", aggregation:"sum"});
+      (cals.samples||[]).forEach(sample=>{
+        const date = ymd(new Date(sample.startDate));
+        const value = Math.round(Number(sample.value)||0);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || value<=0 || value>20000) return;
+        setDayMarker(date, "Active calories", value+" kcal");
+        calDays++;
+      });
+    } catch(e){}
+    try {
+      const hr = await Health.queryAggregated({dataType:"heartRate", startDate:startDate, endDate:endDate, bucket:"day", aggregation:"average"});
+      (hr.samples||[]).forEach(sample=>{
+        const date = ymd(new Date(sample.startDate));
+        const value = Math.round(Number(sample.value)||0);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || value<30 || value>230) return;
+        setDayMarker(date, "Heart rate", value+" bpm");
+        hrDays++;
+      });
+    } catch(e){}
+    try {
+      const sleepRes = await Health.readSamples({dataType:"sleep", startDate:startDate, endDate:endDate, limit:500, ascending:true});
+      const minutes = {};
+      (sleepRes.samples||[]).forEach(sample=>{
+        if(sample.sleepState==="awake") return;
+        const date = ymd(new Date(sample.endDate || sample.startDate));
+        const mins = Number(sample.value);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isFinite(mins) || mins<=0) return;
+        minutes[date] = (minutes[date]||0) + mins;
+      });
+      const sleepRows = (loadYou().sleep||[]).slice();
+      Object.keys(minutes).forEach(date=>{
+        const hours = r1(minutes[date]/60);
+        if(hours<=0 || hours>24) return;
+        setDayMarker(date, "Sleep", hours+" h");
+        const ex = sleepRows.find(row=>row && row.date===date && String(row.note||"").indexOf("Health")===0);
+        if(ex) ex.hours = hours;
+        else sleepRows.push({id:uid(), date:date, hours:hours, note:"Health sync"});
+        sleepDays++;
+      });
+      saveYou({sleep: sleepRows.slice(-60)});
+    } catch(e){}
+    try {
+      const weight = await Health.queryAggregated({dataType:"weight", startDate:startDate, endDate:endDate, bucket:"day", aggregation:"average"});
+      (weight.samples||[]).forEach(sample=>{
+        const date = ymd(new Date(sample.startDate));
+        const kg = Number(sample.value);
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isFinite(kg) || kg<=0 || kg>500) return;
+        const lbs = r1(kg * 2.2046226218);
+        if(!(lbs>0)) return;
+        const ex = (S.weights||[]).find(row=>row.date===date);
+        if(ex) ex.lbs = lbs;
+        else S.weights.push({id:uid(), date:date, lbs:lbs});
+        weightDays++;
+        if(typeof clientView==="function" && clientView() && ID.activePairId && typeof Link!=="undefined" && Link.saveWeighIn){
+          Link.saveWeighIn(ID.activePairId, {weight:lbs, date:date, note:"Health sync"}).catch(()=>{});
+        }
+      });
+    } catch(e){}
+    try {
+      const wo = await Health.queryWorkouts({startDate:startDate, endDate:endDate, limit:100, ascending:true});
+      const byDate = {};
+      (wo.workouts||[]).forEach(row=>{
+        const date = ymd(new Date(row.startDate));
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+        const mins = Math.round((Number(row.duration)||0)/60);
+        const type = String(row.workoutType||"workout");
+        const kcal = hasNum(row.totalEnergyBurned) ? Math.round(Number(row.totalEnergyBurned)) : null;
+        const line = "Health workout: "+type+(mins>0?" · "+mins+" min":"")+(kcal!=null && kcal>0?" · "+kcal+" kcal":"");
+        if(!byDate[date]) byDate[date] = [];
+        byDate[date].push(line);
+        workoutCount++;
+      });
+      Object.keys(byDate).forEach(date=>{
+        const row = ensureWo(date);
+        const kept = String(row.notes||"").split("\n").filter(line=>line.indexOf("Health workout:")!==0);
+        row.notes = kept.concat(byDate[date]).join("\n").trim();
+      });
+    } catch(e){}
+    save();
+    const links = cleanWearables(loadYou().wearables);
+    const prev = links[providerId] || {entries:[]};
+    const bits = [];
+    if(stepsDays) bits.push(stepsDays+" day"+(stepsDays===1?"":"s")+" of steps");
+    if(workoutCount) bits.push(workoutCount+" workout"+(workoutCount===1?"":"s"));
+    if(calDays) bits.push("active calories");
+    if(hrDays) bits.push("heart rate");
+    if(sleepDays) bits.push("sleep");
+    if(weightDays) bits.push("weight");
+    const note = bits.length ? "Synced "+bits.join(", ") : "Synced. No readings in the last 14 days.";
+    links[providerId] = {status:"connected", at:Date.now(), entries:prev.entries||[], note:note};
+    writeWearables(links);
+    if(typeof render==="function") render();
+    refreshYou();
+    toast(note);
+  } catch(e){
+    toast("Health access was not granted");
+  } finally {
+    healthSyncBusy = false;
+  }
+}
 function wearState(item, link){
-  if(link && link.status==="connected") return "Connected";
+  if(item.kind==="phone" && !nativeHealthApp()) return "Needs the phone app (coming soon)";
+  if(link && link.status==="connected") return link.note ? String(link.note) : "Connected";
   if(link && link.status==="pending") return "Sign-in started. The token exchange is not finished.";
-  if(item.kind==="phone") return "Needs the phone app (coming soon)";
+  if(item.kind==="phone") return "Ready to connect";
   if(item.kind==="oauth" && wearableClientId(item.id)) return link && link.status==="interest" ? "Interest saved" : "Not connected";
   if(link && link.status==="interest") return "Coming soon · interest saved";
   return "Coming soon";
@@ -12819,6 +12991,10 @@ function wearCard(item, link){
   const buttons = [];
   if(item.kind==="phone"){
     const open = wearOpenId===item.id;
+    if(nativeHealthApp()){
+      const label = link && link.status==="connected" ? "Sync" : "Connect";
+      buttons.push('<button type="button" class="primary" data-wearhealth="'+esc(item.id)+'">'+label+'</button>');
+    }
     buttons.push('<button type="button" data-wearmanual="'+esc(item.id)+'" aria-expanded="'+(open?"true":"false")+'">'+(open?"Hide entry":"Enter manually")+'</button>');
   } else if(link && link.status==="connected"){
     buttons.push('<button type="button" data-wearclear="'+esc(item.id)+'">Disconnect</button>');
@@ -12833,7 +13009,7 @@ function wearCard(item, link){
   const action = buttons.join("");
   const entries = link && link.entries ? link.entries.map(entry=>'<div class="wearentry"><div class="grow"><div class="name">'+esc(wearEntryLine(entry))+'</div><div class="meta">Entered by you</div></div><button type="button" class="x" data-weardel="'+esc(entry.id)+'" data-wearprov="'+esc(item.id)+'" aria-label="Remove entry">×</button></div>').join("") : "";
   const form = item.kind==="phone" && wearOpenId===item.id ? wearManualForm(item) : "";
-  return '<article class="wearcard" data-wearcard="'+esc(item.id)+'"><div class="wearhead"><span class="wearico" aria-hidden="true"><svg viewBox="0 0 24 24">'+icon+'</svg></span><div class="grow"><b>'+esc(item.name)+'</b><span class="wearstate">'+esc(wearState(item, link))+'</span></div></div><p>'+esc(item.blurb)+'</p>'+(action?'<div class="wearacts">'+action+'</div>':"")+form+entries+'</article>';
+  return '<article class="wearcard" data-wearcard="'+esc(item.id)+'"><div class="wearhead"><span class="wearico" aria-hidden="true"><svg viewBox="0 0 24 24">'+icon+'</svg></span><div class="grow"><b>'+esc(item.name)+'</b><span class="wearstate">'+esc(wearState(item, link))+'</span></div></div><p>'+esc(wearBlurb(item))+'</p>'+(action?'<div class="wearacts">'+action+'</div>':"")+form+entries+'</article>';
 }
 function devicesHtml(y){
   const links = cleanWearables(y.wearables);
@@ -12843,7 +13019,10 @@ function devicesHtml(y){
     return '<li><div class="grow"><div class="name">'+esc(d.name)+'</div><div class="meta">'+(picks?esc(picks)+" chosen":"Saved")+'</div><p data-devid="'+esc(d.id)+'">'+esc(deviceStatus(d))+'</p></div><button type="button" class="x" data-youdel="devices" data-id="'+esc(d.id)+'" aria-label="Remove">×</button></li>';
   }).join("");
   const legacy = named ? '<div class="card wearnamed"><p>Devices you named earlier.</p><ul class="list">'+named+'</ul></div>' : "";
-  return '<div class="card wearintro"><p>A web page cannot read Apple Health or Health Connect. Strava, Garmin, and Fitbit can connect when a client ID is set. Nothing here is marked connected until that service finishes its token exchange.</p></div><div class="wearlist">'+cards+'</div>'+legacy;
+  const intro = nativeHealthApp()
+    ? "Connect reads the last 14 days of steps, workouts, active calories, heart rate, sleep, and weight into your diary."
+    : "A web page cannot read Apple Health or Health Connect. Strava, Garmin, and Fitbit can connect when a client ID is set. Nothing here is marked connected until that service finishes its token exchange.";
+  return '<div class="card wearintro"><p>'+esc(intro)+'</p></div><div class="wearlist">'+cards+'</div>'+legacy;
 }
 function wearableRedirectUri(){
   return location.origin + location.pathname;
@@ -13412,6 +13591,8 @@ function onYouClick(e){
     refreshYou();
     return;
   }
+  const wearHealth = e.target.closest("[data-wearhealth]");
+  if(wearHealth){ syncNativeHealth(wearHealth.dataset.wearhealth); return; }
   const wearAsk = e.target.closest("[data-wearask]");
   if(wearAsk){ askWearable(wearAsk.dataset.wearask); return; }
   const wearConnect = e.target.closest("[data-wearconnect]");
