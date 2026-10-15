@@ -3459,10 +3459,104 @@ const GROUPS = [
 ];
 const GROUP_IDS = GROUPS.map(g=>g[0]);
 function groupLabel(id){ const g=GROUPS.find(x=>x[0]===id); return g?g[1]:""; }
+const GROUP_ALIAS = {
+  chest:"chest", pec:"chest", pecs:"chest",
+  back:"back", lat:"back", lats:"back",
+  shoulder:"shoulders", shoulders:"shoulders", delt:"shoulders", delts:"shoulders",
+  arm:"arms", arms:"arms", bicep:"arms", biceps:"arms", tricep:"arms", triceps:"arms",
+  leg:"legs", legs:"legs", quad:"legs", quads:"legs", hamstring:"legs", hamstrings:"legs", calf:"legs", calves:"legs",
+  glute:"glutes", glutes:"glutes",
+  core:"core", ab:"core", abs:"core",
+  cardio:"cardio",
+  full:"full", fullbody:"full", "full body":"full", "full-body":"full"
+};
+function aliasHit(raw){
+  if(GROUP_ALIAS[raw]) return GROUP_ALIAS[raw];
+  const tight = raw.replace(/[\s-]+/g, "");
+  if(GROUP_ALIAS[tight]) return GROUP_ALIAS[tight];
+  const one = raw.replace(/s$/, "");
+  if(GROUP_ALIAS[one]) return GROUP_ALIAS[one];
+  const hit = GROUPS.find(g => g[0]===raw || g[1].toLowerCase()===raw);
+  return hit ? hit[0] : "";
+}
+function canonicalGroup(value){
+  const raw = String(value||"").trim().toLowerCase().replace(/[_]+/g, " ").replace(/\s+/g, " ");
+  if(!raw || raw==="all") return raw==="all" ? "all" : "";
+  const direct = aliasHit(raw);
+  if(direct) return direct;
+  const parts = raw.split(/[/,&+]|\band\b/).map(part=>part.trim()).filter(Boolean);
+  for(let i=0;i<parts.length;i++){
+    const hit = aliasHit(parts[i]);
+    if(hit) return hit;
+  }
+  return "";
+}
+function chosenGroup(raw){
+  const id = String(raw||"").trim().toLowerCase();
+  if(id==="all" || id==="upper" || id==="lower") return id;
+  return canonicalGroup(id) || canonicalGroup(String(raw||"").trim()) || "all";
+}
 const GROUP_PHOTO = {chest:"chest", back:"back", shoulders:"shoulders", arms:"arms", legs:"legs", glutes:"glutes", core:"core", cardio:"cardio", full:"fullbody"};
 function groupPhoto(group){
-  return "images/groups/"+(GROUP_PHOTO[group] || "fullbody")+".jpg";
+  const id = canonicalGroup(group) || "full";
+  return "images/groups/"+(GROUP_PHOTO[id] || "fullbody")+".jpg";
 }
+const GROUP_FILL = {
+  chest:[
+    {name:"Decline push-up", cue:"Feet up, hands under shoulders, lower the chest, then press back up."},
+    {name:"Cable chest press", cue:"Elbows soft, press the handles forward, and squeeze the chest."},
+    {name:"Dumbbell pullover", cue:"Ribs down, arc the dumbbell from overhead to the chest."},
+    {name:"Squeeze press", cue:"Press the dumbbells together as you push them up over the chest."}
+  ],
+  back:[
+    {name:"Straight-arm pulldown", cue:"Arms stay nearly straight, pull the bar to your thighs, then reach back up."},
+    {name:"Chest-supported row", cue:"Chest on the bench, pull the weights toward your hips."},
+    {name:"Superman", cue:"Lift arms and legs off the floor, pause, then lower slowly."},
+    {name:"Band pull-apart", cue:"Arms straight, pull the band apart until it touches your chest."}
+  ],
+  shoulders:[
+    {name:"Upright row", cue:"Pull the weight up toward your collarbone, elbows lead."},
+    {name:"Shrug", cue:"Lift the shoulders straight up, pause, and lower without rolling."},
+    {name:"Pike push-up", cue:"Hips high, bend the elbows, and lower the head toward the floor."},
+    {name:"Cuban press", cue:"Rotate the shoulders as you press from the upright row to overhead."}
+  ],
+  arms:[
+    {name:"Concentration curl", cue:"Elbow braced, curl the weight up without swinging."},
+    {name:"Diamond push-up", cue:"Hands together under the chest, elbows close, lower and press."},
+    {name:"Bench dip", cue:"Hands on the bench, lower until the elbows are near 90°, then press."},
+    {name:"Reverse curl", cue:"Palms down, curl without letting the elbows drift forward."}
+  ],
+  legs:[
+    {name:"Front squat", cue:"Weight at the shoulders, sit down between the hips, then stand tall."},
+    {name:"Walking lunge", cue:"Step forward, drop the back knee, and keep the front heel down."},
+    {name:"Wall sit", cue:"Back on the wall, thighs near parallel, hold a steady brace."},
+    {name:"Leg extension", cue:"Straighten the knees, pause, and lower without letting the stack slam."}
+  ],
+  glutes:[
+    {name:"Frog pump", cue:"Soles together, drive the hips up, and squeeze the glutes."},
+    {name:"Side-lying abduction", cue:"Lie on your side, lift the top leg, and keep the hips stacked."},
+    {name:"Sumo squat", cue:"Toes out, sit down between the knees, then stand and squeeze."},
+    {name:"Single-leg glute bridge", cue:"One heel down, drive the hips up, and keep the ribs tucked."}
+  ],
+  core:[
+    {name:"Side plank", cue:"Elbow under the shoulder, hips lifted, body in one line."},
+    {name:"Hollow hold", cue:"Low back pressed down, arms and legs reaching, ribs tucked."},
+    {name:"Dead hang", cue:"Hang from the bar with the shoulders packed and the ribs down."},
+    {name:"Heel tap", cue:"Shoulders up, tap the heels side to side, and keep the low back down."}
+  ],
+  cardio:[
+    {name:"Stair climb", cue:"Light hands if you need the rails, steady steps, easy breathing."},
+    {name:"Elliptical", cue:"Tall posture, smooth circles, a pace you can keep talking through."},
+    {name:"Battle ropes", cue:"Soft knees, waves from the shoulders, keep the core braced."},
+    {name:"High knees", cue:"Quick light steps, knees toward hip height, stay tall."}
+  ],
+  full:[
+    {name:"Squat to press", cue:"Squat with the weights at the shoulders, then drive them overhead."},
+    {name:"Devil press", cue:"Swing the weights through to a push-up, then jump them overhead."},
+    {name:"Bear crawl", cue:"Knees hover, move opposite hand and foot, hips stay low."},
+    {name:"Burpee broad jump", cue:"Chest down, hop in, then jump forward and land softly."}
+  ]
+};
 function groupPhotoImg(group){
   return '<img class="gphoto-bg" alt="" src="'+esc(groupPhoto(group))+'" loading="lazy" decoding="async">';
 }
@@ -3627,7 +3721,7 @@ function normalizeCustomExercises(list){
     if(!e || typeof e!=="object") return null;
     const name=String(e.name||"").trim();
     if(!name) return null;
-    const group=GROUP_IDS.includes(e.group)?e.group:"full";
+    const group=canonicalGroup(e.group) || "full";
     const video=e.video?String(e.video):"";
     return {id:String(e.id||nid()), name, group, cue:e.cue?String(e.cue):"", video};
   }).filter(Boolean);
@@ -6425,9 +6519,21 @@ function weekDates(){
   const mon=new Date(t); mon.setDate(t.getDate()-dow);
   return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return ymd(d); });
 }
+function exerciseGroup(ex){
+  return canonicalGroup(ex && ex.group) || "full";
+}
 function allExercises(){
-  return LIBRARY.map(e=>({name:e.name, group:e.group, cue:e.cue||"", video:"", custom:false}))
-    .concat((S.customExercises||[]).map(e=>({name:e.name, group:e.group, cue:e.cue||"", video:e.video||"", custom:true, id:e.id})));
+  const list = LIBRARY.map(e=>({name:e.name, group:exerciseGroup(e), cue:e.cue||"", video:"", custom:false}))
+    .concat((S.customExercises||[]).map(e=>({name:e.name, group:exerciseGroup(e), cue:e.cue||"", video:e.video||"", custom:true, id:e.id})));
+  GROUP_IDS.forEach(id=>{
+    const extras = GROUP_FILL[id] || [];
+    extras.forEach(extra=>{
+      if(list.filter(e=>e.group===id).length>=4) return;
+      if(list.some(e=>e.name.toLowerCase()===String(extra.name||"").toLowerCase())) return;
+      list.push({name:extra.name, group:id, cue:extra.cue||"", video:"", custom:false});
+    });
+  });
+  return list;
 }
 function findExercise(name){
   const n=String(name||"").trim().toLowerCase();
@@ -6719,7 +6825,8 @@ function matchesQuery(e, q){
 }
 function filteredExercises(group, q){
   const query=String(q||"").trim().toLowerCase();
-  return allExercises().filter(e=>(group==="all"||e.group===group) && matchesQuery(e, query));
+  const want = !group || group==="all" ? "all" : (canonicalGroup(group) || "");
+  return allExercises().filter(e=>(want==="all" || e.group===want) && matchesQuery(e, query));
 }
 function renderLibrary(){
   $("hdrTitle").textContent = "Exercise library";
@@ -6731,11 +6838,12 @@ function renderLibrary(){
   }
   const chips=[["all","All"]].concat(GROUPS);
   $("libGroups").innerHTML = groupFilterHtml(chips, libGroup, "data-libgroup");
-  $("libGroups").querySelectorAll("[data-libgroup]").forEach(b=>b.onclick=()=>{ libGroup=b.dataset.libgroup; renderLibrary(); });
+  $("libGroups").querySelectorAll("[data-libgroup]").forEach(b=>b.onclick=()=>{ libGroup=chosenGroup(b.dataset.libgroup); renderLibrary(); });
   const list=filteredExercises(libGroup, $("libSearch").value);
   if(!list.length){ $("libList").innerHTML='<div class="empty">No exercises match.</div>'; return; }
   const parts=[];
-  const groups=libGroup==="all"?GROUPS.filter(g=>list.some(e=>e.group===g[0])):GROUPS.filter(g=>g[0]===libGroup);
+  const shownGroup = libGroup==="all" ? "all" : (canonicalGroup(libGroup) || "");
+  const groups=shownGroup==="all"?GROUPS.filter(g=>list.some(e=>e.group===g[0])):GROUPS.filter(g=>g[0]===shownGroup);
   groups.forEach(([id,label])=>{
     const items=list.filter(e=>e.group===id);
     if(!items.length) return;
@@ -6893,7 +7001,7 @@ function setPickKind(kind){
 function renderPicker(){
   const chips=[["all","All"]].concat(GROUPS);
   $("pickerGroups").innerHTML = groupFilterHtml(chips, pickGroup, "data-pickgroup");
-  $("pickerGroups").querySelectorAll("[data-pickgroup]").forEach(b=>b.onclick=()=>{ pickGroup=b.dataset.pickgroup; renderPicker(); });
+  $("pickerGroups").querySelectorAll("[data-pickgroup]").forEach(b=>b.onclick=()=>{ pickGroup=chosenGroup(b.dataset.pickgroup); renderPicker(); });
   const list=filteredExercises(pickGroup, $("pickerSearch").value);
   $("pickerResults").innerHTML = list.length ? list.map(e=>`<button type="button" class="pickhit gtile" data-pick="${esc(e.name)}">${groupPhotoImg(e.group)}<div><div class="name">${esc(e.name)}${e.custom?'<span class="badge">Custom</span>':""}</div><div class="meta">${esc(groupLabel(e.group))}${e.cue?" · "+esc(e.cue):""}</div></div></button>`).join("") : '<div class="empty">No exercises match.</div>';
   $("pickerResults").querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{
@@ -7397,11 +7505,12 @@ function moveMeta(m, blank){
   return muscle ? muscle+" · "+target : target;
 }
 function helperInChip(ex, chip){
-  if(!chip || chip==="all") return true;
-  if(chip==="upper") return ex.group==="chest" || ex.group==="back" || ex.group==="shoulders" || ex.group==="arms";
-  if(chip==="lower") return ex.group==="legs" || ex.group==="glutes";
-  if(chip==="full") return ex.group==="full";
-  return ex.group===chip;
+  const group = exerciseGroup(ex);
+  const want = chosenGroup(chip);
+  if(!want || want==="all") return true;
+  if(want==="upper") return group==="chest" || group==="back" || group==="shoulders" || group==="arms";
+  if(want==="lower") return group==="legs" || group==="glutes";
+  return group===want;
 }
 function defaultSets(ex){
   const name = String(ex && ex.name || "").toLowerCase();
@@ -7434,7 +7543,7 @@ function renderHelperLibrary(){
   if(!chips || !listEl) return;
   const scroll = listEl.scrollTop;
   chips.innerHTML = groupFilterHtml(HELPER_CHIPS, helperFilter, "data-helperchip");
-  chips.querySelectorAll("[data-helperchip]").forEach(b=>b.onclick=()=>{ helperFilter=b.dataset.helperchip; renderHelperLibrary(); });
+  chips.querySelectorAll("[data-helperchip]").forEach(b=>b.onclick=()=>{ helperFilter=chosenGroup(b.dataset.helperchip); renderHelperLibrary(); });
   const q = String($("helperSearch").value||"").trim().toLowerCase();
   const list = allExercises().filter(e => helperInChip(e, helperFilter) && (!q || e.name.toLowerCase().includes(q) || groupLabel(e.group).toLowerCase().includes(q)));
   const note = $("helperNote");
