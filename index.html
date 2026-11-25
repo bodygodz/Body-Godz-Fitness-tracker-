@@ -1,10 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" style="background-color:#FFFFFF">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#FFFFFF">
+<meta name="color-scheme" content="light">
 <style>html,body{background-color:#FFFFFF}</style>
+<script>
+/* Paint the saved theme before the first frame. Login stays light until the app opens. */
+(function(){
+  try {
+    var v = localStorage.getItem("curlyGirlFitness.theme.v1") || "";
+    var dark = v === "dark" || (v === "system" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    if(!dark) return;
+    document.documentElement.classList.add("theme-dark");
+    document.documentElement.style.colorScheme = "dark";
+  } catch(e) {}
+})();
+</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1678,6 +1691,179 @@ body:not(.welcome-on) .wotype.sel{background:#E6E2F0 !important;border-color:#6E
 .pickhit.gtile{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:12px 14px;margin:0 0 8px;min-height:76px;color:#fff !important}
 .pickhit.gtile .name{color:#fff !important}
 .pickhit.gtile .meta{color:rgba(255,255,255,.88) !important;white-space:normal}
+</style>
+<style id="app-appearance">
+/* Dark theme. Light rules above are unchanged. Login (.welcome-on) stays linen. */
+html.theme-dark:not(:has(body.welcome-on)){
+  background-color:#0B0B39 !important;
+  color-scheme:dark;
+}
+html.theme-dark body.theme-dark:not(.welcome-on){
+  --bg:#0B0B39; --card:#1A1744; --card2:#221E52; --line:rgba(244,241,250,.16);
+  --text:#F4F1FA; --muted:rgba(244,241,250,.70); --text-2:rgba(244,241,250,.72); --text-3:rgba(244,241,250,.55);
+  --navy:#F4F1FA; --lav:#2A265C; --hair:rgba(244,241,250,.14);
+  --field-border:rgba(244,241,250,.38); --fill-1:rgba(244,241,250,.10);
+  --accent:#C4B6E4; --accent2:#C4B6E4;
+  --accent-08:rgba(196,182,228,.16); --accent-16:rgba(196,182,228,.30);
+  --focus:0 0 0 3px #0B0B39,0 0 0 5px #C4B6E4;
+  --e-1:0 1px 2px rgba(0,0,0,.45); --e-2:0 8px 24px rgba(0,0,0,.45);
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+  background-color:#0B0B39 !important;
+  background-image:none !important;
+  color:#F4F1FA !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :where(:not(.gchip):not(.gtile):not(.video-tile):not(.primary):not(.btn-primary):not(.menuaction):not(.tabplus):not(.foodplus):not(.toolplus):not(.ovadd):not(.ps-btn):not(.cfcount):not(img):not(video):not(canvas)){
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:rgba(244,241,250,.18);
+  background-color:transparent !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(header,#hdrTitle,.screentitle,#todayPick,#noteBell,.menubtn,.icon-btn){
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(header,.tabbar,.navmenu,.sheetbar,#menuLogout){
+  background-color:#0B0B39 !important;
+  background-image:none !important;
+  color:#F4F1FA !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.card,.stat,.dcard,.promptcard,.setupcard,.qcard,.sessioncard,.noterow,.gatebox,.modalbox,.foodsheet,.foodrow,.wearcard,.wocard,.wotype,.worow,.tmcard,.tmpdf,.calitem,.helperhit,.morepop,.askbubble,.ovcard,.ovact,.ovfilter,.week div,.macros div,.cgclient,.findbox,.foodlog,.toolpanel,.askday,.list.card,.bubble){
+  background-color:#1A1744 !important;
+  background-image:none !important;
+  color:#F4F1FA !important;
+  border-color:rgba(244,241,250,.16) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,.btn-secondary,.iconback,.findhits button,.addpick){
+  background-color:#221E52 !important;
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:rgba(244,241,250,.32) !important;
+  color-scheme:dark;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) select{
+  background-color:#221E52 !important;
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:rgba(244,241,250,.32) !important;
+  color-scheme:dark;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23F4F1FA' stroke-width='1.75'%3E%3Cpath d='M5 8l5 5 5-5'/%3E%3C/svg%3E") !important;
+  background-repeat:no-repeat !important;
+  background-position:right 14px center !important;
+  background-size:20px !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) ::placeholder{
+  color:rgba(244,241,250,.55) !important;
+  -webkit-text-fill-color:rgba(244,241,250,.55);
+  opacity:1;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) input:-webkit-autofill{
+  -webkit-text-fill-color:#F4F1FA !important;
+  caret-color:#F4F1FA;
+  box-shadow:0 0 0 1000px #221E52 inset !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(button:disabled,button[aria-disabled="true"],.btn:disabled){
+  background:rgba(244,241,250,.10) !important;
+  color:rgba(244,241,250,.40) !important;
+  -webkit-text-fill-color:rgba(244,241,250,.40);
+  border-color:transparent !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(#csteps button,#page-overview .ovfilterbtn,.chip,button.chip,.stepper button){
+  background-color:#221E52 !important;
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:rgba(244,241,250,.32) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(#subbar button.sel,#modePicks button.sel,#clientFile .cftabs button.sel,#clientFile .cffoot button.sel,.eventfilters button.sel,.segment button.sel,.segment button.chip.sel,#page-overview .ovsections button.sel,.wotype.sel,.wocard.sel,.tmcard.sel,.mlrow.sel,.navmenu .navitem.active){
+  background-color:#3C366F !important;
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:#C4B6E4 !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.chip.sel,button.chip.sel,.chip[aria-pressed="true"],.calgrid button.sel,.rolepick button.sel,.yesno button.sel){
+  background:#6E5F96 !important;
+  background-color:#6E5F96 !important;
+  color:#fff !important;
+  -webkit-text-fill-color:#fff;
+  border-color:#6E5F96 !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.tabpill button.sel,.themerow.sel,.themerow .mark,.linkish,.cflink,.cgadd,.logplus,#menuLogout,#logOutBtn,a){
+  color:#C4B6E4 !important;
+  -webkit-text-fill-color:#C4B6E4;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.tabpill button,#subbar button,#modePicks button,.eventfilters button,#clientFile .cftabs button,#clientFile .cffoot button,.yourow,.themerow,.navmenu .navitem,.mlrow,.menulogout){
+  background-color:transparent !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) .tabpill button.sel svg{
+  background:rgba(196,182,228,.28);
+}
+html.theme-dark body.theme-dark:not(.welcome-on) input[type=checkbox]{
+  background:#221E52 !important;
+  border-color:rgba(244,241,250,.45) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) input[type=checkbox]:checked{
+  background:#6E5F96 !important;
+  border-color:#6E5F96 !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) svg{stroke:currentColor}
+html.theme-dark body.theme-dark:not(.welcome-on) svg [fill="#0B0B39"],
+html.theme-dark body.theme-dark:not(.welcome-on) svg [fill="#0b0b39"]{fill:currentColor !important}
+html.theme-dark body.theme-dark:not(.welcome-on) .banner{
+  background:#3A2E12 !important;
+  color:#F6D48A !important;
+  -webkit-text-fill-color:#F6D48A;
+  border-color:#8A6A22 !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) .bar{background:rgba(244,241,250,.16) !important}
+html.theme-dark body.theme-dark:not(.welcome-on) .bar>div{background:#C4B6E4 !important}
+html.theme-dark body.theme-dark:not(.welcome-on) .bar.over>div{background:#fb7185 !important}
+html.theme-dark body.theme-dark:not(.welcome-on) .pill{
+  background:rgba(196,182,228,.20) !important;
+  color:#C4B6E4 !important;
+  -webkit-text-fill-color:#C4B6E4;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.pill.ok,.badge--done){
+  background:rgba(196,182,228,.22) !important;
+  color:#C4B6E4 !important;
+  -webkit-text-fill-color:#C4B6E4;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.pill.no,.badge--todo){
+  background:rgba(244,241,250,.10) !important;
+  color:rgba(244,241,250,.75) !important;
+  -webkit-text-fill-color:rgba(244,241,250,.75);
+}
+html.theme-dark body.theme-dark:not(.welcome-on) button:not(.sel):not([aria-pressed="true"]){
+  border-color:rgba(244,241,250,.38) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.btn-secondary,.iconback,#todayPick){
+  background-color:transparent !important;
+  background-image:none !important;
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:rgba(244,241,250,.45) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) #todayPick{
+  background-color:rgba(244,241,250,.12) !important;
+  border-color:transparent !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) .themerow,
+html.theme-dark body.theme-dark:not(.welcome-on) .themerow.sel{
+  border-color:rgba(244,241,250,.38) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) .weekdots button{
+  background:transparent !important;
+  color:#F4F1FA !important;
+  -webkit-text-fill-color:#F4F1FA;
+  border-color:rgba(244,241,250,.45) !important;
+}
+html.theme-dark body.theme-dark:not(.welcome-on) .weekdots .dot.on{background:#C4B6E4 !important}
+html.theme-dark body.theme-dark:not(.welcome-on) :is(.empty::before,.ovempty::before,.sessionempty::before,.cgempty::before,.cfempty::before,.findempty::before,.foodlog-empty::before){
+  background-color:#2A265C !important;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='none' stroke='%23F4F1FA' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'><rect x='5' y='4' width='14' height='16' rx='2'/><path d='M8 9h8M8 13h5'/></svg>") !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+  background-size:24px !important;
+}
 </style>
 </head>
 <body class="welcome-on front-on">
@@ -7642,14 +7828,17 @@ function drawChart(ws, goal){
   if(typeof Chart==="undefined"){ $("wChartEmpty").style.display=""; $("wChartEmpty").textContent="Chart unavailable offline (Chart.js didn't load). Your data is safe."; return; }
   const labels = ws.map(w=>fmtDate(w.date,{month:"short",day:"numeric"}));
   const data = ws.map(w=>w.lbs);
+  const ink = themeIsDark() ? "#F4F1FA" : "#0B0B39";
+  const grid = themeIsDark() ? "rgba(244,241,250,.14)" : "rgba(11,11,57,.08)";
+  const goalInk = themeIsDark() ? "#C4B6E4" : "#0B0B39";
   const datasets=[{label:"Weight", data, borderColor:"#8A7BB0", backgroundColor:"rgba(138,123,176,.2)", fill:true, tension:.3, pointRadius:3, pointBackgroundColor:"#8A7BB0", borderWidth:2.5}];
-  if(goal) datasets.push({label:"Goal", data:ws.map(()=>goal), borderColor:"#0B0B39", borderDash:[6,5], pointRadius:0, borderWidth:1.5, fill:false});
+  if(goal) datasets.push({label:"Goal", data:ws.map(()=>goal), borderColor:goalInk, borderDash:[6,5], pointRadius:0, borderWidth:1.5, fill:false});
   const vals = data.concat(goal?[goal]:[]);
   const min=Math.floor((Math.min(...vals)-1)/5)*5, max=Math.ceil((Math.max(...vals)+1)/5)*5;
   const cfg = {type:"line", data:{labels, datasets}, options:{responsive:true, maintainAspectRatio:false, animation:false,
-    plugins:{legend:{display:!!goal, labels:{color:"#0B0B39", boxWidth:12}}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y} lb`}}},
-    scales:{x:{ticks:{color:"#0B0B39", maxRotation:0, autoSkip:true, maxTicksLimit:6}, grid:{color:"rgba(11,11,57,.08)"}},
-            y:{min, max, ticks:{color:"#0B0B39"}, grid:{color:"rgba(11,11,57,.08)"}}}}};
+    plugins:{legend:{display:!!goal, labels:{color:ink, boxWidth:12}}, tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y} lb`}}},
+    scales:{x:{ticks:{color:ink, maxRotation:0, autoSkip:true, maxTicksLimit:6}, grid:{color:grid}},
+            y:{min, max, ticks:{color:ink}, grid:{color:grid}}}}};
   if(chart){ chart.destroy(); }
   chart = new Chart($("wChart"), cfg);
 }
@@ -12560,12 +12749,28 @@ function themeIsDark(){
 }
 function applyTheme(){
   const dark = themeIsDark();
-  document.body.classList.toggle("theme-dark", dark);
   const welcome = document.body.classList.contains("welcome-on");
-  const bg = (!welcome && dark) ? "#FFFFFF" : "#FFFFFF";
+  const showDark = dark && !welcome;
+  document.documentElement.classList.toggle("theme-dark", showDark);
+  document.body.classList.toggle("theme-dark", showDark);
+  const bg = showDark ? "#0B0B39" : "#FFFFFF";
+  const scheme = showDark ? "dark" : "light";
   document.documentElement.style.backgroundColor = bg;
+  document.documentElement.style.colorScheme = scheme;
+  if(document.body){
+    document.body.style.backgroundColor = welcome ? "" : bg;
+    document.body.style.colorScheme = scheme;
+  }
   const meta = document.querySelector('meta[name="theme-color"]');
   if(meta) meta.setAttribute("content", bg);
+  let cs = document.querySelector('meta[name="color-scheme"]');
+  if(!cs){
+    cs = document.createElement("meta");
+    cs.setAttribute("name", "color-scheme");
+    document.head.appendChild(cs);
+  }
+  cs.setAttribute("content", scheme);
+  if(!welcome && currentTab==="weight") renderWeight();
 }
 function setTheme(choice){
   const next = choice==="light" || choice==="dark" ? choice : "system";
